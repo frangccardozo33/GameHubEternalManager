@@ -179,7 +179,7 @@
   }
   // Aspecto extra de la carta (cortes, barbas, accesorios, poses del módulo cardlook.js). Determinista por jugador: no consume el RNG del mundo.
   const LOOK = {
-    hair: ['mohicano', 'afro', 'rulos', 'trenzas', 'rastas', 'melena', 'colita', 'mono', 'rodete', 'flequillo', 'jopo', 'undercut', 'degradado', 'engominado', 'raya', 'puas', 'media', 'taza', 'trencitas', 'corona'],
+    hair: ['mohicano', 'afro', 'rulos', 'trenzas', 'rastas', 'melena', 'colita', 'mono', 'rodete', 'flequillo', 'jopo', 'undercut', 'degradado', 'engominado', 'raya', 'puas', 'media', 'taza', 'trencitas', 'corona', 'buzz', 'crop', 'librito', 'mullet', 'texturizado', 'cresta', 'edgar', 'rulosfade', 'brocoli', 'twists', 'manbun', 'mediacola', 'disenio', 'hightop', 'crop', 'texturizado', 'buzz', 'degradado'],
     beard: ['completa', 'corta', 'sombra', 'larga', 'vikinga', 'canosa', 'desprolija', 'candado', 'perilla', 'chivera', 'chivo', 'mosca', 'herradura', 'anclada', 'bigote', 'manubrio', 'fumanchu', 'mostacho', 'patillas', 'chuletas'],
     acc: ['vincha', 'vinchaancha', 'bandana', 'gorrolana', 'munequera', 'cadena', 'aros', 'snood', 'mascaranariz', 'pinturaojos', 'rodillera', 'mangalarga'],
     pose: ['cruzado', 'cintura', 'patada', 'cabezazo', 'punos', 'saludo', 'rodilla', 'gambeta', 'escudo'],
