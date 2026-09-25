@@ -1,4 +1,6 @@
-# Anunciantes de los pop-ups (placeholders)
+# Anunciantes de los pop-ups
+
+> **Estado:** los cinco logos ya existen en `sponsors/` (marca + nombre, 400×300, transparente). Se pueden reemplazar con el mismo nombre.
 
 Los banners de anunciante que salen durante el partido (`lfoskin/lfo-popups.js`, tipo `sponsor`) usan **marcas ficticias** y un
 logo provisional (la inicial sobre el color de la marca). Para poner el logo real de cada una, guardar un PNG con fondo transparente

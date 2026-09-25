@@ -5,9 +5,9 @@ Estado: **corregido** = ya está en el código; **placeholder** = existe pero es
 ## Lo que el fútbol tiene y los demás no
 | Incongruencia | Estado |
 |---|---|
-| Presentación de equipos/formaciones antes del partido (LBO, LGO, LLO no la tenían) | corregido (`assets/broadcast`) — placeholder visual |
-| Estudio con dos presentadores antes, en el entretiempo y al final | corregido en LBO, LGO, LRO, LLO (solo texto) — placeholder visual |
-| Gráficas de TV en el partido (placas de eventos) | corregido (placas por deporte) — placeholder visual |
+| Presentación de equipos/formaciones antes del partido (LBO, LGO, LLO no la tenían) | corregido (`assets/broadcast`) — arte por deporte en `assets/broadcast/art/` (fondos de intro por deporte y escudo genérico con los colores del equipo) |
+| Estudio con dos presentadores antes, en el entretiempo y al final | corregido en LBO, LGO, LRO, LLO: set con fondo por liga, mesa, pantalla con el logo y dos presentadores ilustrados (SVG) con boca y ojos animados. Pendiente: voz |
+| Gráficas de TV en el partido (placas de eventos) | corregido: chapa propia de cada deporte (`plate-<liga>.png`) con franjas del color del equipo |
 | Tribuna (álbum de cromos) solo existía en fútbol | corregido: `assets/tribuna` en LBO, LGO, LRO, LLO — diseño de carta placeholder (`TRIBUNA_PARA_IA.md`) |
 | Torneos de eliminatoria además de la liga | corregido: La Cupidité (fútbol), Copa LGO, Copa LBO. LRO y LLO no tienen |
 | Efectos/cosméticos de gol | corregido en fútbol (Explosión); en los otros deportes no existen cosméticos |
@@ -54,7 +54,11 @@ Estado: **corregido** = ya está en el código; **placeholder** = existe pero es
 | LRO: el calendario tenía texto del color del fondo | corregido (tema oscuro en `motorsport.css`) |
 | LRO: la Tribuna dibujaba otro diseño de carta que el Mercado | corregido: la Tribuna usa el diseño del Mercado (`drawFront`) |
 | Anuncios reales (`assets/videocomerciales/`) en previa y descanso (fútbol, LBO, LGO) | hecho: `assets/broadcast/adbreak.js`. Pendiente: LLO y LRO no tienen descansos |
-| Pop-ups de TV (tarjetas, goles, cambios, tabla, estadísticas…) con piel de La Cupidité | hecho: `lfoskin/lfo-popups.js`. Pendiente: arte definitivo de los placeholders `pop-*.png` y logos de anunciantes |
+| Pop-ups de TV (tarjetas, goles, cambios, tabla, estadísticas…) con piel de La Cupidité | hecho: `lfoskin/lfo-popups.js`. Arte de los `pop-*.png` y logos de los 5 anunciantes hechos (`lfoskin/popups/sponsors/`) |
 | LRO: lore de circuitos repetitivo y sin las naciones del Continente Viejo; 20 prompts separados | corregido: lore nuevo con variedad, 20 naciones, un solo prompt (`02_circuitos_PROMPT_UNICO.md`), bundle `circuits/circuits.json`, validador y modelo descargable |
 | LRO: los 20 circuitos eran trazados provisionales sin decorado (y 4 con curvas más cerradas que la pista) | corregido: se instalaron los 20 circuitos reales de `GT3_20_Circuitos.zip` (trazado + 210–250 props cada uno) en `07-carreras-apex/circuits/`; los provisionales quedaron en `_backup_circuits_provisionales/`. El validador pasa 20/20 |
 | `tools/check_circuit.mjs` daba un falso «tramos a 50 m» en horquillas cerradas | corregido: usa la distancia recorrida real y no el largo medio por muestra |
+
+| Fútbol: gráficas de La Cupidité (21 placeholders de `lfoskin/cupidite/`) y logos en baja resolución | hecho: arte vectorial definitivo con los mismos nombres y proporciones; logo, icono, wordmark y lema en alta. Pendiente: set 3D del estudio y ceremonia del trofeo (ver `CUPIDITE_PLACEHOLDERS.md`) |
+| Fútbol: balón de la liga y de La Cupidité | hecho: `LFO_BALL` (`fulbo.html`), cambia solo con el paquete de la copa |
+| Fútbol: peinados de los jugadores 3D | rehechos 11 estilos y 14 nuevos (`cardlook.js`) |

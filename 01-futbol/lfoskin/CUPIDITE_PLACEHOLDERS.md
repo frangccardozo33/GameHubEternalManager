@@ -22,7 +22,11 @@ imagen (fondo negro quitado) y **son de baja resolución: conviene rehacerlos en
 - **Forma:** trofeo de diamante tallado con dos astas; patrones geométricos de facetas; marcos metálicos oscuros con borde esmeralda brillante.
 - **Lema:** *AD ASTRA PER ASPERA* (aparece en la marca de agua y en la intro).
 
-## Slots de arte (PLACEHOLDERS en `lfoskin/cupidite/`)
+## Slots de arte (`lfoskin/cupidite/`)
+
+> **Estado:** todos los archivos de esta tabla y los cuatro de la marca ya tienen arte definitivo (vectorial, generado a medida
+> con los mismos nombres y proporciones). La tabla queda como especificación por si se quieren rehacer.
+
 Cada uno es un archivo generado que lleva su nombre y tamaño escrito abajo a la izquierda (texto tenue). **Para reemplazarlo:
 guardar el archivo nuevo con el mismo nombre y las mismas proporciones** (se estira con `background-size:100% 100%` salvo que se indique
 otra cosa). Todos se declaran una vez en `cupidite.css`, bloque `:root[data-lfo-pkg="cupidite"]` (variables `--cup-*`); si se
@@ -52,7 +56,7 @@ cambia un nombre o formato, se cambia ahí.
 3. **Ceremonia de entrega del trofeo** (campeón): no existe; hoy solo hay noticia + banner en la pantalla de la copa. Hace falta animación 3D del
    trofeo (`trophy-render.png` sirve de referencia) y confeti esmeralda.
 4. **Audio:** *stingers* de la copa (himno corto, gol, transición, tarjeta) — hoy se reutilizan los de la liga (`soundeffects/`).
-5. **Balón / redes / banderines de córner** con la marca: no hay.
+5. **Balón**: hecho (`LFO_BALL` en `fulbo.html`, tema `cupidite`: negro con facetas esmeralda; cambia solo con `pushPackage`). Redes y banderines de córner con la marca: no hay.
 
 ## Cómo verificar un cambio
 1. `python -m http.server 8080` en `GameHub_Organizado` y abrir `http://localhost:8080/01-futbol/fulbo.html`.
