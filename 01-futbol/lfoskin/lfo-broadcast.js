@@ -111,6 +111,7 @@
     S.pkg = id;
     applyPackage();
     const pk = $('lfo-pkg'); if (pk) pk.value = id;
+    announce(id);
     return true;
   }
   function popPackage() {
@@ -118,8 +119,11 @@
     S.pkg = S.stack; S.stack = null;
     applyPackage();
     const pk = $('lfo-pkg'); if (pk) pk.value = S.pkg;
+    announce(S.pkg);
     return true;
   }
+  // Avisa al resto del juego (p. ej. el balón oficial) qué paquete de competición quedó activo.
+  function announce(id) { try { window.dispatchEvent(new CustomEvent('lfo:package', { detail: id })); } catch (e) {} }
 
   /* =========================================================================
      ACCESO AL ESTADO DEL PARTIDO

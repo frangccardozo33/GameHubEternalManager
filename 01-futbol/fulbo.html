@@ -32745,167 +32745,247 @@ const ne = (i, t = {}) => new $h({ color: i, roughness: 0.85, ...t }); // ======
 // ============================================================================
 
 /* ============================================================================
-   LFO_BALL — Balón oficial de la liga (modelo de la referencia gráfica).
-   Azul "LF" #1857a6 + blanco roto, paneles termosellados con costura fina,
-   micro-grip en relieve y el monograma LF en dos caras opuestas.
-   albedo() -> mapa de color · bump() -> mapa de relieve (grip + costuras)
+   LFO_BALL — Balones oficiales (dos diseños, según la competición del partido).
+   · "liga": blanco perla con cuatro paneles azules de lados curvos (trilóbulos
+     sobre un tetraedro), filete azul marino y el monograma LF en rombo.
+   · "cupidite": negro con facetas esmeralda talladas como una gema (icosaedro
+     subdividido), aristas con brillo verde y el trofeo + LA CUPIDITÉ en dos caras.
+   El patrón se calcula por píxel desde la dirección 3D, así no se deforma en los
+   polos del mapa equirectangular. albedo() / bump() usan el tema activo;
+   apply(view, tema) cambia el balón del partido en vivo (lo llama el cambio de
+   paquete de transmisión: pushPackage("cupidite") / popPackage()).
    ========================================================================== */
 const LFO_BALL = {
-  BLUE: "#1c5cab",
-  BLUE_DK: "#123a6d",
-  WHITE: "#f4f6f8",
-  INK: "#16346b",
-  /* geometría de los paneles en coordenadas UV (equirectangular 1024x512) */
-  panels(w, h) {
-    // 6 "pétalos" azules alternados con 6 blancos alrededor del ecuador,
-    // más dos casquetes: azul arriba-izq/abajo-der (como la foto).
-    const out = [];
-    for (let i = 0; i < 6; i++) {
-      out.push({ cx: (i + 0.5) * (w / 6), cy: h * 0.5, rx: w / 13, ry: h * 0.30, blue: i % 2 === 0 });
-      out.push({ cx: i * (w / 6), cy: h * 0.07, rx: w / 11, ry: h * 0.18, blue: i % 2 === 1 });
-      out.push({ cx: i * (w / 6), cy: h * 0.93, rx: w / 11, ry: h * 0.18, blue: i % 2 === 0 });
-    }
-    return out;
+  theme: "liga",
+  BLUE: "#1d5fb4",
+  BLUE_DK: "#0f3b78",
+  WHITE: "#f5f7f9",
+  INK: "#12306a",
+  EMERALD: "#2ee07a",
+  // dirección 3D del píxel (px, py) según el mapeo UV de SphereGeometry
+  _dir(px, py, w, h) {
+    const ph = (px / w) * Math.PI * 2, th = (py / h) * Math.PI;
+    return [-Math.cos(ph) * Math.sin(th), Math.cos(th), Math.sin(ph) * Math.sin(th)];
   },
-  _petal(c, p) {
-    // pétalo/panel de esquinas redondeadas (silueta del balón de referencia)
-    const { cx, cy, rx, ry } = p;
-    c.beginPath();
-    const N = 48;
-    for (let i = 0; i <= N; i++) {
-      const a = (i / N) * Math.PI * 2;
-      // superelipse: lados casi rectos con esquinas suaves
-      const k = 3.1;
-      const ca = Math.cos(a), sa = Math.sin(a);
-      const x = cx + rx * Math.sign(ca) * Math.pow(Math.abs(ca), 2 / k);
-      const y = cy + ry * Math.sign(sa) * Math.pow(Math.abs(sa), 2 / k);
-      i ? c.lineTo(x, y) : c.moveTo(x, y);
-    }
-    c.closePath();
+  // posición en el mapa (x, y) de una dirección 3D, y escala horizontal local (1/cos lat)
+  _uv(d, w, h) {
+    const th = Math.acos(Math.max(-1, Math.min(1, d[1]))), ph = Math.atan2(d[2], -d[0]);
+    return { x: ((ph / (Math.PI * 2) + 1) % 1) * w, y: (th / Math.PI) * h, sx: 1 / Math.max(0.3, Math.sin(th)) };
   },
-  _mono(c, x, y, s, col) {
-    // Monograma "LF" itálico del logo de la liga
+  _norm(v) { const m = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / m, v[1] / m, v[2] / m]; },
+  _dot(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; },
+  _cross(a, b) { return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]; },
+  // Tetraedro con un vértice arriba y los otros tres a -19.5° de latitud: los centros blancos (opuestos) quedan cerca del ecuador.
+  _tetra() {
+    if (this._T) return this._T;
+    const out = [[0, 1, 0]], lat = -Math.asin(1 / 3);
+    for (let k = 0; k < 3; k++) { const lo = (k / 3) * Math.PI * 2 + Math.PI / 6; out.push([Math.cos(lat) * Math.cos(lo), Math.sin(lat), Math.cos(lat) * Math.sin(lo)]); }
+    return (this._T = out);
+  },
+  _ico() {
+    if (this._I) return this._I;
+    const t = (1 + Math.sqrt(5)) / 2, V = [[-1, t, 0], [1, t, 0], [-1, -t, 0], [1, -t, 0], [0, -1, t], [0, 1, t], [0, -1, -t], [0, 1, -t], [t, 0, -1], [t, 0, 1], [-t, 0, -1], [-t, 0, 1]].map((v) => this._norm(v));
+    const F = [[0, 11, 5], [0, 5, 1], [0, 1, 7], [0, 7, 10], [0, 10, 11], [1, 5, 9], [5, 11, 4], [11, 10, 2], [10, 7, 6], [7, 1, 8], [3, 9, 4], [3, 4, 2], [3, 2, 6], [3, 6, 8], [3, 8, 9], [4, 9, 5], [2, 4, 11], [6, 2, 10], [8, 6, 7], [9, 8, 1]];
+    // cada cara se talla en 3 facetas (centro → arista): 60 facetas con normal propia
+    const facets = [];
+    F.forEach((f, fi) => {
+      const c = this._norm([0, 1, 2].reduce((s, k) => s.map((x, q) => x + V[f[k]][q]), [0, 0, 0]));
+      for (let e = 0; e < 3; e++) {
+        const a = V[f[e]], b = V[f[(e + 1) % 3]], mid = this._norm([(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2]);
+        facets.push({ face: fi, c, a, b, n: this._norm(c.map((x, q) => x * 0.55 + mid[q] * 0.45)), h: ((fi * 7 + e * 13) % 17) / 17 });
+      }
+    });
+    return (this._I = { V, F, facets, centers: F.map((f) => this._norm([0, 1, 2].reduce((s, k) => s.map((x, q) => x + V[f[k]][q]), [0, 0, 0]))) });
+  },
+  // Clasificación de un punto de la esfera para el tema activo. Devuelve { col:[r,g,b], seam:0..1 }
+  _liga(d) {
+    const T = this._tetra();
+    let best = -2, bi = 0;
+    for (let k = 0; k < 4; k++) { const v = this._dot(d, T[k]); if (v > best) { best = v; bi = k; } }
+    const c = T[bi], ref = Math.abs(c[1]) > 0.9 ? [1, 0, 0] : [0, 1, 0], e1 = this._norm(this._cross(c, ref)), e2 = this._cross(c, e1);
+    const ang = Math.atan2(this._dot(d, e2), this._dot(d, e1)) + bi * 0.9;
+    // trilóbulo: panel de tres puntas con lados cóncavos, levemente girado (efecto "hélice")
+    const lim = 0.76 + 0.13 * Math.cos(3 * ang + 0.9 * Math.sin(3 * ang)), sd = best - lim;
+    const inner = best - (lim + 0.03);
+    return { sd, inner, best };
+  },
+  // Calcula el patrón por píxel a media resolución (rápido) y lo escala al tamaño final; los logos se dibujan después a resolución completa.
+  _paint(W, H, draw, k = 2) {
+    const w = W / k, h = H / k, cv = document.createElement("canvas");
+    cv.width = w; cv.height = h;
+    const c = cv.getContext("2d"), img = c.createImageData(w, h), px = img.data;
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const col = draw(this._dir(x + 0.5, y + 0.5, w, h), y / h), i = (y * w + x) * 4;
+      px[i] = col[0]; px[i + 1] = col[1]; px[i + 2] = col[2]; px[i + 3] = 255;
+    }
+    c.putImageData(img, 0, 0);
+    if (k === 1) return cv;
+    const big = document.createElement("canvas");
+    big.width = W; big.height = H;
+    const g = big.getContext("2d");
+    g.imageSmoothingQuality = "high"; g.drawImage(cv, 0, 0, W, H);
+    return big;
+  },
+  _ss(a, b, x) { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); },
+  _mix(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; },
+  // Monograma LF en rombo (logo de la liga), centrado en (0,0), alto ≈ 2s
+  _mono(c, s, col) {
     c.save();
-    c.translate(x, y);
-    c.transform(1, 0, -0.16, 1, 0, 0);
+    c.lineJoin = "round";
+    c.strokeStyle = col; c.lineWidth = s * 0.13;
+    c.beginPath(); c.moveTo(0, -s); c.lineTo(s * 1.05, 0); c.lineTo(0, s); c.lineTo(-s * 1.05, 0); c.closePath(); c.stroke();
+    c.lineWidth = s * 0.05;
+    c.beginPath(); c.moveTo(0, -s * 0.8); c.lineTo(s * 0.86, 0); c.lineTo(0, s * 0.8); c.lineTo(-s * 0.86, 0); c.closePath(); c.stroke();
+    c.transform(1, 0, -0.2, 1, 0, 0);
     c.fillStyle = col;
-    // L
-    c.fillRect(-1.05 * s, -0.62 * s, 0.30 * s, 1.24 * s);
-    c.fillRect(-1.05 * s, 0.36 * s, 0.86 * s, 0.26 * s);
-    // F
-    c.fillRect(0.14 * s, -0.62 * s, 0.30 * s, 1.24 * s);
-    c.fillRect(0.14 * s, -0.62 * s, 0.90 * s, 0.26 * s);
-    c.fillRect(0.14 * s, -0.11 * s, 0.70 * s, 0.24 * s);
+    c.fillRect(-0.62 * s, -0.42 * s, 0.2 * s, 0.84 * s);
+    c.fillRect(-0.62 * s, 0.26 * s, 0.52 * s, 0.16 * s);
+    c.fillRect(0.02 * s, -0.42 * s, 0.2 * s, 0.84 * s);
+    c.fillRect(0.02 * s, -0.42 * s, 0.56 * s, 0.16 * s);
+    c.fillRect(0.02 * s, -0.08 * s, 0.44 * s, 0.15 * s);
     c.restore();
   },
-  albedo(canvasMap, seeded) {
-    const B = this;
-    return canvasMap(2048, 1024, (c, w, h) => {
-      // base blanco perla con degradado sutil de fábrica
-      const base = c.createLinearGradient(0, 0, 0, h);
-      base.addColorStop(0, "#e6eaee");
-      base.addColorStop(0.5, B.WHITE);
-      base.addColorStop(1, "#e2e7ec");
-      c.fillStyle = base;
-      c.fillRect(0, 0, w, h);
-
-      // paneles
-      for (const p of B.panels(w, h)) {
-        for (const dx of [-w, 0, w]) {
-          const q = { ...p, cx: p.cx + dx };
-          B._petal(c, q);
-          if (p.blue) {
-            const g = c.createLinearGradient(q.cx - q.rx, q.cy - q.ry, q.cx + q.rx, q.cy + q.ry);
-            g.addColorStop(0, "#2a6ec4");
-            g.addColorStop(0.55, B.BLUE);
-            g.addColorStop(1, B.BLUE_DK);
-            c.fillStyle = g;
-          } else {
-            c.fillStyle = "#fbfcfd";
-          }
-          c.fill();
-          // costura termosellada
-          c.lineWidth = 7;
-          c.strokeStyle = p.blue ? "rgba(8,26,54,.55)" : "rgba(120,133,148,.45)";
-          c.stroke();
-          c.lineWidth = 2;
-          c.strokeStyle = "rgba(255,255,255,.55)";
-          c.stroke();
-        }
-      }
-
-      // micro-grip hexagonal (textura de la referencia)
-      c.save();
-      c.globalAlpha = 0.085;
-      for (let y = 0; y < h; y += 13) {
-        for (let x = ((y / 13) % 2) * 7; x < w; x += 14) {
-          c.fillStyle = "#0b1c33";
-          c.fillRect(x, y, 5, 5);
-        }
-      }
-      c.restore();
-
-      // monograma LF en dos caras opuestas (sobre panel blanco)
-      for (const cx of [w * 0.25, w * 0.75]) {
-        B._mono(c, cx, h * 0.5, w * 0.042, B.INK);
-        c.save();
-        c.translate(cx, h * 0.5 + w * 0.062);
-        c.textAlign = "center";
-        c.fillStyle = B.INK;
-        c.font = "bold " + Math.round(w * 0.016) + "px 'Barlow Condensed',Arial";
-        c.fillText("LIGA DE FÚTBOL ONLINE", 0, 0);
-        c.restore();
-      }
-      // sello pequeño de partido en los otros dos cuadrantes
-      for (const cx of [w * 0.0, w * 0.5]) {
-        c.save();
-        c.translate(cx, h * 0.5);
-        c.textAlign = "center";
-        c.fillStyle = "rgba(255,255,255,.85)";
-        c.font = "bold " + Math.round(w * 0.013) + "px 'Barlow Condensed',Arial";
-        c.fillText("MATCH BALL", 0, 0);
-        c.fillText("LFO · OFICIAL", 0, w * 0.017);
-        c.restore();
-      }
-
-      // suciedad / grano muy leve para que no se vea plano
-      const r = seeded(31);
-      for (let i = 0; i < 9000; i++) {
-        c.fillStyle = "rgba(20,28,40,.045)";
-        c.fillRect(r() * w, r() * h, 1.5, 1.5);
-      }
-    });
+  // Trofeo de La Cupidité (diamante sobre copa en V), centrado en (0,0), alto ≈ 2s
+  _trophy(c, s, col, glow) {
+    c.save();
+    c.shadowColor = glow; c.shadowBlur = s * 0.25;
+    c.fillStyle = col;
+    // diamante
+    c.beginPath(); c.moveTo(-0.34 * s, -1.0 * s); c.lineTo(0.34 * s, -1.0 * s); c.lineTo(0.46 * s, -0.8 * s); c.lineTo(0, -0.28 * s); c.lineTo(-0.46 * s, -0.8 * s); c.closePath(); c.fill();
+    // copa en V con brazos
+    c.beginPath(); c.moveTo(-0.44 * s, -0.66 * s); c.lineTo(-0.1 * s, 0.18 * s); c.lineTo(-0.16 * s, 0.18 * s); c.lineTo(-0.52 * s, -0.6 * s); c.closePath(); c.fill();
+    c.beginPath(); c.moveTo(0.44 * s, -0.66 * s); c.lineTo(0.1 * s, 0.18 * s); c.lineTo(0.16 * s, 0.18 * s); c.lineTo(0.52 * s, -0.6 * s); c.closePath(); c.fill();
+    // tallo y base
+    c.beginPath(); c.moveTo(-0.12 * s, 0.1 * s); c.lineTo(0.12 * s, 0.1 * s); c.lineTo(0.06 * s, 0.5 * s); c.lineTo(0.34 * s, 0.9 * s); c.lineTo(0.34 * s, 1.0 * s); c.lineTo(-0.34 * s, 1.0 * s); c.lineTo(-0.34 * s, 0.9 * s); c.lineTo(-0.06 * s, 0.5 * s); c.closePath(); c.fill();
+    // destello
+    c.shadowBlur = 0; c.fillStyle = "#eafff2";
+    c.beginPath(); const sx = 0.2 * s, sy = -0.88 * s, r = 0.1 * s;
+    c.moveTo(sx, sy - r); c.lineTo(sx + r * 0.25, sy - r * 0.25); c.lineTo(sx + r, sy); c.lineTo(sx + r * 0.25, sy + r * 0.25); c.lineTo(sx, sy + r); c.lineTo(sx - r * 0.25, sy + r * 0.25); c.lineTo(sx - r, sy); c.lineTo(sx - r * 0.25, sy - r * 0.25); c.closePath(); c.fill();
+    c.restore();
   },
-  bump(canvasMap, seeded) {
-    const B = this;
-    return canvasMap(1024, 512, (c, w, h) => {
-      c.fillStyle = "#808080";
-      c.fillRect(0, 0, w, h);
-      // costuras hundidas
-      for (const p of B.panels(w, h)) {
-        for (const dx of [-w, 0, w]) {
-          B._petal(c, { ...p, cx: p.cx * (w / 2048 ? 1 : 1) + dx, rx: p.rx, ry: p.ry });
-          c.lineWidth = 6;
-          c.strokeStyle = "#3a3a3a";
-          c.stroke();
-        }
-      }
-      // grip en relieve
-      for (let y = 0; y < h; y += 7) {
-        for (let x = ((y / 7) % 2) * 4; x < w; x += 8) {
-          c.fillStyle = "#a6a6a6";
-          c.fillRect(x, y, 3, 3);
-        }
-      }
-      const r = seeded(17);
-      for (let i = 0; i < 4000; i++) {
-        c.fillStyle = "rgba(255,255,255,.08)";
-        c.fillRect(r() * w, r() * h, 1, 1);
-      }
+  // Dibuja algo centrado en la dirección d, corrigiendo el estiramiento horizontal del mapa.
+  _decal(c, d, w, h, fn) {
+    const p = this._uv(d, w, h);
+    for (const dx of [-w, 0, w]) { c.save(); c.translate(p.x + dx, p.y); c.scale(p.sx, 1); fn(c); c.restore(); }
+  },
+  // Faceta de la gema bajo la dirección d: cara del icosaedro más cercana y, dentro de ella, la arista más cercana.
+  _facet(d) {
+    const I = this._ico();
+    let best = -2, fi = 0;
+    I.centers.forEach((c, i) => { const v = this._dot(d, c); if (v > best) { best = v; fi = i; } });
+    let fb = -2, f = null;
+    for (let e = 0; e < 3; e++) { const q = I.facets[fi * 3 + e], v = this._dot(d, this._norm([q.a[0] + q.b[0], q.a[1] + q.b[1], q.a[2] + q.b[2]])); if (v > fb) { fb = v; f = q; } }
+    return f;
+  },
+  _edgeDist(d, f) {
+    let de = 9;
+    for (const [p, q] of [[f.a, f.b], [f.c, f.a], [f.c, f.b]]) de = Math.min(de, Math.abs(this._dot(d, this._norm(this._cross(p, q)))));
+    return de;
+  },
+  _white() { return this._tetra().slice(1).map((v) => [-v[0], -v[1], -v[2]]); },
+  _badges() { return [[1, 0, 0], [-1, 0, 0]]; },
+  albedo(canvasMap) {
+    const B = this, W = 2048, H = 1024;
+    if (B.theme === "cupidite") {
+      const L = B._norm([-0.4, 0.8, 0.45]), badges = B._badges();
+      const black = [9, 13, 11], deep = [8, 52, 30], em = [30, 196, 104], hi = [120, 255, 176];
+      const cv = B._paint(W, H, (d) => {
+        const f = B._facet(d), de = B._edgeDist(d, f);
+        // distancia a las aristas (grandes círculos) de la faceta, para filetes y costuras
+        const lit = Math.max(0, B._dot(f.n, L)), shade = 0.2 + 0.8 * lit * lit;
+        // facetas alternadas: negras pulidas y esmeralda (como el trofeo tallado)
+        let col = f.h < 0.45 ? B._mix(black, deep, 0.35 + 0.65 * shade) : B._mix(deep, em, shade);
+        col = B._mix(col, hi, Math.pow(lit, 10) * (f.h < 0.45 ? 0.15 : 0.5));
+        // insignias negras donde van el trofeo y el nombre
+        let bd = 0; for (const b of badges) bd = Math.max(bd, B._dot(d, b));
+        col = B._mix(col, black, B._ss(0.8, 0.86, bd));
+        // aristas: surco negro con filete verde brillante
+        col = B._mix(col, black, 1 - B._ss(0.004, 0.011, de));
+        col = B._mix(col, [90, 255, 150], (1 - B._ss(0.0, 0.004, Math.abs(de - 0.008))) * 0.7 * (1 - B._ss(0.8, 0.86, bd)));
+        return col;
+      });
+      const c = cv.getContext("2d");
+      badges.forEach((b) => {
+        B._decal(c, b, W, H, (k) => {
+          k.strokeStyle = "rgba(46,224,122,.85)"; k.lineWidth = 5;
+          k.beginPath(); k.arc(0, 0, 150, 0, Math.PI * 2); k.stroke();
+          k.lineWidth = 2; k.beginPath(); k.arc(0, 0, 138, 0, Math.PI * 2); k.stroke();
+          B._trophy(k, 70, B.EMERALD, "rgba(46,224,122,.9)");
+          k.textAlign = "center"; k.fillStyle = B.EMERALD;
+          k.font = "italic 900 40px 'Barlow Condensed','Arial Black',Arial";
+          k.fillText("LA CUPIDITÉ", 0, 112);
+          k.font = "700 15px 'Barlow Condensed',Arial"; k.fillStyle = "rgba(200,255,220,.8)";
+          k.fillText("AD ASTRA PER ASPERA", 0, 132);
+        });
+      });
+      return B._tex(canvasMap, cv);
+    }
+    const blue = [29, 95, 180], blueDk = [15, 59, 120], white = [245, 247, 249], ink = [18, 48, 106];
+    const cv = B._paint(W, H, (d, v) => {
+      const q = B._liga(d);
+      let col = white.map((x) => x - 10 * Math.abs(v - 0.5));
+      const pan = B._ss(-0.004, 0.004, q.sd);
+      // panel azul con degradé hacia la punta y filete marino
+      const inner = B._mix(blueDk, blue, B._ss(0.5, 0.9, q.best));
+      col = B._mix(col, ink, pan);
+      col = B._mix(col, inner, B._ss(-0.004, 0.004, q.inner));
+      // línea fina paralela al panel (sobre el blanco)
+      col = B._mix(col, blue, (1 - B._ss(0.002, 0.006, Math.abs(q.sd + 0.06))) * 0.85);
+      return col;
     });
+    const c = cv.getContext("2d");
+    B._white().forEach((d, i) => {
+      if (i === 2) return;
+      B._decal(c, d, W, H, (k) => {
+        B._mono(k, 96, B.INK);
+        k.textAlign = "center"; k.fillStyle = B.INK;
+        k.font = "900 30px 'Barlow Condensed','Arial Black',Arial";
+        k.fillText("LIGA DE FÚTBOL ONLINE", 0, 140);
+      });
+    });
+    B._decal(c, B._white()[2], W, H, (k) => {
+      k.textAlign = "center"; k.fillStyle = B.INK;
+      k.font = "900 26px 'Barlow Condensed','Arial Black',Arial"; k.fillText("OFFICIAL MATCH BALL", 0, -6);
+      k.font = "700 16px 'Barlow Condensed',Arial"; k.fillText("LFO · TEMPORADA OFICIAL", 0, 16);
+    });
+    return B._tex(canvasMap, cv);
+  },
+  // Texturas: se dibuja el canvas ya calculado dentro del canvasMap del juego (mantiene colorSpace y anisotropía).
+  _tex(canvasMap, cv) { return canvasMap(cv.width, cv.height, (c) => c.drawImage(cv, 0, 0)); },
+  bump(canvasMap) {
+    const B = this, W = 1024, H = 512;
+    let cv;
+    if (B.theme === "cupidite") {
+      cv = B._paint(W, H, (d) => {
+        const f = B._facet(d), de = B._edgeDist(d, f);
+        const g = 150 - 90 * (1 - B._ss(0.003, 0.012, de)) + 30 * (B._dot(d, f.n) - 0.9);
+        return [g, g, g];
+      });
+    } else {
+      cv = B._paint(W, H, (d) => {
+        const q = B._liga(d), seam = 1 - B._ss(0.001, 0.007, Math.abs(q.sd));
+        const grip = (Math.sin(d[0] * 260) * Math.sin(d[1] * 260) * Math.sin(d[2] * 260) > 0.2 ? 14 : 0);
+        const g = 140 + grip - 95 * seam;
+        return [g, g, g];
+      });
+    }
+    return B._tex(canvasMap, cv);
+  },
+  // Cambia el balón del partido en vivo (y deja cacheadas las texturas de cada tema).
+  apply(view, theme) {
+    theme = theme === "cupidite" ? "cupidite" : "liga";
+    const prev = this.theme;
+    this.theme = theme;
+    if (!view || !view.ball || !view.canvasMap || prev === theme && view._ballTheme === theme) return;
+    const cache = (view._ballTex = view._ballTex || {}), m = view.ball.material;
+    if (!cache[view._ballTheme || prev]) cache[view._ballTheme || prev] = { map: m.map, bump: m.bumpMap };
+    if (!cache[theme]) { const cm = view.canvasMap.bind(view); cache[theme] = { map: this.albedo(cm), bump: this.bump(cm) }; }
+    m.map = cache[theme].map; m.bumpMap = cache[theme].bump; m.needsUpdate = true;
+    view._ballTheme = theme;
   },
 };
 window.LFO_BALL = LFO_BALL;
+window.addEventListener("lfo:package", (e) => LFO_BALL.apply(window.lfoArchive && window.lfoArchive.view, e.detail));
 
 const T3 = {
   Scene: Hh,
