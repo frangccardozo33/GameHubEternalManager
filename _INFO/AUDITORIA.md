@@ -59,6 +59,6 @@ Estado: **corregido** = ya está en el código; **placeholder** = existe pero es
 | LRO: los 20 circuitos eran trazados provisionales sin decorado (y 4 con curvas más cerradas que la pista) | corregido: se instalaron los 20 circuitos reales de `GT3_20_Circuitos.zip` (trazado + 210–250 props cada uno) en `07-carreras-apex/circuits/`; los provisionales quedaron en `_backup_circuits_provisionales/`. El validador pasa 20/20 |
 | `tools/check_circuit.mjs` daba un falso «tramos a 50 m» en horquillas cerradas | corregido: usa la distancia recorrida real y no el largo medio por muestra |
 
-| Fútbol: gráficas de La Cupidité (21 placeholders de `lfoskin/cupidite/`) y logos en baja resolución | hecho: arte vectorial definitivo con los mismos nombres y proporciones; logo, icono, wordmark y lema en alta. Pendiente: set 3D del estudio y ceremonia del trofeo (ver `CUPIDITE_PLACEHOLDERS.md`) |
+| Fútbol: gráficas de La Cupidité (21 placeholders de `lfoskin/cupidite/`) y logos en baja resolución | hecho: arte definitivo con los mismos nombres y proporciones, usando solo la marca oficial (logo, icono, wordmark y lema sin cambios). Set 3D del estudio y ceremonia del trofeo hechos (ver `CUPIDITE_PLACEHOLDERS.md`). Marcador en cancha rediseñado según el Broadcast Pack |
 | Fútbol: balón de la liga y de La Cupidité | hecho: `LFO_BALL` (`fulbo.html`), cambia solo con el paquete de la copa |
 | Fútbol: peinados de los jugadores 3D | rehechos 11 estilos y 14 nuevos (`cardlook.js`) |

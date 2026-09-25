@@ -24,8 +24,8 @@ imagen (fondo negro quitado) y **son de baja resolución: conviene rehacerlos en
 
 ## Slots de arte (`lfoskin/cupidite/`)
 
-> **Estado:** todos los archivos de esta tabla y los cuatro de la marca ya tienen arte definitivo (vectorial, generado a medida
-> con los mismos nombres y proporciones). La tabla queda como especificación por si se quieren rehacer.
+> **Estado:** todos los archivos de esta tabla ya tienen arte definitivo con los mismos nombres y proporciones. Donde aparece la marca
+> (trofeo, wordmark, lema) se usan **solo los cuatro archivos oficiales** de `equiposfut/cupidite/`, sin redibujarlos. La marca no se toca.
 
 Cada uno es un archivo generado que lleva su nombre y tamaño escrito abajo a la izquierda (texto tenue). **Para reemplazarlo:
 guardar el archivo nuevo con el mismo nombre y las mismas proporciones** (se estira con `background-size:100% 100%` salvo que se indique
@@ -50,13 +50,12 @@ cambia un nombre o formato, se cambia ahí.
 | `trophy-render.png` | 551×1033 (o mayor) | Trofeo grande (campeón / intro) | Render del trofeo-diamante, fondo transparente. Hoy es el mismo `icon.png`. |
 
 ## Cosas que NO son imagen y quedan como placeholder
-1. **Estudio 3D** (dos presentadores y set en `tlb/graphics.js`/`tlb/app.js`): sigue con los colores del paquete de liga; falta un set 3D con la
-   paleta de la copa (mesa curva esmeralda, pantalla de datos con el diamante, fondo de ciudad nocturna).
+1. **Estudio 3D**: hecho (`cupStudio` en el bloque TLB de `fulbo.html`): pared LED facetada, mesa negra con filos esmeralda y el wordmark oficial, trofeo 3D (calcado del icono oficial) en pedestal y holograma del icono oficial. Se usa solo con el paquete `cupidite`.
 2. **Presentación de alineaciones 3D** (`tlb/app.js`, cancha táctica): solo se recolorea con CSS; falta una cancha táctica con marco de diamantes.
-3. **Ceremonia de entrega del trofeo** (campeón): no existe; hoy solo hay noticia + banner en la pantalla de la copa. Hace falta animación 3D del
-   trofeo (`trophy-render.png` sirve de referencia) y confeti esmeralda.
+3. **Ceremonia de entrega del trofeo**: hecha (`TLBGraphics.ceremony` + `LFOCeremony.show`): estadio de noche, podio octogonal, el trofeo sube girando, haces de luz, confeti y fuegos artificiales. Se dispara una vez por edición al cerrarse la final (`cupCeremony` en `manager/tlm-ui-match.js`).
+   **Ojo:** `tlb/*.js` está desactualizado respecto de lo inyectado en `fulbo.html`; no correr `node tlb/build.mjs` (pisa cambios). Editar `fulbo.html` directo.
 4. **Audio:** *stingers* de la copa (himno corto, gol, transición, tarjeta) — hoy se reutilizan los de la liga (`soundeffects/`).
-5. **Balón**: hecho (`LFO_BALL` en `fulbo.html`, tema `cupidite`: negro con facetas esmeralda; cambia solo con `pushPackage`). Redes y banderines de córner con la marca: no hay.
+5. **Balón**: hecho (`LFO_BALL` en `fulbo.html`, tema `cupidite`: negro con facetas esmeralda y el icono + wordmark oficiales; cambia solo con `pushPackage`). Redes y banderines de córner con la marca: no hay.
 
 ## Cómo verificar un cambio
 1. `python -m http.server 8080` en `GameHub_Organizado` y abrir `http://localhost:8080/01-futbol/fulbo.html`.

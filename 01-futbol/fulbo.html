@@ -32828,41 +32828,16 @@ const LFO_BALL = {
   },
   _ss(a, b, x) { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); },
   _mix(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; },
-  // Monograma LF en rombo (logo de la liga), centrado en (0,0), alto ≈ 2s
-  _mono(c, s, col) {
-    c.save();
-    c.lineJoin = "round";
-    c.strokeStyle = col; c.lineWidth = s * 0.13;
-    c.beginPath(); c.moveTo(0, -s); c.lineTo(s * 1.05, 0); c.lineTo(0, s); c.lineTo(-s * 1.05, 0); c.closePath(); c.stroke();
-    c.lineWidth = s * 0.05;
-    c.beginPath(); c.moveTo(0, -s * 0.8); c.lineTo(s * 0.86, 0); c.lineTo(0, s * 0.8); c.lineTo(-s * 0.86, 0); c.closePath(); c.stroke();
-    c.transform(1, 0, -0.2, 1, 0, 0);
-    c.fillStyle = col;
-    c.fillRect(-0.62 * s, -0.42 * s, 0.2 * s, 0.84 * s);
-    c.fillRect(-0.62 * s, 0.26 * s, 0.52 * s, 0.16 * s);
-    c.fillRect(0.02 * s, -0.42 * s, 0.2 * s, 0.84 * s);
-    c.fillRect(0.02 * s, -0.42 * s, 0.56 * s, 0.16 * s);
-    c.fillRect(0.02 * s, -0.08 * s, 0.44 * s, 0.15 * s);
-    c.restore();
-  },
-  // Trofeo de La Cupidité (diamante sobre copa en V), centrado en (0,0), alto ≈ 2s
-  _trophy(c, s, col, glow) {
-    c.save();
-    c.shadowColor = glow; c.shadowBlur = s * 0.25;
-    c.fillStyle = col;
-    // diamante
-    c.beginPath(); c.moveTo(-0.34 * s, -1.0 * s); c.lineTo(0.34 * s, -1.0 * s); c.lineTo(0.46 * s, -0.8 * s); c.lineTo(0, -0.28 * s); c.lineTo(-0.46 * s, -0.8 * s); c.closePath(); c.fill();
-    // copa en V con brazos
-    c.beginPath(); c.moveTo(-0.44 * s, -0.66 * s); c.lineTo(-0.1 * s, 0.18 * s); c.lineTo(-0.16 * s, 0.18 * s); c.lineTo(-0.52 * s, -0.6 * s); c.closePath(); c.fill();
-    c.beginPath(); c.moveTo(0.44 * s, -0.66 * s); c.lineTo(0.1 * s, 0.18 * s); c.lineTo(0.16 * s, 0.18 * s); c.lineTo(0.52 * s, -0.6 * s); c.closePath(); c.fill();
-    // tallo y base
-    c.beginPath(); c.moveTo(-0.12 * s, 0.1 * s); c.lineTo(0.12 * s, 0.1 * s); c.lineTo(0.06 * s, 0.5 * s); c.lineTo(0.34 * s, 0.9 * s); c.lineTo(0.34 * s, 1.0 * s); c.lineTo(-0.34 * s, 1.0 * s); c.lineTo(-0.34 * s, 0.9 * s); c.lineTo(-0.06 * s, 0.5 * s); c.closePath(); c.fill();
-    // destello
-    c.shadowBlur = 0; c.fillStyle = "#eafff2";
-    c.beginPath(); const sx = 0.2 * s, sy = -0.88 * s, r = 0.1 * s;
-    c.moveTo(sx, sy - r); c.lineTo(sx + r * 0.25, sy - r * 0.25); c.lineTo(sx + r, sy); c.lineTo(sx + r * 0.25, sy + r * 0.25); c.lineTo(sx, sy + r); c.lineTo(sx - r * 0.25, sy + r * 0.25); c.lineTo(sx - r, sy); c.lineTo(sx - r * 0.25, sy - r * 0.25); c.closePath(); c.fill();
-    c.restore();
-  },
+  // Marca oficial de La Cupidité (icono y wordmark del usuario, sin redibujar): se precarga y el balón se rehace al cargar.
+  _off: (() => { const o = {}; for (const n of ["icon", "wordmark"]) { const im = new Image(); im.src = "equiposfut/cupidite/" + n + ".png"; o[n] = im; } return o; })(),
+  // Logo oficial de la liga (equiposfut/ligadefutbolonlinelogo.png). Si todavía no cargó cuando se arma el balón, se rehace al cargar.
+  _lfo: (() => { const im = new Image(); im.src = "equiposfut/ligadefutbolonlinelogo.png";
+    im.addEventListener("load", () => { const v = window.lfoArchive && window.lfoArchive.view, B = window.LFO_BALL; if (!B || !v || !v.ball || B._lfoDrawn) return;
+      const cm = v.canvasMap.bind(v), keep = B.theme; B.theme = "liga"; const map = B.albedo(cm); B.theme = keep;
+      if (v._ballTex) v._ballTex.liga = { map, bump: (v._ballTex.liga || {}).bump || v.ball.material.bumpMap };
+      if ((v._ballTheme || "liga") === "liga") { v.ball.material.map = map; v.ball.material.needsUpdate = true; } }, { once: true });
+    return im; })(),
+  _offReady() { return Object.values(this._off).every((im) => im.complete && im.naturalWidth); },
   // Dibuja algo centrado en la dirección d, corrigiendo el estiramiento horizontal del mapa.
   _decal(c, d, w, h, fn) {
     const p = this._uv(d, w, h);
@@ -32910,12 +32885,9 @@ const LFO_BALL = {
           k.strokeStyle = "rgba(46,224,122,.85)"; k.lineWidth = 5;
           k.beginPath(); k.arc(0, 0, 150, 0, Math.PI * 2); k.stroke();
           k.lineWidth = 2; k.beginPath(); k.arc(0, 0, 138, 0, Math.PI * 2); k.stroke();
-          B._trophy(k, 70, B.EMERALD, "rgba(46,224,122,.9)");
-          k.textAlign = "center"; k.fillStyle = B.EMERALD;
-          k.font = "italic 900 40px 'Barlow Condensed','Arial Black',Arial";
-          k.fillText("LA CUPIDITÉ", 0, 112);
-          k.font = "700 15px 'Barlow Condensed',Arial"; k.fillStyle = "rgba(200,255,220,.8)";
-          k.fillText("AD ASTRA PER ASPERA", 0, 132);
+          const ic = B._off.icon, wm = B._off.wordmark;
+          if (ic.naturalWidth) { k.save(); k.shadowColor = "rgba(46,224,122,.9)"; k.shadowBlur = 18; const ih = 150, iw = ih * ic.naturalWidth / ic.naturalHeight; k.drawImage(ic, -iw / 2, -100, iw, ih); k.restore(); }
+          if (wm.naturalWidth) { const ww = 210, wh = ww * wm.naturalHeight / wm.naturalWidth; k.drawImage(wm, -ww / 2, 58, ww, wh); }
         });
       });
       return B._tex(canvasMap, cv);
@@ -32937,9 +32909,8 @@ const LFO_BALL = {
     B._white().forEach((d, i) => {
       if (i === 2) return;
       B._decal(c, d, W, H, (k) => {
-        B._mono(k, 96, B.INK);
-        k.textAlign = "center"; k.fillStyle = B.INK;
-        k.font = "900 30px 'Barlow Condensed','Arial Black',Arial";
+        const lg = B._lfo; if (lg.naturalWidth) { B._lfoDrawn = true; k.drawImage(lg, -105, -115, 210, 210 * lg.naturalHeight / lg.naturalWidth); }
+        k.textAlign = "center"; k.fillStyle = B.INK; k.font = "900 30px 'Barlow Condensed','Arial Black',Arial";
         k.fillText("LIGA DE FÚTBOL ONLINE", 0, 140);
       });
     });
@@ -32979,6 +32950,10 @@ const LFO_BALL = {
     if (!view || !view.ball || !view.canvasMap || prev === theme && view._ballTheme === theme) return;
     const cache = (view._ballTex = view._ballTex || {}), m = view.ball.material;
     if (!cache[view._ballTheme || prev]) cache[view._ballTheme || prev] = { map: m.map, bump: m.bumpMap };
+    if (theme === "cupidite" && !this._offReady()) { // espera la marca oficial y recién ahí arma el balón
+      Object.values(this._off).forEach((im) => im.complete || im.addEventListener("load", () => { if (this.theme === "cupidite" && this._offReady()) { view._ballTheme = null; this.theme = "liga"; this.apply(view, "cupidite"); } }, { once: true }));
+      return;
+    }
     if (!cache[theme]) { const cm = view.canvasMap.bind(view); cache[theme] = { map: this.albedo(cm), bump: this.bump(cm) }; }
     m.map = cache[theme].map; m.bumpMap = cache[theme].bump; m.needsUpdate = true;
     view._ballTheme = theme;
@@ -38252,6 +38227,7 @@ const TLBGraphics = (() => {
     return {root,body,head,mouth,arms};
   }
   function studio(host){
+    if(isCupPkg())return cupStudio(host); // set propio de La Cupidité
     const s=scene(),c=camera(42);s.background=new T3.Color('#84949b');
     box(s,24,.18,18,'#4b5861',0,-.1,0);
     cylinder(s,4.8,4.8,.08,'#8d8e85',0,.02,.3);
@@ -38358,8 +38334,224 @@ const TLBGraphics = (() => {
       for(const o of md.tlFace)if(o.geometry?.type==='SphereGeometry'&&o.geometry.parameters.radius<.02)o.scale.y=blink?.09:.65;
     });
   }
-  return {frame,stinger,studio,card,tactical,intro,fieldFrame,views};
+  // ================= La Cupidité: set 3D del estudio y ceremonia del trofeo =================
+  // El bundle de three.js del juego no trae Lathe/Cone/Point/SpotLight/Points: el trofeo se talla con cilindros de 8 lados
+  // (facetas de gema), las astas son un tubo propio y el confeti es un InstancedMesh.
+  const cLerp=(a,b,t)=>a+(b-a)*t;
+  const CUP_EM='#27d468',CUP_LT='#6fffa6',ADDITIVE=2,DOUBLE=2,BACK=1;
+  const isCupPkg=()=>document.documentElement.getAttribute('data-lfo-pkg')==='cupidite';
+  const glowMat=(c,o=1)=>new T3.MeshBasicMaterial({color:c,transparent:o<1,opacity:o});
+  const addMat=(c,o)=>{const m=new T3.MeshBasicMaterial({color:c,transparent:true,opacity:o,depthWrite:false,side:DOUBLE});m.blending=ADDITIVE;return m;};
+  const facetCyl=(p,a,b,h,m,y=0,x=0,z=0,seg=8)=>mesh(new T3.CylinderGeometry(a,b,h,seg),m,p,x,y,z);
+  function imgTex(src,w,h,paint){
+    const cv=document.createElement('canvas');cv.width=w;cv.height=h;const ctx=cv.getContext('2d'),t=new T3.CanvasTexture(cv);t.colorSpace=T3.SRGBColorSpace;
+    const im=new Image();const draw=()=>{paint(ctx,w,h,im.complete&&im.naturalWidth?im:null);t.needsUpdate=true;};im.onload=draw;im.src=src;draw();return t;
+  }
+  function tubeMesh(p,pts,r,mat){
+    const pos=[],idx=[],R=8,n=pts.length;
+    for(let i=0;i<n;i++){
+      const a=pts[Math.max(0,i-1)],b=pts[Math.min(n-1,i+1)],t=new T3.Vector3(b[0]-a[0],b[1]-a[1],b[2]-a[2]).normalize();
+      const ref=Math.abs(t.y)<.9?new T3.Vector3(0,1,0):new T3.Vector3(1,0,0),u=new T3.Vector3().crossVectors(t,ref).normalize(),v=new T3.Vector3().crossVectors(t,u),rr=r*(1-.6*i/(n-1));
+      for(let j=0;j<=R;j++){const th=j/R*Math.PI*2,cs=Math.cos(th)*rr,sn=Math.sin(th)*rr;pos.push(pts[i][0]+u.x*cs+v.x*sn,pts[i][1]+u.y*cs+v.y*sn,pts[i][2]+u.z*cs+v.z*sn);}
+    }
+    for(let i=0;i<n-1;i++)for(let j=0;j<R;j++){const a=i*(R+1)+j,b=a+R+1;idx.push(a,b,a+1,b,b+1,a+1);}
+    const g=new T3.BufferGeometry();g.setAttribute('position',new T3.Float32BufferAttribute(pos,3));g.setIndex(idx);g.computeVertexNormals();return mesh(g,mat,p);
+  }
+  const bez=(p0,p1,p2,p3,n=14)=>Array.from({length:n+1},(_,i)=>{const t=i/n,k=1-t;return [0,1,2].map(q=>k*k*k*p0[q]+3*k*k*t*p1[q]+3*k*t*t*p2[q]+t*t*t*p3[q]);});
+  // Trofeo de La Cupidité en 3D, calcado de la silueta del icono oficial (equiposfut/cupidite/icon.png):
+  // gema arriba, dos astas que bajan de sus puntas + una púa central, collar, cuello y base triangular. ≈2.4 de alto, base en y=0.
+  function cupTrophy(p,scale=1){
+    const g=new T3.Group();p.add(g);g.scale.setScalar(scale);
+    const em=new T3.MeshStandardMaterial({color:'#22d866',emissive:'#0b5a2c',emissiveIntensity:.7,metalness:.3,roughness:.16,flatShading:true});
+    const lt=new T3.MeshStandardMaterial({color:'#7dffb0',emissive:'#1f9a52',emissiveIntensity:.8,metalness:.25,roughness:.12,flatShading:true});
+    facetCyl(g,.14,.62,.9,em,.45,0,0,4).rotation.y=Math.PI/4;        // base triangular (pirámide)
+    facetCyl(g,.1,.14,.2,em,1.0,0,0,4).rotation.y=Math.PI/4;         // cuello
+    facetCyl(g,.34,.18,.14,em,1.17,0,0,4).rotation.y=Math.PI/4;      // collar
+    facetCyl(g,0,.15,1.05,lt,1.76,0,0,4).rotation.y=Math.PI/4;        // púa central
+    for(const s of [-1,1])tubeMesh(g,[[s*.1,1.2,0],[s*.24,1.6,0],[s*.38,2.0,0],[s*.5,2.3,0]],.1,em); // astas: anchas abajo, finas arriba
+    const gem=new T3.Group();g.add(gem);gem.position.y=2.42;           // gema: mesa plana, corona y pabellón corto
+    facetCyl(gem,.42,.68,.22,lt,.11,0,0,8);facetCyl(gem,.68,.3,.34,lt,-.17,0,0,8);
+    const star=mesh(new T3.PlaneGeometry(.22,.22),new T3.MeshBasicMaterial({map:texture(64,64,(c,w,h)=>{c.clearRect(0,0,w,h);c.fillStyle='#fff';c.beginPath();c.moveTo(32,0);c.quadraticCurveTo(32,32,64,32);c.quadraticCurveTo(32,32,32,64);c.quadraticCurveTo(32,32,0,32);c.quadraticCurveTo(32,32,32,0);c.fill();}),transparent:true,depthWrite:false}),gem,.36,.14,.5);
+    return {g,gem,star};
+  }
+  function facetWallTexture(){
+    return texture(2048,512,(c,w,h)=>{
+      let seed=7;const rnd=()=>(seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296;
+      c.fillStyle='#030a06';c.fillRect(0,0,w,h);const s=74,pts=[];
+      for(let j=0;j<=h/(s*.86)+1;j++){pts.push([]);for(let i=0;i<=w/s+1;i++)pts[j].push([(i+(j%2)*.5)*s+(rnd()-.5)*s*.4,j*s*.86+(rnd()-.5)*s*.3]);}
+      for(let j=0;j<pts.length-1;j++)for(let i=0;i<pts[j].length-1;i++){const a=pts[j][i],b=pts[j][i+1],cc=pts[j+1][i+1],d=pts[j+1][i];for(const tri of (i+j)%2?[[a,b,cc],[a,cc,d]]:[[a,b,d],[b,cc,d]]){
+        const k=Math.pow(rnd(),2.2),x=(tri[0][0]+tri[1][0]+tri[2][0])/3,mid=1-Math.abs(x/w-.5)*1.3;c.beginPath();c.moveTo(...tri[0]);c.lineTo(...tri[1]);c.lineTo(...tri[2]);c.closePath();
+        c.fillStyle=`rgb(${6+k*30*mid|0},${22+k*190*mid|0},${14+k*90*mid|0})`;c.fill();c.strokeStyle='rgba(111,255,166,.16)';c.lineWidth=1.2;c.stroke();}}
+    });
+  }
+  function cupScreen(ctx,txt){
+    const g=ctx.createLinearGradient(0,0,0,512);g.addColorStop(0,'#08241a');g.addColorStop(1,'#020806');ctx.fillStyle=g;ctx.fillRect(0,0,1024,512);
+    ctx.fillStyle=CUP_EM;ctx.fillRect(0,0,1024,62);ctx.fillStyle='#03140b';ctx.font='italic 900 34px "Barlow Condensed",Arial';ctx.fillText('LA CUPIDITÉ  |  MESA DE ANÁLISIS',28,44);
+    ctx.strokeStyle='rgba(111,255,166,.35)';ctx.lineWidth=2;ctx.strokeRect(8,70,1008,434);
+    ctx.fillStyle='#eafff2';ctx.font='bold 30px Arial';const words=String(txt||'').split(/\s+/);let line='',y=124;
+    for(const word of words){if(ctx.measureText(line+' '+word).width>940){ctx.fillText(line,32,y);y+=44;line=word;}else line+=' '+word;}ctx.fillText(line,32,y);
+  }
+  function cupStudio(host){
+    const s=new T3.Scene(),c=camera(42);s.background=new T3.Color('#020604');s.fog=new T3.Fog('#020604',16,36);
+    s.add(new T3.HemisphereLight('#c9ffe0','#06120b',1.25));
+    const key=new T3.DirectionalLight('#f4fff8',2.4);key.position.set(-3,6,8);s.add(key);
+    const rim=new T3.DirectionalLight(CUP_EM,2.6);rim.position.set(4,3,-6);s.add(rim);
+    box(s,32,.18,24,new T3.MeshStandardMaterial({color:'#040907',metalness:.35,roughness:.4}),0,-.1,0);
+    cylinder(s,4.6,4.6,.08,new T3.MeshStandardMaterial({color:'#07140d',metalness:.6,roughness:.3}),0,.04,.3);
+    for(const [r,w] of [[4.62,.07],[5.5,.035],[7.3,.05]]){const ring=mesh(new T3.RingGeometry(r,r+w,96),glowMat(CUP_EM,.9),s,0,.09,.3);ring.rotation.x=-Math.PI/2;}
+    // pared LED curva facetada
+    const wallTex=facetWallTexture(),N=15,wallMats=[];
+    for(let i=0;i<N;i++){
+      const a=-1.12+i/(N-1)*2.24,x=Math.sin(a)*8.2,z=2-Math.cos(a)*8.2,geo=new T3.PlaneGeometry(1.78,5.4),uv=geo.attributes.uv;
+      for(let k=0;k<uv.count;k++)uv.setX(k,(i+uv.getX(k))/N);
+      const m=new T3.MeshBasicMaterial({map:wallTex});wallMats.push(m);
+      const panel=mesh(geo,m,s,x,2.7,z);panel.lookAt(0,2.7,2);
+      for(const y of [0,5.4]){const strip=box(s,1.8,.05,.05,glowMat(CUP_LT),x,y,z);strip.lookAt(0,y,2);}
+      const post=box(s,.05,5.4,.05,glowMat(CUP_EM,.8),Math.sin(a-.075)*8.18,2.7,2-Math.cos(a-.075)*8.18);
+    }
+    // pantalla central
+    box(s,4.9,2.45,.3,new T3.MeshStandardMaterial({color:'#0c1511',metalness:.8,roughness:.3}),0,2.55,-3.05);
+    const frame=box(s,5.02,2.57,.26,glowMat(CUP_EM),0,2.55,-3.1);
+    const screenCanvas=document.createElement('canvas');screenCanvas.width=1024;screenCanvas.height=512;
+    const screenTexture=new T3.CanvasTexture(screenCanvas);screenTexture.colorSpace=T3.SRGBColorSpace;
+    mesh(new T3.PlaneGeometry(4.62,2.2),new T3.MeshBasicMaterial({map:screenTexture}),s,0,2.55,-2.88);
+    let screenText=null;
+    // trofeo sobre pedestal (derecha) y gema holográfica (izquierda)
+    const dark=new T3.MeshStandardMaterial({color:'#0b1611',metalness:.85,roughness:.22,flatShading:true});
+    facetCyl(s,.55,.68,1.05,dark,.52,3.55,-1.25);
+    const pr=mesh(new T3.RingGeometry(.56,.62,8),glowMat(CUP_LT),s,3.55,1.06,-1.25);pr.rotation.x=-Math.PI/2;
+    const troph=cupTrophy(s,.78);troph.g.position.set(3.55,1.05,-1.25);
+    mesh(new T3.CylinderGeometry(.62,.9,4,24,1,true),addMat(CUP_EM,.08),s,3.55,3,-1.25);
+    facetCyl(s,.4,.5,.3,dark,.15,-3.55,-1.25);
+    // holograma con el icono OFICIAL (equiposfut/cupidite/icon.png), girando sobre su eje
+    const holoTex=imgTex('equiposfut/cupidite/icon.png',289,545,(ctx,w,h,im)=>{ctx.clearRect(0,0,w,h);if(im)ctx.drawImage(im,0,0,w,h);});
+    const holo=mesh(new T3.PlaneGeometry(.75,1.41),new T3.MeshBasicMaterial({map:holoTex,transparent:true,opacity:.85,side:DOUBLE,depthWrite:false}),s,-3.55,1.35,-1.25);
+    mesh(new T3.CylinderGeometry(.5,.5,1.8,24,1,true),addMat(CUP_EM,.1),s,-3.55,1.2,-1.25);
+    // mesa curva negra con filos esmeralda
+    const top=new T3.MeshStandardMaterial({color:'#0b0f0d',metalness:.7,roughness:.18}),fascia=new T3.MeshStandardMaterial({color:'#07130d',metalness:.5,roughness:.35,flatShading:true});
+    for(let i=0;i<19;i++){
+      const a=-1.0+i/18*2,x=Math.sin(a)*3.25,z=Math.cos(a)*1.25,r=-a*.45;
+      box(s,.35,.88,.2,fascia,x,.62,z).rotation.y=r;box(s,.43,.1,.83,top,x,1.1,z).rotation.y=r;
+      for(const y of [1.04,.3])box(s,.4,.03,.03,glowMat(y>1?CUP_LT:CUP_EM),x,y,z+.12).rotation.y=r;
+    }
+    const logo=imgTex('equiposfut/cupidite/wordmark.png',1024,160,(ctx,w,h,im)=>{ctx.clearRect(0,0,w,h);if(im)ctx.drawImage(im,40,6,w-80,h-12);else{ctx.fillStyle=CUP_EM;ctx.font='italic 900 110px "Barlow Condensed",Arial';ctx.textAlign='center';ctx.fillText('LA CUPIDITÉ',w/2,120);}});
+    mesh(new T3.PlaneGeometry(2.6,.4),new T3.MeshBasicMaterial({map:logo,transparent:true}),s,0,.66,1.49);
+    for(const x of [-1.6,1.6]){cylinder(s,.09,.075,.19,'#e7efe9',x,1.25,1);box(s,.40,.025,.27,'#d9e2dc',x+.3,1.17,.97);}
+    // columnas de luz y aro superior
+    for(const x of [-5.6,5.6]){box(s,.14,4.8,.14,glowMat(CUP_LT),x,2.4,-.6);mesh(new T3.CylinderGeometry(.35,.35,4.8,16,1,true),addMat(CUP_EM,.1),s,x,2.4,-.6);}
+    const ring=mesh(new T3.RingGeometry(3.1,3.3,64),glowMat(CUP_EM),s,0,4.2,0);ring.rotation.x=Math.PI/2;ring.material.side=DOUBLE;
+    const lucia=human(s,{female:true,suit:'#1c2b24',skin:'#cf9b7d'}),diego=human(s,{suit:'#101a16',skin:'#b88664'});
+    lucia.root.position.set(-1.5,.18,0);diego.root.position.set(1.5,.18,0);lucia.root.scale.setScalar(1.12);diego.root.scale.setScalar(1.16);
+    const pos=new T3.Vector3(0,2.8,10),look=new T3.Vector3(0,1.55,0),target=new T3.Vector3();
+    return mount(host,s,c,(t)=>{
+      const who=host.querySelector('.tlb-host.a')?.classList.contains('talk')?0:1;
+      [lucia,diego].forEach((h,i)=>{
+        const active=i===who,beat=active?Math.sin(t*3.8):Math.sin(t*.65)*.15;
+        h.head.rotation.set(active?Math.sin(t*2.6)*.05:.02,active?Math.sin(t*.7)*.1:(i?-.2:.2),beat*.018);
+        h.body.rotation.z=Math.sin(t*.8+i)*.015;
+        h.arms.forEach((arm,j)=>{arm.pivot.rotation.set(-.6-(active?.18*Math.sin(t*2+j):0),0,arm.sign*.14);arm.elbow.rotation.x=-.8-(active?.22*(.5+.5*Math.sin(t*3+j)):0);});
+        h.mouth.scale.y=active?1+.25*Math.sin(t*7):1;
+      });
+      troph.g.rotation.y=reduced?0:t*.35;holo.rotation.y=-t*.6;holo.position.y=1.35+Math.sin(t*1.4)*.06;
+      wallMats.forEach((m,i)=>m.color.setScalar(.72+.28*Math.max(0,Math.sin(t*1.6-i*.45))));
+      const mode=reduced?0:Math.floor(t/9)%4;
+      if(mode===0){target.set(0,2.8,10);look.lerp(new T3.Vector3(0,1.55,0),.08);}
+      else if(mode===3){target.set(2.2,2.3,4.6);look.lerp(new T3.Vector3(3.4,1.9,-1.25),.06);}
+      else {target.set(who?2.1:-2.1,2.25,7.5);look.lerp(new T3.Vector3(who?.85:-.85,1.6,0),.06);}
+      target.z=Math.max(target.z,(mode===3?4.6:7.3)/Math.max(.75,c.aspect));pos.lerp(target,.035);c.position.copy(pos);c.lookAt(look);
+      const txt=host.querySelector('.tlb-screen')?.textContent||'';
+      if(txt!==screenText){screenText=txt;cupScreen(screenCanvas.getContext('2d'),txt||'Ad astra per aspera.');screenTexture.needsUpdate=true;}
+    });
+  }
+  // Ceremonia de entrega: estadio de noche, podio octogonal, el trofeo sube girando, haces de luz, confeti y fuegos artificiales.
+  // o: { name, color, season }
+  function ceremony(host,o={}){
+    const s=new T3.Scene(),c=camera(40);s.background=new T3.Color('#010403');s.fog=new T3.Fog('#010403',40,110);
+    s.add(new T3.HemisphereLight('#d8ffe8','#04100a',1.1));
+    const key=new T3.DirectionalLight('#ffffff',2.6);key.position.set(-6,14,12);s.add(key);
+    const rim=new T3.DirectionalLight(CUP_EM,3);rim.position.set(6,6,-10);s.add(rim);
+    // césped con franjas
+    const grass=texture(512,512,(ctx,w,h)=>{for(let i=0;i<8;i++){ctx.fillStyle=i%2?'#0f4a26':'#12562c';ctx.fillRect(0,i*h/8,w,h/8);}});
+    grass.wrapS=grass.wrapT=1000;grass.repeat.set(3,3);
+    const pitch=mesh(new T3.PlaneGeometry(140,100),new T3.MeshStandardMaterial({map:grass,roughness:.95}),s,0,0,0);pitch.rotation.x=-Math.PI/2;
+    // tribunas con público y flashes
+    const crowd=texture(2048,256,(ctx,w,h)=>{ctx.fillStyle='#050807';ctx.fillRect(0,0,w,h);let sd=3;const r=()=>(sd=(Math.imul(sd,1664525)+1013904223)>>>0)/4294967296;for(let i=0;i<9000;i++){ctx.fillStyle=r()<.18?'rgba(111,255,166,.8)':r()<.5?'rgba(255,255,255,.45)':'rgba(120,140,130,.35)';ctx.fillRect(r()*w,r()*h,2,2);}});
+    crowd.wrapS=1000;crowd.repeat.set(4,1);
+    mesh(new T3.CylinderGeometry(62,48,26,64,1,true),new T3.MeshBasicMaterial({map:crowd,side:BACK}),s,0,13,0);
+    for(let i=0;i<8;i++){const a=i/8*Math.PI*2+.2,x=Math.cos(a)*56,z=Math.sin(a)*56;box(s,.6,34,.6,'#0b120e',x,17,z);box(s,5,1.6,.4,glowMat('#f2fff7'),x,34,z).lookAt(0,34,0);}
+    // podio octogonal escalonado
+    const metal=new T3.MeshStandardMaterial({color:'#0b1611',metalness:.85,roughness:.2,flatShading:true});
+    facetCyl(s,4.2,4.6,.5,metal,.25);facetCyl(s,3.2,3.6,.5,metal,.75);facetCyl(s,2.2,2.5,.5,metal,1.25);
+    for(const [r,y] of [[4.25,.51],[3.25,1.01],[2.25,1.51]]){const e=mesh(new T3.RingGeometry(r-.06,r+.02,8),glowMat(CUP_LT),s,0,y,0);e.rotation.x=-Math.PI/2;e.rotation.z=Math.PI/8;}
+    const troph=cupTrophy(s,1.5);troph.g.position.y=-2;
+    const halo=mesh(new T3.CircleGeometry(2.2,48),addMat(CUP_EM,.0),s,0,4.3,-.6);
+    // haces de luz que barren
+    const beams=[];for(let i=0;i<6;i++){const b=mesh(new T3.CylinderGeometry(.25,3.2,30,24,1,true),addMat(i%2?'#ffffff':CUP_EM,.022),s,0,0,0);beams.push({b,a:i/6*Math.PI*2});}
+    // cartel del campeón
+    const banner=texture(1024,256,(ctx,w,h)=>{ctx.clearRect(0,0,w,h);ctx.textAlign='center';ctx.fillStyle=CUP_LT;ctx.font='800 40px "Barlow Condensed",Arial';ctx.fillText('CAMPEÓN DE LA CUPIDITÉ'+(o.season?` · ${o.season}/${String((o.season+1)%100).padStart(2,'0')}`:''),w/2,58);
+      ctx.fillStyle='#ffffff';ctx.font='italic 900 120px "Barlow Condensed",Arial';ctx.shadowColor=CUP_EM;ctx.shadowBlur=30;ctx.fillText(String(o.name||'').toUpperCase(),w/2,190,w-40);});
+    const bn=mesh(new T3.PlaneGeometry(14,3.5),new T3.MeshBasicMaterial({map:banner,transparent:true,depthWrite:false}),s,0,9.4,-6);
+    // confeti (InstancedMesh) y fuegos artificiales
+    const CN=900,conf=new T3.InstancedMesh(new T3.PlaneGeometry(.16,.09),new T3.MeshBasicMaterial({side:DOUBLE}),CN),P=[],col=new T3.Color(),dm=new T3.Object3D();
+    const pal=[CUP_EM,CUP_LT,'#ffffff','#b9c6c0',o.color||'#27d468'];
+    for(let i=0;i<CN;i++){P.push({x:0,y:-50,z:0,vx:0,vy:0,vz:0,rx:Math.random()*6,ry:Math.random()*6,sp:1+Math.random()*4,on:false});col.set(pal[i%pal.length]);conf.setColorAt(i,col);}
+    s.add(conf);
+    const FN=360,fw=new T3.InstancedMesh(new T3.PlaneGeometry(.35,.35),addMat('#ffffff',.9),FN),F=[];
+    for(let i=0;i<FN;i++){F.push({x:0,y:-50,z:0,vx:0,vy:0,vz:0,life:0});col.set(i%3?CUP_LT:'#ffffff');fw.setColorAt(i,col);}s.add(fw);
+    let fired=false,nextFw=3.2,fwi=0;
+    const cannon=(side)=>{for(let k=0;k<CN/2;k++){const i=side?k+CN/2:k,p=P[i];p.on=true;p.x=side?4.4:-4.4;p.y=.6;p.z=1.5*(Math.random()-.5);const a=(side?-1:1)*(.15+Math.random()*.5);p.vx=a*6*Math.random();p.vy=12+Math.random()*9;p.vz=(Math.random()-.5)*6;}};
+    const burst=()=>{const cx=(Math.random()-.5)*50,cy=24+Math.random()*10,cz=-25-Math.random()*15;for(let k=0;k<60;k++){const f=F[fwi++%FN],th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1),sp=6+Math.random()*3;f.x=cx;f.y=cy;f.z=cz;f.vx=Math.sin(ph)*Math.cos(th)*sp;f.vy=Math.cos(ph)*sp;f.vz=Math.sin(ph)*Math.sin(th)*sp;f.life=1.8;}};
+    let lastT=0;
+    return mount(host,s,c,(t)=>{
+      const dt=Math.min(.05,t-lastT);lastT=t;
+      // el trofeo sube del podio y gira
+      const up=smooth(clamp((t-.6)/2.4));troph.g.position.y=-2+up*3.55;troph.g.rotation.y=t*(reduced?0:.6);
+      halo.material.opacity=.18*up*(0.8+.2*Math.sin(t*3));halo.lookAt(c.position);
+      if(!fired&&t>3){fired=true;cannon(0);cannon(1);}
+      if(t>nextFw){burst();nextFw=t+.6+Math.random()*.9;}
+      beams.forEach((B,i)=>{const a=B.a+t*.4,x=Math.cos(a)*16,z=Math.sin(a)*16-4;B.b.position.set(x*.5,15,z*.5);B.b.lookAt(0,1.5,0);B.b.rotateX(-Math.PI/2);});
+      for(let i=0;i<CN;i++){const p=P[i];if(p.on){p.vy-=9.8*dt*.55;p.vx*=.985;p.vz*=.985;if(p.vy<-2.2)p.vy=-2.2+Math.sin(t*p.sp+i)*.4;p.x+=p.vx*dt+Math.sin(t*p.sp+i)*.01;p.y+=p.vy*dt;p.z+=p.vz*dt;if(p.y<.05){p.y=.05;p.vx=p.vz=0;}}
+        dm.position.set(p.x,p.y,p.z);dm.rotation.set(p.rx+t*p.sp,p.ry+t*p.sp*.7,0);dm.updateMatrix();conf.setMatrixAt(i,dm.matrix);}
+      conf.instanceMatrix.needsUpdate=true;
+      for(let i=0;i<FN;i++){const f=F[i];if(f.life>0){f.life-=dt;f.vy-=3*dt;f.x+=f.vx*dt;f.y+=f.vy*dt;f.z+=f.vz*dt;}const k=Math.max(0,f.life/1.8);dm.position.set(f.x,f.life>0?f.y:-50,f.z);dm.rotation.set(0,0,0);dm.scale.setScalar(.3+k);dm.lookAt(c.position);dm.updateMatrix();fw.setMatrixAt(i,dm.matrix);}
+      fw.instanceMatrix.needsUpdate=true;dm.scale.setScalar(1);
+      // cámara: acercamiento y luego órbita lenta
+      const intro=smooth(clamp(t/3.2)),a=reduced?0:(t-3.2)*.18*(t>3.2?1:0),R=cLerp(26,14,intro);
+      c.position.set(Math.sin(a)*R,cLerp(8,3.4,intro),Math.cos(a)*R);c.lookAt(0,cLerp(2.2,2.3,intro),0);
+      bn.lookAt(c.position.x*.2,9.4,c.position.z);
+    },{fps:30});
+  }
+  return {frame,stinger,studio,card,tactical,intro,fieldFrame,views,ceremony,cupStudio};
 })();
+window.TLBGraphics = TLBGraphics;
+// Ceremonia de entrega del trofeo de La Cupidité (pantalla completa). LFOCeremony.show({ name, color, season, mine, onDone })
+window.LFOCeremony = {
+  show(o = {}) {
+    const el = document.createElement("div");
+    el.className = "lfo-ceremony";
+    el.style.cssText = "position:fixed;inset:0;z-index:99999;background:#010403;color:#fff;font-family:'Barlow Condensed',Arial,sans-serif;opacity:0;transition:opacity .5s";
+    const esc = (v) => String(v == null ? "" : v).replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+    el.innerHTML = `<div class="stage" style="position:absolute;inset:0"></div>
+      <img src="equiposfut/cupidite/wordmark.png" alt="La Cupidité" style="position:absolute;top:3%;left:50%;transform:translateX(-50%);height:min(9vh,70px);filter:drop-shadow(0 0 18px #27d468aa)">
+      <div style="position:absolute;left:0;right:0;bottom:6%;text-align:center;text-shadow:0 4px 18px #000">
+        <div style="letter-spacing:.4em;color:#6fffa6;font-weight:800;font-size:clamp(14px,2vw,20px)">${o.mine ? "¡TU CLUB ES CAMPEÓN!" : "CAMPEÓN"}</div>
+        <div style="font-style:italic;font-weight:900;font-size:clamp(34px,7vw,84px);line-height:1">${esc(o.name)}</div>
+        <div style="letter-spacing:.3em;color:#cfe;opacity:.8;font-size:13px;margin-top:6px">AD ASTRA PER ASPERA</div>
+        <button type="button" style="margin-top:16px;font:800 15px 'Barlow Condensed',Arial;letter-spacing:.2em;background:#27d468;color:#03140b;border:0;border-radius:4px;padding:10px 24px;cursor:pointer">CONTINUAR ▶</button>
+      </div>`;
+    document.body.appendChild(el);
+    const view = TLBGraphics.ceremony(el.querySelector(".stage"), o);
+    requestAnimationFrame(() => (el.style.opacity = "1"));
+    let done = false;
+    // Motor propio de cuadros: la ceremonia puede abrirse desde el manager, fuera del bucle del partido.
+    const tick = () => { if (done) return; TLBGraphics.frame(performance.now()); requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+    const close = () => { if (done) return; done = true; document.removeEventListener("keydown", key); el.style.opacity = "0"; setTimeout(() => { view && view.stop(); el.remove(); o.onDone && o.onDone(); }, 450); };
+    const key = (e) => { if (e.key === "Escape" || e.key === "Enter") close(); };
+    el.querySelector("button").onclick = close; document.addEventListener("keydown", key);
+    return { close };
+  },
+};
 
 // TLB broadcast director: original 3D inserts, joint animation and retro television graphics.
 const TLB = (window.TLB = (() => {
