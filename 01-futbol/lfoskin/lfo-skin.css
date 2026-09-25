@@ -1,0 +1,757 @@
+/* =============================================================================
+   LFO SKIN — "LIGA DE FÚTBOL ONLINE · COPA ONLINE"
+   Rediseño completo de UI / GUI / gráficas de transmisión.
+   Referencias: pack de marca retro 2000s (celeste #7FB2E5, blanco, azul profundo
+   #003366, cromo plateado, rojo #CC0000, oro de copa #DAA520).
+   Este archivo SÓLO redefine apariencia; no toca IDs ni la lógica del motor.
+   Se carga DESPUÉS de los estilos originales, por eso gana por cascada.
+   ========================================================================== */
+
+:root {
+  /* --- Paleta oficial LFO --- */
+  --lfo-sky: #7fb2e5;
+  --lfo-sky-lt: #a9cef2;
+  --lfo-sky-dk: #4a84c4;
+  --lfo-deep: #003366;
+  --lfo-deep-2: #012347;
+  --lfo-ink: #05121f;
+  --lfo-white: #ffffff;
+  --lfo-paper: #eef4fb;
+  --lfo-chrome-hi: #ffffff;
+  --lfo-chrome: #cfd6de;
+  --lfo-chrome-mid: #9aa5b1;
+  --lfo-chrome-lo: #5d6873;
+  --lfo-gold: #daa520;
+  --lfo-gold-hi: #f6d878;
+  --lfo-red: #cc0000;
+  --lfo-red-hi: #ff4b4b;
+  --lfo-green: #1f8a4c;
+
+  /* Gradientes reutilizables (cromo cepillado del pack de marca) */
+  --grad-chrome: linear-gradient(180deg, #ffffff 0%, #e4e9ef 18%, #b9c2cc 48%, #8e99a5 52%, #cdd5de 78%, #ffffff 100%);
+  --grad-chrome-v: linear-gradient(100deg, #f7fafc 0%, #c3ccd6 24%, #8d98a4 50%, #c8d1da 74%, #f2f6fa 100%);
+  --grad-deep: linear-gradient(180deg, #0a4a8c 0%, #013b73 42%, #01274c 100%);
+  --grad-sky: linear-gradient(180deg, #a8cdf1 0%, #7fb2e5 45%, #5490cc 100%);
+  --grad-gold: linear-gradient(180deg, #fff0b8 0%, #f0cd6a 38%, #c99a22 62%, #8f6a12 100%);
+  --grad-red: linear-gradient(180deg, #ff6b6b 0%, #d81515 45%, #8c0000 100%);
+
+  /* Overrides del tema base del juego */
+  --bg: #071726;
+  --panel: #0c2340;
+  --panel-light: #113254;
+  --line: #2a5586;
+  --text: #eaf2fb;
+  --muted: #92aec9;
+  --lime: var(--lfo-sky);
+  --home: var(--lfo-sky);
+  --away: var(--lfo-red-hi);
+  --radius: 5px;
+}
+
+/* ===================== 1. FONDO / CHASIS GENERAL ========================= */
+body {
+  background:
+    radial-gradient(ellipse at 50% -10%, #1c4f80 0%, transparent 58%),
+    repeating-linear-gradient(0deg, #ffffff06 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, #08203a 0%, #051425 60%, #030d18 100%) !important;
+  background-attachment: fixed !important;
+  color: var(--text);
+}
+/* Textura de cancha muy sutil al fondo (como el pack: campo celeste detrás) */
+body::before {
+  content: "";
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, #7fb2e508 0 64px, transparent 64px 128px),
+    radial-gradient(circle at 50% 35%, #7fb2e510, transparent 62%);
+  mix-blend-mode: screen;
+}
+body > * { position: relative; z-index: 1; }
+
+/* ===================== 2. CABECERA / MARCA ============================== */
+.site-header {
+  height: 82px !important;
+  background: var(--grad-deep) !important;
+  border-bottom: 0 !important;
+  box-shadow: inset 0 1px 0 #ffffff26, 0 4px 16px #0009;
+  position: relative;
+}
+.site-header::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 5px;
+  background: var(--grad-chrome);
+  box-shadow: 0 1px 0 #00000066;
+}
+.site-header::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(112deg, #ffffff0a 0 3px, transparent 3px 9px);
+}
+.brand {
+  font-family: "Barlow Condensed", "Arial Narrow", sans-serif !important;
+  font-style: italic !important; font-weight: 800 !important;
+  font-size: 30px !important; letter-spacing: 1.5px !important;
+  color: var(--lfo-white) !important;
+  text-shadow: 0 2px 0 #00193a, 0 0 18px #7fb2e566;
+  gap: 12px !important;
+}
+.brand .brand-period { color: var(--lfo-sky) !important; }
+.brand-mark {
+  width: 52px !important; height: 52px !important;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 28%, #ffffff, #cdd6df 55%, #7d8a97 100%);
+  padding: 2px;
+  box-shadow: 0 0 0 2px #012347, 0 2px 6px #0008, inset 0 0 0 1px #ffffff;
+  overflow: visible !important;
+}
+.brand-mark img { border-radius: 50%; filter: drop-shadow(0 1px 2px #0006); }
+.prototype {
+  font-family: "Barlow Condensed", sans-serif !important;
+  font-size: 11px !important; font-weight: 700; letter-spacing: 2px !important;
+  color: #05121f !important;
+  background: var(--grad-chrome);
+  border: 1px solid #ffffff !important;
+  border-radius: 3px !important;
+  padding: 4px 8px !important;
+  box-shadow: 0 2px 5px #0006;
+}
+.site-header nav > * { color: #bcd6ef !important; font-weight: 600 !important; }
+.site-header nav .nav-active { color: #fff !important; }
+.nav-active::after { background: var(--grad-chrome) !important; height: 3px !important; }
+.site-header nav button:hover { color: var(--lfo-sky-lt) !important; }
+.engine-state { color: #b9d3ec !important; }
+.status-dot { background: var(--lfo-sky) !important; box-shadow: 0 0 9px #7fb2e5aa !important; }
+.status-dot.neutral { background: #7d93a8 !important; box-shadow: none !important; }
+.version {
+  border: 1px solid #ffffff44 !important; color: #dbeaf8 !important;
+  background: #00224a88; border-radius: 3px !important;
+}
+
+/* ===================== 3. TÍTULOS / TIPOGRAFÍA ========================== */
+h1 {
+  font-family: "Barlow Condensed", "Arial Narrow", sans-serif !important;
+  font-style: italic; font-weight: 800 !important;
+  text-transform: uppercase; letter-spacing: 1px !important;
+  color: #fff;
+  text-shadow: 0 3px 0 #002347, 0 0 24px #7fb2e544;
+}
+h1 span { color: var(--lfo-sky) !important; }
+.eyebrow {
+  color: var(--lfo-sky) !important; font-weight: 700 !important;
+  letter-spacing: 3px !important;
+}
+.page-heading p { color: #9dbbd6 !important; }
+
+/* ===================== 4. BOTONES (GUI cromada) ========================= */
+.button, .control-button, .icon-button, .speed-control button,
+.archive-controls button, .lineup-switch button, .panel-tabs button {
+  font-family: "Barlow Condensed", "Arial Narrow", sans-serif !important;
+  text-transform: uppercase; letter-spacing: 1px;
+  font-weight: 700 !important;
+}
+.button {
+  height: 42px !important;
+  border-radius: 4px !important;
+  position: relative; overflow: hidden;
+  transform: skewX(-6deg);
+}
+.button > * { transform: skewX(6deg); }
+.button-primary {
+  background: var(--grad-chrome) !important;
+  background-image: var(--grad-chrome) !important;
+  color: #01203f !important;
+  border: 1px solid #ffffff !important;
+  box-shadow: inset 0 1px 0 #fff, inset 0 -3px 6px #7f8d9b80, 0 3px 10px #0007 !important;
+  font-size: 13px !important;
+}
+.button-primary::after {
+  content: "" !important; position: absolute; inset: 0;
+  background: repeating-linear-gradient(112deg, #ffffff55 0 2px, transparent 2px 8px) !important;
+  pointer-events: none;
+}
+.button-primary:hover {
+  background-image: linear-gradient(180deg, #fff, #f0f5fa 20%, #cfd8e2 50%, #a7b2be 54%, #e2e9f0 80%, #fff) !important;
+  box-shadow: inset 0 1px 0 #fff, 0 0 20px #7fb2e566, 0 4px 12px #0008 !important;
+}
+.button-outline {
+  background: linear-gradient(180deg, #0d3f73, #01274c) !important;
+  background-image: linear-gradient(180deg, #0d3f73, #01274c) !important;
+  border: 1px solid #4a84c4 !important;
+  color: #dceaf8 !important;
+  box-shadow: inset 0 1px 0 #ffffff33, 0 2px 8px #0006 !important;
+}
+.button-outline:hover {
+  border-color: var(--lfo-sky-lt) !important;
+  background-image: linear-gradient(180deg, #14538f, #023060) !important;
+}
+.control-button { color: #c3daf0 !important; }
+.control-button:hover { color: #fff !important; }
+.icon-button {
+  background: linear-gradient(180deg, #11477f, #012348) !important;
+  border: 1px solid #3b6e9f !important;
+  border-radius: 4px !important;
+  color: #cbe0f5 !important;
+  box-shadow: inset 0 1px 0 #ffffff26 !important;
+}
+.icon-button:hover:not(:disabled) {
+  background: var(--grad-chrome) !important; color: #01203f !important;
+}
+.speed-control button {
+  color: #b7d2ec !important; border: 1px solid transparent; border-radius: 3px !important;
+}
+.speed-control button.selected {
+  background: var(--grad-chrome) !important; color: #01203f !important;
+  border-color: #fff !important;
+  box-shadow: 0 1px 4px #0007 !important;
+}
+.speed-control button:hover { background: #12467d !important; }
+.control-separator { background: #2f6096 !important; }
+
+/* ===================== 5. TARJETA DE TRANSMISIÓN ======================== */
+.broadcast-card, .panel, dialog {
+  background-image: linear-gradient(170deg, #0f3157 0%, #0a2340 55%, #061727 100%) !important;
+  border: 1px solid #2f6096 !important;
+  border-radius: 6px !important;
+  box-shadow: inset 0 1px 0 #ffffff1f, 0 10px 30px #0009 !important;
+}
+/* Borde cromado superior (como los paneles del pack) */
+.broadcast-card::after, .panel::after, dialog::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important; right: 0 !important; top: 0 !important;
+  width: auto !important; height: 3px !important;
+  border-radius: 6px 6px 0 0 !important;
+  background: var(--grad-chrome) !important;
+  box-shadow: none !important;
+  z-index: 3;
+}
+.broadcast-card::before, .panel::before, dialog::before { opacity: .22 !important; }
+
+.match-strip {
+  background-image: var(--grad-deep) !important;
+  border-bottom: 2px solid #4a84c4 !important;
+  color: #dbeaf8 !important;
+  height: 34px !important;
+  font-family: "Barlow Condensed", sans-serif !important;
+  font-size: 11px !important; letter-spacing: 1.2px !important;
+  box-shadow: inset 0 1px 0 #ffffff22 !important;
+}
+.match-strip .muted { color: #8fb4d6 !important; }
+.tiny-square {
+  width: 10px !important; height: 10px !important; margin-right: 4px !important;
+  background: var(--grad-chrome) !important;
+  transform: rotate(45deg);
+  box-shadow: 0 0 0 1px #012347;
+}
+.stadium-text { color: #b8d3ea !important; }
+.strip-divider { color: #4a84c4 !important; }
+
+/* ---------- 5.1 MARCADOR PRINCIPAL (cabecera del partido) ---------- */
+.scoreboard {
+  background-image:
+    radial-gradient(ellipse at 50% 120%, #14538f 0%, transparent 62%),
+    repeating-linear-gradient(90deg, #ffffff07 0 2px, transparent 2px 6px),
+    linear-gradient(180deg, #0b3d6f 0%, #01274c 55%, #011a34 100%) !important;
+  border-bottom: 4px solid transparent !important;
+  border-image: var(--grad-chrome) 4 !important;
+  height: 122px !important;
+  gap: 32px !important;
+  position: relative;
+}
+.scoreboard::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, #ffffff18, transparent 42%);
+}
+/* Escudos reales de los equipos */
+.crest {
+  width: 62px !important; height: 62px !important;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 26%, #ffffff, #d2dae3 52%, #7b8894 100%);
+  padding: 3px;
+  box-shadow: 0 0 0 2px #012347, 0 3px 9px #0009, inset 0 0 0 1px #fff;
+  filter: none !important;
+  display: grid; place-items: center;
+  overflow: hidden;
+}
+.crest svg { width: 92% !important; height: 92% !important; }
+.crest img, .crest .tlm-sb-crest {
+  width: 100% !important; height: 100% !important;
+  object-fit: contain; border-radius: 50%;
+  filter: drop-shadow(0 1px 2px #0007);
+}
+.crest .tlm-sb-mono {
+  width: 100%; height: 100%; border-radius: 50%;
+  display: grid; place-items: center;
+  font: 800 26px "Barlow Condensed", sans-serif;
+}
+.team h2 {
+  font-family: "Barlow Condensed", "Arial Narrow", sans-serif !important;
+  font-weight: 800 !important; font-style: italic;
+  text-transform: uppercase; letter-spacing: .5px !important;
+  color: #fff !important;
+  text-shadow: 0 2px 0 #001f3d, 0 0 14px #7fb2e544;
+  font-size: 27px !important;
+}
+.team-tag {
+  color: #05121f !important;
+  background: var(--grad-chrome);
+  padding: 2px 7px; border-radius: 2px;
+  font-weight: 800 !important; letter-spacing: 1.4px !important;
+  display: inline-block;
+}
+.formation-label {
+  color: var(--lfo-sky-lt) !important; font-weight: 700;
+  font-family: "Barlow Condensed", sans-serif; letter-spacing: 1.5px;
+}
+.score-numbers {
+  font-family: "Barlow Condensed", "Arial Narrow", sans-serif !important;
+  font-weight: 800 !important; font-style: italic;
+  font-size: 56px !important;
+  color: #fff;
+  text-shadow: 0 3px 0 #001f3d, 0 0 26px #7fb2e566;
+}
+.score-dash { color: var(--lfo-sky) !important; }
+.match-clock {
+  background: var(--grad-chrome);
+  color: #01203f !important;
+  padding: 3px 12px; border-radius: 3px;
+  border: 1px solid #fff;
+  font-family: "Barlow Condensed", sans-serif !important;
+  font-weight: 700; font-size: 12px !important;
+  box-shadow: 0 2px 6px #0007;
+}
+#period {
+  color: #01203f !important; border-left: 1px solid #8e99a5 !important;
+  font-weight: 800 !important;
+}
+.match-clock .status-dot { background: var(--lfo-red) !important; box-shadow: 0 0 8px #cc0000 !important; }
+.match-clock .status-dot.neutral { background: #7d8a97 !important; }
+
+/* ---------- 5.2 CONTROLES ---------- */
+.match-controls {
+  background-image: linear-gradient(180deg, #0d3861 0%, #05213c 100%) !important;
+  border-top: 1px solid #2f6096;
+}
+.playback-timeline { background: #052945 !important; height: 4px !important; }
+.playback-timeline > div {
+  background: var(--grad-chrome) !important;
+  box-shadow: 0 0 10px #ffffff88;
+}
+.timeline-half { background: var(--lfo-gold) !important; }
+
+.archive-controls {
+  background: linear-gradient(180deg, #0a2f55, #04192e) !important;
+  border-bottom: 1px solid #2f6096 !important;
+  font-family: "Barlow Condensed", sans-serif !important;
+}
+.archive-controls > span {
+  color: #05121f !important; background: var(--grad-chrome);
+  padding: 3px 9px; border-radius: 2px; letter-spacing: 2px !important;
+  font-size: 10px !important; font-weight: 800 !important;
+}
+.archive-controls label { color: #a9c8e3 !important; }
+.archive-controls select, .archive-controls button {
+  background: linear-gradient(180deg, #0f4275, #02203d) !important;
+  color: #dceaf8 !important; border: 1px solid #3b6e9f !important;
+  border-radius: 3px !important;
+}
+.archive-controls button:hover { background: var(--grad-chrome) !important; color: #01203f !important; }
+
+/* ===================== 6. PANELES LATERALES ============================ */
+.panel-heading h3 {
+  font-family: "Barlow Condensed", sans-serif !important;
+  font-size: 15px !important; font-weight: 800 !important;
+  text-transform: uppercase; letter-spacing: 1.2px;
+  color: #fff !important;
+}
+.panel-heading > svg { color: var(--lfo-sky) !important; }
+.panel-tabs { border-bottom: 1px solid #2f6096 !important; }
+.panel-tabs button { color: #94b6d6 !important; font-size: 11px !important; }
+.panel-tabs button.active { color: #fff !important; }
+.panel-tabs button.active::after { background: var(--grad-chrome) !important; height: 3px !important; }
+.possession-bar {
+  background: var(--lfo-red) !important; height: 8px !important;
+  border-radius: 2px !important; border: 1px solid #00000055;
+  box-shadow: inset 0 1px 2px #00000066;
+}
+.possession-bar > span {
+  background: var(--grad-sky) !important;
+  border-right: 2px solid #01274c !important;
+}
+.possession-values > strong {
+  font-family: "Barlow Condensed", sans-serif !important;
+  font-weight: 800 !important; color: #fff !important;
+}
+.stats-teams { color: #dceaf8 !important; }
+.team-dot { box-shadow: 0 0 0 1px #00000055; }
+.home-dot { background: var(--lfo-sky) !important; }
+.away-dot { background: var(--lfo-red) !important; }
+.stat-row { border-bottom: 1px solid #ffffff0a; }
+.stat-row > span:first-child, .stat-row > span:last-child { color: #fff !important; }
+.event-symbol {
+  background: linear-gradient(180deg, #0f4275, #02203d) !important;
+  border: 1px solid #3b6e9f !important; color: #bcd9f3 !important;
+}
+.event-row.goal .event-symbol {
+  background: var(--grad-chrome) !important; color: #01203f !important;
+  border-color: #fff !important;
+}
+.event-row:first-child { background: #7fb2e50d !important; }
+.event-copy strong { color: #eaf2fb !important; }
+.empty-icon {
+  background: #0b3159 !important; border-color: #2f6096 !important; color: var(--lfo-sky) !important;
+}
+.pulse-bars > span { background: #0b3159 !important; }
+.pulse-bars > span.lit { background: var(--grad-sky) !important; box-shadow: 0 0 6px #7fb2e5aa; }
+.live-pill {
+  background: var(--lfo-red) !important; border-color: #ff7b7b !important;
+  color: #fff !important; font-weight: 700;
+}
+.lineup-player > span:first-child {
+  background: var(--grad-chrome) !important; color: #01203f !important; font-weight: 800;
+}
+.lineup-player > strong { color: var(--lfo-sky-lt) !important; }
+.lineup-switch button.active { background: var(--grad-chrome) !important; color: #01203f !important; }
+
+/* ===================== 7. DIÁLOGOS / TOAST ============================= */
+dialog { border: 1px solid #2f6096 !important; }
+dialog::backdrop { background: #02101ee0 !important; }
+.dialog-heading h2 {
+  font-family: "Barlow Condensed", sans-serif !important;
+  font-weight: 800 !important; font-style: italic; text-transform: uppercase;
+  color: #fff !important;
+}
+dialog select {
+  background: #062440 !important; border: 1px solid #3b6e9f !important; color: #dceaf8 !important;
+}
+dialog .config-note {
+  background: #0b3159 !important; border-color: #2f6096 !important; color: #b6d2ea !important;
+}
+.help-step > b { color: var(--lfo-sky) !important; }
+.toast {
+  background: var(--grad-chrome) !important; color: #01203f !important;
+  border: 1px solid #fff; font-weight: 700;
+  font-family: "Barlow Condensed", sans-serif !important;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+
+/* ===================== 8. TÁCTICAS EN VIVO ============================= */
+.tactics-panel {
+  background: linear-gradient(170deg, #0f3157, #061727) !important;
+  border: 1px solid #2f6096 !important;
+}
+.tactics-team-switch button, .tactics-preset-grid button {
+  background: linear-gradient(180deg, #0f4275, #02203d) !important;
+  border-color: #3b6e9f !important; color: #dceaf8 !important;
+  font-family: "Barlow Condensed", sans-serif !important; text-transform: uppercase;
+}
+.tactics-team-switch button.active, .tactics-preset-grid button.active {
+  background: var(--grad-chrome) !important; color: #01203f !important; border-color: #fff !important;
+}
+.tactics-dial-step { background: #072a4a !important; border-color: #2f6096 !important; }
+.tactics-dial-step.requested { background: #0f4275 !important; border-color: var(--lfo-sky) !important; }
+.tactics-dial-step.active-mark::after { background: var(--grad-sky) !important; }
+.tactics-suggestion { background: #0a2d51 !important; border-color: #2f6096 !important; }
+.tactics-suggestion button { background: var(--grad-chrome) !important; color: #01203f !important; }
+
+/* ===================== 9. VIEWPORT / SEÑAL DE TV ======================= */
+.viewport {
+  background-image: repeating-linear-gradient(180deg, #2f6b3c 0 26px, #296036 26px 52px) !important;
+  border-radius: 0 !important;
+}
+/* Marco del tubo: bordes redondeados + sombra interior (TV de verdad) */
+#viewport::after {
+  content: "" !important;
+  position: absolute !important; inset: 0 !important;
+  pointer-events: none !important; z-index: 20 !important;
+  border-radius: 14px / 22px;
+  box-shadow:
+    inset 0 0 0 2px #00000099,
+    inset 0 0 26px 10px #00000070,
+    inset 0 0 90px 24px #00000040,
+    inset 0 22px 44px -26px #ffffff14;
+  background:
+    linear-gradient(0deg, #00000055, transparent 18%, transparent 82%, #00000038),
+    radial-gradient(ellipse at 24% 14%, #ffffff0e, transparent 46%);
+}
+/* Esquinas negras del tubo */
+#viewport::before {
+  content: ""; position: absolute; inset: -2px; z-index: 21; pointer-events: none;
+  border-radius: 18px / 26px;
+  box-shadow: 0 0 0 9999px transparent;
+  border: 3px solid #000;
+  opacity: .85;
+}
+body.lfo-crt-off #viewport::after,
+body.lfo-crt-off #viewport::before { display: none !important; }
+
+/* ---------- 9.1 SCORE BUG (marcador de TV en cancha) ---------- */
+.tv-score {
+  left: 18px !important; top: 18px !important;
+  height: auto !important; line-height: normal !important;
+  transform: none !important;
+  display: grid !important;
+  grid-template-columns: auto auto auto auto auto;
+  grid-template-rows: auto auto;
+  align-items: stretch !important;
+  gap: 0 !important;
+  font-family: "Barlow Condensed", "Arial Narrow", sans-serif !important;
+  filter: drop-shadow(0 4px 10px #000a);
+  z-index: 30 !important;
+}
+/* Fila 1: escudo local | nombre local | score | nombre visita | escudo visita
+   El HTML original es: b(home) strong(home) strong(away) b(away) span(clock) small(period)
+   Reorganizado con grid-area. */
+.tv-score b {
+  grid-row: 1;
+  background: var(--grad-deep) !important;
+  color: #fff !important;
+  padding: 0 12px !important;
+  font-size: 20px !important; font-weight: 800 !important; font-style: italic;
+  letter-spacing: 1.5px;
+  display: flex; align-items: center;
+  border-top: 2px solid #ffffff; border-bottom: 2px solid #5d6873;
+  text-shadow: 0 1px 0 #001f3d;
+  min-width: 62px; justify-content: center;
+  position: relative;
+}
+.tv-score b:nth-of-type(1) { grid-column: 2; border-left: 2px solid #fff; border-radius: 3px 0 0 0; }
+.tv-score b:nth-of-type(2) { grid-column: 4; }
+.tv-score strong {
+  grid-row: 1;
+  min-width: 32px !important; text-align: center !important;
+  background: var(--grad-chrome) !important;
+  color: #01203f !important;
+  font-size: 22px !important; font-weight: 800 !important;
+  display: flex; align-items: center; justify-content: center;
+  border-top: 2px solid #fff; border-bottom: 2px solid #5d6873;
+  border-right: 1px solid #8e99a5 !important;
+  padding: 0 4px;
+}
+.tv-score strong:nth-of-type(1) { grid-column: 3; }
+.tv-score strong:nth-of-type(2) { grid-column: 3; display: none; } /* fusionado abajo */
+/* Reloj: segunda fila, centrado bajo el score */
+.tv-score span {
+  grid-row: 2; grid-column: 2 / span 3;
+  margin-left: 0 !important;
+  background: linear-gradient(180deg, #0c3f72, #01203f) !important;
+  color: #fff !important;
+  font-size: 15px !important; font-weight: 700 !important;
+  text-align: center; padding: 1px 6px !important;
+  border: 2px solid #5d6873; border-top: 1px solid #ffffff55;
+  border-radius: 0 0 3px 3px;
+  letter-spacing: 1px;
+}
+.tv-score small {
+  grid-row: 2; grid-column: 5;
+  background: var(--grad-red) !important;
+  color: #fff !important;
+  font-size: 12px !important; font-weight: 800 !important;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 8px !important;
+  border: 2px solid #ffffff; border-left: 0;
+  border-radius: 0 0 3px 0;
+  letter-spacing: 1.2px;
+  text-shadow: 0 1px 2px #0008;
+}
+/* Escudo LFO/liga a la izquierda del bug */
+.tv-score::before {
+  content: ""; grid-row: 1 / span 2; grid-column: 1;
+  width: 46px;
+  background:
+    url("../equiposfut/ligadefutbolonlinelogo.png") center/78% no-repeat,
+    radial-gradient(circle at 34% 26%, #ffffff, #cfd6de 55%, #7b8894 100%);
+  border: 2px solid #fff; border-right: 0;
+  border-radius: 3px 0 0 3px;
+  box-shadow: inset 0 0 0 1px #01203f55;
+}
+/* Escudos de equipo dentro del bug (los inyecta lfo-skin.js) */
+.tv-score .lfo-bug-crest {
+  grid-row: 1; width: 30px; height: 30px; align-self: center;
+  object-fit: contain;
+  background: radial-gradient(circle at 34% 26%, #fff, #d4dce4 60%, #8b97a3);
+  border-radius: 50%; padding: 2px;
+  box-shadow: 0 0 0 1px #01203f, 0 1px 3px #0008;
+  margin: 0 -2px;
+  position: relative; z-index: 2;
+}
+.tv-score .lfo-bug-crest.home { grid-column: 2; justify-self: start; margin-left: 4px; }
+.tv-score .lfo-bug-crest.away { grid-column: 4; justify-self: end; margin-right: 4px; }
+.tv-score b:nth-of-type(1) { padding-left: 38px !important; }
+.tv-score b:nth-of-type(2) { padding-right: 38px !important; border-right: 2px solid #fff; border-radius: 0 3px 0 0; }
+
+/* Marcador combinado: mostramos ambos números en una sola celda cromada */
+.tv-score .lfo-bug-score {
+  grid-row: 1; grid-column: 3;
+  background: var(--grad-chrome);
+  color: #01203f;
+  font: 800 italic 24px/1 "Barlow Condensed", sans-serif;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 4px 10px;
+  border-top: 2px solid #fff; border-bottom: 2px solid #5d6873;
+  min-width: 66px;
+}
+.tv-score .lfo-bug-score i { color: var(--lfo-red); font-style: normal; }
+body.lfo-bug-ready .tv-score strong { display: none !important; }
+/* Pedido explícito: "marcador clonado" — había DOS marcadores en pantalla a la vez: este chip nativo
+   (.tv-score, arriba a la izquierda) y la barra del pack (.lfo-bc-bar, centrada) + su ticker inferior
+   (.lfo-bc-ticker). El pedido: dejar el chip de la izquierda (con escudos, ver enhanceScoreBug() en
+   lfo-broadcast.js) y sacar el del centro. */
+.lfo-bc-bar, .lfo-bc-ticker { display: none !important; }
+
+/* ---------- 9.2 MARCA DE AGUA / LOGO EN CANCHA ---------- */
+.broadcast-watermark {
+  right: 18px !important; top: 16px !important;
+  font-family: "Barlow Condensed", sans-serif !important;
+  font-style: italic !important; font-weight: 800 !important;
+  font-size: 22px !important;
+  color: #ffffffdd !important;
+  text-shadow: 0 2px 4px #000b;
+  align-items: center !important;
+  z-index: 30 !important;
+  filter: drop-shadow(0 3px 8px #000a);
+}
+.broadcast-watermark::before {
+  content: "";
+  width: 34px; height: 34px;
+  background: url("../equiposfut/ligadefutbolonlinelogo.png") center/contain no-repeat;
+  filter: drop-shadow(0 2px 4px #000b);
+}
+.broadcast-watermark span {
+  border: 0 !important;
+  background: var(--grad-red);
+  color: #fff !important;
+  font-family: "Barlow Condensed", sans-serif !important;
+  font-weight: 800 !important; font-size: 9px !important;
+  padding: 3px 7px !important; border-radius: 2px !important;
+  box-shadow: 0 1px 4px #0009, inset 0 1px 0 #ffffff55;
+  letter-spacing: 1.4px !important;
+}
+
+/* ---------- 9.3 CHIP DE CÁMARA / METADATOS ---------- */
+.camera-chip {
+  background: linear-gradient(180deg, #0c3f72e8, #01203fe8) !important;
+  border: 1px solid #ffffff44 !important;
+  border-left: 3px solid var(--lfo-sky) !important;
+  border-radius: 3px !important;
+  color: #dceaf8 !important;
+  font-family: "Barlow Condensed", sans-serif !important;
+  font-size: 10px !important; letter-spacing: 1.3px !important; font-weight: 600;
+  z-index: 25 !important;
+}
+.camera-auto { color: #a9cef2 !important; border-color: #ffffff33 !important; }
+.field-meta { color: #dbeaf8cc !important; font-family: "Barlow Condensed", sans-serif !important; z-index: 25 !important; }
+#minimap {
+  border: 2px solid #ffffff55 !important;
+  border-radius: 3px !important;
+  background: #04203ba8 !important;
+  box-shadow: 0 4px 14px #000a;
+  z-index: 25 !important;
+}
+.fullscreen-button {
+  background: linear-gradient(180deg, #0c3f72cc, #01203fcc) !important;
+  border: 1px solid #ffffff44; color: #dceaf8 !important;
+  z-index: 25 !important;
+}
+.fullscreen-button:hover { background: var(--grad-chrome) !important; color: #01203f !important; }
+
+/* ---------- 9.4 INTRO EN CANCHA ---------- */
+.pitch-intro {
+  border-left: 4px solid transparent !important;
+  border-image: var(--grad-chrome) 4 !important;
+  background: linear-gradient(90deg, #01274ced, #01274cc4 70%, #01274c00) !important;
+  z-index: 26 !important;
+}
+.pitch-intro h3 {
+  font-family: "Barlow Condensed", sans-serif !important;
+  font-style: italic; font-weight: 800 !important; text-transform: uppercase;
+  color: #fff; text-shadow: 0 2px 0 #001f3d;
+}
+.intro-kicker { color: var(--lfo-sky-lt) !important; font-weight: 700; letter-spacing: 2px !important; }
+.intro-hint { color: #c2dbf0 !important; }
+
+/* ---------- 9.5 CALLOUT DE EVENTO ---------- */
+.event-callout {
+  background: linear-gradient(120deg, #01274cf2, #0c3f72e8) !important;
+  border-left: 4px solid transparent !important;
+  border-image: var(--grad-chrome) 4 !important;
+  border-radius: 0 4px 4px 0 !important;
+  z-index: 28 !important;
+}
+.event-callout > span:first-child {
+  color: var(--lfo-sky-lt) !important; font-weight: 700; letter-spacing: 2px !important;
+}
+.event-callout > strong {
+  font-family: "Barlow Condensed", sans-serif !important;
+  font-weight: 800 !important; font-style: italic; text-transform: uppercase;
+  color: #fff !important;
+}
+.event-callout > span:last-child { color: #bcd9f3 !important; }
+.event-callout.goal {
+  background: var(--grad-chrome) !important; color: #01203f !important;
+  border-image: var(--grad-red) 4 !important;
+}
+.event-callout.goal > span:first-child { color: var(--lfo-red) !important; }
+.event-callout.goal > span:last-child { color: #0a3a66 !important; }
+
+.paused-overlay {
+  background: linear-gradient(180deg, #01274ce8, #011a34e8) !important;
+  border: 2px solid transparent !important;
+  border-image: var(--grad-chrome) 2 !important;
+  border-radius: 4px !important;
+  font-family: "Barlow Condensed", sans-serif !important;
+  font-weight: 800 !important; letter-spacing: 2px !important;
+  color: #fff !important;
+  z-index: 28 !important;
+}
+.replay-badge {
+  background: var(--grad-red) !important; color: #fff !important;
+  border: 2px solid #fff; border-radius: 3px !important;
+  font-family: "Barlow Condensed", sans-serif !important;
+  font-weight: 800 !important; letter-spacing: 1.5px !important;
+  box-shadow: 0 4px 14px #000a;
+  z-index: 29 !important;
+}
+.replay-badge button { border-left-color: #ffffff66 !important; color: #fff !important; }
+.player-label {
+  background: linear-gradient(180deg, #0c3f72e8, #01203fe8) !important;
+  border-bottom: 3px solid var(--lfo-sky) !important;
+  border-radius: 2px !important;
+  font-family: "Barlow Condensed", sans-serif !important;
+  font-weight: 700; letter-spacing: .6px;
+  z-index: 24 !important;
+}
+
+/* ===================== 10. FOOTER / MISC =============================== */
+footer { color: #7ea3c4 !important; }
+footer .status-dot { background: var(--lfo-sky) !important; }
+.footer-version { border-left-color: #2f6096 !important; }
+.below-broadcast { color: #8fb0cd !important; }
+.below-broadcast svg { color: var(--lfo-sky) !important; }
+kbd {
+  background: linear-gradient(180deg, #0f4275, #02203d) !important;
+  border: 1px solid #3b6e9f !important; color: #cbe0f5 !important;
+  font-family: "Barlow Condensed", sans-serif !important; font-weight: 700;
+}
+.match-details { border-color: #2f6096 !important; border-style: solid !important; }
+.match-details > div > svg { color: var(--lfo-sky) !important; }
+.match-details strong { color: #eaf2fb !important; }
+.match-details small { color: #8fb0cd !important; }
+.stats-footer { color: #8fb0cd !important; border-top-color: #2f6096 !important; }
+
+/* ===================== 11. RESPONSIVE ================================== */
+@media (max-width: 1200px) {
+  .crest { width: 48px !important; height: 48px !important; }
+  .team h2 { font-size: 22px !important; }
+  .score-numbers { font-size: 44px !important; }
+}
+@media (max-width: 640px) {
+  .site-header { height: 64px !important; }
+  .brand { font-size: 23px !important; }
+  .brand-mark { width: 40px !important; height: 40px !important; }
+  .scoreboard { height: 104px !important; gap: 14px !important; }
+  .crest { width: 38px !important; height: 38px !important; }
+  .team h2 { font-size: 18px !important; }
+  .score-numbers { font-size: 36px !important; }
+  .tv-score { transform: scale(.78) !important; transform-origin: left top !important; }
+  .broadcast-watermark { font-size: 16px !important; }
+  .broadcast-watermark::before { width: 24px; height: 24px; }
+}

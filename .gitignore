@@ -1,0 +1,13 @@
+# Assets pesados: quedan en tu PC, no se suben (GitHub no aguanta ~5 GB).
+# Ver ASSETS_PESADOS.md para saber qué son y dónde van.
+assets/roster/
+01-futbol/roster/
+assets/carengines/
+# Basura
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+
+# copia del repo original de Carreras (apexracingproj); se renombró para poder subir esos archivos al repo principal
+.git-lro-backup/

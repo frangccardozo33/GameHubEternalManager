@@ -1,0 +1,670 @@
+{
+ "_formato": "Modelo aislado del circuito VALLE VERDE con decorado de ejemplo. Es el formato que carga el juego desde 07-carreras-apex/circuits/valleverde.json (o dentro de circuits.json). Los campos con «_» son referencia y se ignoran.",
+ "_como_usarlo": "Copiá este archivo como circuits/valleverde.json (sin el prefijo _modelo_) para verlo en el juego; verificá con: node tools/check_circuit.mjs circuits/valleverde.json",
+ "id": "valleverde",
+ "name": "VALLE VERDE",
+ "nation": "Peronia",
+ "region": "San Esteban",
+ "theme": "grass",
+ "halfWidth": 8.5,
+ "groundColor": "#9dcc95",
+ "skyColor": "#b6c4bd",
+ "wetChance": 0.15,
+ "tempBase": 24,
+ "gripMod": 1,
+ "brakingMod": 1,
+ "aeroMod": 1,
+ "overtakeDiff": 0.5,
+ "treeCount": 120,
+ "layout": [
+  [
+   -220,
+   135
+  ],
+  [
+   -80,
+   135
+  ],
+  [
+   100,
+   135
+  ],
+  [
+   245,
+   120
+  ],
+  [
+   290,
+   35
+  ],
+  [
+   250,
+   -65
+  ],
+  [
+   135,
+   -103
+  ],
+  [
+   88,
+   -25
+  ],
+  [
+   18,
+   -18
+  ],
+  [
+   -9,
+   -119
+  ],
+  [
+   -106,
+   -150
+  ],
+  [
+   -230,
+   -109
+  ],
+  [
+   -290,
+   -15
+  ],
+  [
+   -270,
+   95
+  ]
+ ],
+ "props": [
+  {
+   "type": "tree",
+   "x": 306.5,
+   "z": -29.4,
+   "h": 13,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": 239.2,
+   "z": -23.9,
+   "h": 15,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": 282.8,
+   "z": -75.9,
+   "h": 17,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": 224.8,
+   "z": -43.7,
+   "h": 13,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": 233.4,
+   "z": -110.6,
+   "h": 15,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": 189.6,
+   "z": -59.0,
+   "h": 17,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": 188.5,
+   "z": -126.7,
+   "h": 13,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": 151.9,
+   "z": -70.0,
+   "h": 15,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": 131.6,
+   "z": -134.9,
+   "h": 17,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": 148.3,
+   "z": -72.5,
+   "h": 13,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": 81.6,
+   "z": -82.0,
+   "h": 15,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": 131.5,
+   "z": -36.0,
+   "h": 17,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": 65.9,
+   "z": -47.8,
+   "h": 13,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": 83.2,
+   "z": 12.1,
+   "h": 15,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": 48.0,
+   "z": -45.4,
+   "h": 17,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": 25.7,
+   "z": 18.4,
+   "h": 13,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": 44.1,
+   "z": -36.3,
+   "h": 15,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": -22.6,
+   "z": -41.6,
+   "h": 17,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": 36.9,
+   "z": -73.9,
+   "h": 13,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": -29.9,
+   "z": -84.1,
+   "h": 15,
+   "shape": "round",
+   "color": "#4c7a3c"
+  },
+  {
+   "type": "tree",
+   "x": -182.4,
+   "z": -166.6,
+   "h": 15,
+   "shape": "round",
+   "color": "#5a8a44"
+  },
+  {
+   "type": "tree",
+   "x": -208.7,
+   "z": -157.2,
+   "h": 15,
+   "shape": "round",
+   "color": "#5a8a44"
+  },
+  {
+   "type": "tree",
+   "x": -235.9,
+   "z": -145.1,
+   "h": 15,
+   "shape": "round",
+   "color": "#5a8a44"
+  },
+  {
+   "type": "tree",
+   "x": -265.4,
+   "z": -122.6,
+   "h": 15,
+   "shape": "round",
+   "color": "#5a8a44"
+  },
+  {
+   "type": "tree",
+   "x": -284.5,
+   "z": -98.8,
+   "h": 15,
+   "shape": "round",
+   "color": "#5a8a44"
+  },
+  {
+   "type": "tree",
+   "x": -300.3,
+   "z": -74.5,
+   "h": 15,
+   "shape": "round",
+   "color": "#5a8a44"
+  },
+  {
+   "type": "tree",
+   "x": -314.2,
+   "z": -48.2,
+   "h": 15,
+   "shape": "round",
+   "color": "#5a8a44"
+  },
+  {
+   "type": "tree",
+   "x": -324.6,
+   "z": -11.6,
+   "h": 15,
+   "shape": "round",
+   "color": "#5a8a44"
+  },
+  {
+   "type": "tree",
+   "x": -322.9,
+   "z": 20.8,
+   "h": 15,
+   "shape": "round",
+   "color": "#5a8a44"
+  },
+  {
+   "type": "tree",
+   "x": -318.2,
+   "z": 48.8,
+   "h": 15,
+   "shape": "round",
+   "color": "#5a8a44"
+  },
+  {
+   "type": "cylinder",
+   "x": -69.8,
+   "z": 73.0,
+   "r": 1.6,
+   "h": 14,
+   "color": "#d9d4c4"
+  },
+  {
+   "type": "cone",
+   "x": -69.8,
+   "z": 73.0,
+   "y": 14,
+   "r": 2.4,
+   "h": 3,
+   "color": "#8a5a3a"
+  },
+  {
+   "type": "box",
+   "x": -69.8,
+   "z": 74.9,
+   "y": 13.2,
+   "w": 0.5,
+   "h": 9.5,
+   "d": 0.3,
+   "rot": 0,
+   "color": "#efe9d6"
+  },
+  {
+   "type": "box",
+   "x": -69.8,
+   "z": 74.9,
+   "y": 13.2,
+   "w": 0.5,
+   "h": 9.5,
+   "d": 0.3,
+   "rot": 90,
+   "color": "#efe9d6"
+  },
+  {
+   "type": "box",
+   "x": 41.0,
+   "z": -64.6,
+   "w": 26,
+   "h": 7,
+   "d": 14,
+   "rot": 15,
+   "color": "#a2492f"
+  },
+  {
+   "type": "cone",
+   "x": 41.0,
+   "z": -64.6,
+   "y": 7,
+   "r": 9,
+   "h": 4,
+   "rot": 15,
+   "color": "#5b3a2a"
+  },
+  {
+   "type": "cylinder",
+   "x": 39.3,
+   "z": -82.7,
+   "r": 4,
+   "h": 14,
+   "color": "#c9ccc2"
+  },
+  {
+   "type": "cone",
+   "x": 39.3,
+   "z": -82.7,
+   "y": 14,
+   "r": 4.2,
+   "h": 3,
+   "color": "#7d8079"
+  },
+  {
+   "type": "box",
+   "x": 80.3,
+   "z": 164.6,
+   "w": 36,
+   "h": 1.2,
+   "d": 0.2,
+   "rot": 5.194428907734473,
+   "color": "#8d8467"
+  },
+  {
+   "type": "box",
+   "x": 121.0,
+   "z": 163.2,
+   "w": 36,
+   "h": 1.2,
+   "d": 0.2,
+   "rot": 5.710593137499321,
+   "color": "#8d8467"
+  },
+  {
+   "type": "box",
+   "x": 161.4,
+   "z": 161.3,
+   "w": 36,
+   "h": 1.2,
+   "d": 0.2,
+   "rot": -0.0,
+   "color": "#8d8467"
+  },
+  {
+   "type": "box",
+   "x": 202.7,
+   "z": 158.2,
+   "w": 36,
+   "h": 1.2,
+   "d": 0.2,
+   "rot": 5.710593137499321,
+   "color": "#8d8467"
+  },
+  {
+   "type": "box",
+   "x": 248.3,
+   "z": 149.9,
+   "w": 36,
+   "h": 1.2,
+   "d": 0.2,
+   "rot": 16.69924423399422,
+   "color": "#8d8467"
+  },
+  {
+   "type": "box",
+   "x": 292.2,
+   "z": 111.1,
+   "w": 36,
+   "h": 1.2,
+   "d": 0.2,
+   "rot": 59.74356283647091,
+   "color": "#8d8467"
+  },
+  {
+   "type": "box",
+   "x": 312.0,
+   "z": 68.9,
+   "w": 36,
+   "h": 1.2,
+   "d": 0.2,
+   "rot": 67.38013505195963,
+   "color": "#8d8467"
+  },
+  {
+   "type": "box",
+   "x": 316.7,
+   "z": 14.6,
+   "w": 36,
+   "h": 1.2,
+   "d": 0.2,
+   "rot": 101.30993247401959,
+   "color": "#8d8467"
+  },
+  {
+   "type": "box",
+   "x": 303.7,
+   "z": -28.4,
+   "w": 36,
+   "h": 1.2,
+   "d": 0.2,
+   "rot": 108.43494882292264,
+   "color": "#8d8467"
+  },
+  {
+   "type": "box",
+   "x": 283.5,
+   "z": -69.5,
+   "w": 36,
+   "h": 1.2,
+   "d": 0.2,
+   "rot": 124.69515353123336,
+   "color": "#8d8467"
+  },
+  {
+   "type": "box",
+   "x": 240.4,
+   "z": -104.2,
+   "w": 36,
+   "h": 1.2,
+   "d": 0.2,
+   "rot": 156.03751102542242,
+   "color": "#8d8467"
+  },
+  {
+   "type": "box",
+   "x": 200.0,
+   "z": -119.9,
+   "w": 36,
+   "h": 1.2,
+   "d": 0.2,
+   "rot": 160.01689347810031,
+   "color": "#8d8467"
+  },
+  {
+   "type": "sphere",
+   "x": -470,
+   "z": -210,
+   "r": 80,
+   "squash": 0.35,
+   "color": "#86a274"
+  },
+  {
+   "type": "sphere",
+   "x": 330,
+   "z": -330,
+   "r": 90,
+   "squash": 0.35,
+   "color": "#86a274"
+  },
+  {
+   "type": "sphere",
+   "x": 480,
+   "z": 60,
+   "r": 85,
+   "squash": 0.35,
+   "color": "#86a274"
+  },
+  {
+   "type": "sphere",
+   "x": -440,
+   "z": 60,
+   "r": 70,
+   "squash": 0.35,
+   "color": "#86a274"
+  },
+  {
+   "type": "sphere",
+   "x": -60,
+   "z": -390,
+   "r": 95,
+   "squash": 0.35,
+   "color": "#86a274"
+  },
+  {
+   "type": "grandstand",
+   "s": 1250,
+   "lane": -34,
+   "length": 40,
+   "reverse": true
+  },
+  {
+   "type": "sign",
+   "s": 300,
+   "lane": -30,
+   "text": "VALLE VERDE",
+   "sub": "SAN ESTEBAN 1961",
+   "width": 30,
+   "bg": "#e8dfc6",
+   "fg": "#283e30"
+  },
+  {
+   "type": "sign",
+   "s": 760,
+   "lane": 30,
+   "text": "ESTANCIA SAN JUAN",
+   "sub": "DESDE 1902",
+   "width": 32,
+   "bg": "#2f5d3a",
+   "fg": "#f3ead0"
+  },
+  {
+   "type": "sign",
+   "s": 1100,
+   "lane": -30,
+   "text": "RADIO PAMPA",
+   "sub": "FM 96.3",
+   "width": 26,
+   "bg": "#bc5032",
+   "fg": "#f6e3b8"
+  }
+ ],
+ "_referencia": {
+  "largoMetros": 1595,
+  "sentido": "El punto 0 es la línea de largada; se avanza por el orden de los puntos (hacia +x en la recta principal).",
+  "boxes": "Carril de pit lane a la IZQUIERDA del sentido de marcha (z menores en la recta principal): lane +10…+25 entre s = 30 y 295 m; edificio de boxes en s = 170, lane 36 (16 × 7 × 175 m); guardarraíl de boxes en lane +40 hasta s = 305. Reservar libre x −200…110, z 70…200.",
+  "lane": "Los props de tipo sign y grandstand se ubican por s (metros recorridos desde la largada) y lane (metros laterales; + = izquierda, − = derecha).",
+  "puntos_de_control": [
+   {
+    "i": 0,
+    "x": -220,
+    "z": 135
+   },
+   {
+    "i": 1,
+    "x": -80,
+    "z": 135
+   },
+   {
+    "i": 2,
+    "x": 100,
+    "z": 135
+   },
+   {
+    "i": 3,
+    "x": 245,
+    "z": 120
+   },
+   {
+    "i": 4,
+    "x": 290,
+    "z": 35
+   },
+   {
+    "i": 5,
+    "x": 250,
+    "z": -65
+   },
+   {
+    "i": 6,
+    "x": 135,
+    "z": -103
+   },
+   {
+    "i": 7,
+    "x": 88,
+    "z": -25
+   },
+   {
+    "i": 8,
+    "x": 18,
+    "z": -18
+   },
+   {
+    "i": 9,
+    "x": -9,
+    "z": -119
+   },
+   {
+    "i": 10,
+    "x": -106,
+    "z": -150
+   },
+   {
+    "i": 11,
+    "x": -230,
+    "z": -109
+   },
+   {
+    "i": 12,
+    "x": -290,
+    "z": -15
+   },
+   {
+    "i": 13,
+    "x": -270,
+    "z": 95
+   }
+  ]
+ }
+}

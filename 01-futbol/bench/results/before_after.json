@@ -1,0 +1,38 @@
+[
+ {
+  "escena": "1v1: distancia mínima defensor–poseedor en 2 s (m, media)",
+  "antes": "1.16",
+  "despues": "1.73",
+  "nota": "el defensor cierra en vez de acompañar"
+ },
+ {
+  "escena": "Tiro claro: tiempo hasta que el defensor está a <2 m o se corta el tiro (s, media)",
+  "antes": "0.46",
+  "despues": "0.76",
+  "nota": "defensa por peligro (timeToShot vs timeToContact)"
+ },
+ {
+  "escena": "Pase con rival sobre la línea: % de semillas donde igualmente se elige ese pase",
+  "antes": "0%",
+  "despues": "0%",
+  "nota": "el PassPlan lo descarta por margen temporal negativo"
+ },
+ {
+  "escena": "Pase largo a receptor que un rival alcanza antes: % que se juega igual",
+  "antes": "100%",
+  "despues": "0%",
+  "nota": ""
+ },
+ {
+  "escena": "Pase corto a 10 m: recorrido del receptor hasta controlar",
+  "antes": "1.0 m (llegó 8/8)",
+  "despues": "1.2 m (llegó 8/8)",
+  "nota": "recepción al pie: no persigue la pelota"
+ },
+ {
+  "escena": "Sprint: tiempo a 8.1 m/s (90% de ~9 m/s) (s)",
+  "antes": "0.38",
+  "despues": "2.05",
+  "nota": "curva de aceleración humana (auditada)"
+ }
+]

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080d19">
+  <title>LRO — Liga Racing Online</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --paper:#e9e5db; --ink:#242821; --muted:#818175; --orange:#e56532; --line:#ccc9bd; --mono:'IBM Plex Mono',monospace; --display:'Barlow Condensed',Impact,sans-serif; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:'Barlow',Arial,sans-serif; }
+    body::before { content:''; position:fixed; inset:0; pointer-events:none; opacity:.12; z-index:20; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23000' filter='url(%23n)' opacity='.3' d='M0 0h180v180H0z'/%3E%3C/svg%3E"); }
+    button,select,input { font:inherit; } button { cursor:pointer; } button:disabled { opacity:.35; cursor:not-allowed; } button:focus-visible,select:focus-visible { outline:2px solid var(--orange); outline-offset:4px; }
+    button { transition:background .18s,color .18s,border-color .18s; } button:hover:not(:disabled) { filter:brightness(1.12); }
+    .topbar { height:79px; padding:0 3.1%; background:#20251f; color:var(--paper); display:flex; align-items:center; justify-content:space-between; border-bottom:4px solid var(--orange); gap:20px; }
+    .brand { display:flex; gap:11px; align-items:center; text-decoration:none; color:inherit; flex-shrink:0; }
+    .brand-mark { width:36px; height:36px; transform:skew(-12deg); background:repeating-conic-gradient(#e9e5db 0 25%,transparent 0 50%) 0/18px 18px; }
+    .brand-name { font:800 33px/.85 var(--display); letter-spacing:1.2px; } .brand-tag { font:9px var(--mono); letter-spacing:2px; margin-top:7px; }
+    nav.mainnav { align-self:stretch; display:flex; gap:22px; overflow-x:auto; scrollbar-width:none; } nav.mainnav::-webkit-scrollbar{display:none;}
+    nav.mainnav button { color:#a7ac9f; border:0; background:none; padding:0 3px; font:600 11px var(--mono); letter-spacing:.5px; position:relative; white-space:nowrap; flex-shrink:0; }
+    nav.mainnav button.active { color:#f5f0df; } nav.mainnav button.active::after { content:''; height:3px; position:absolute; bottom:13px; left:3px; right:3px; background:var(--orange); }
+    .network { font:10px var(--mono); letter-spacing:1.5px; display:flex; align-items:center; gap:9px; flex-shrink:0; } .dot { display:inline-block; width:6px; height:6px; background:var(--orange); border-radius:50%; }
+    main { max-width:1800px; margin:auto; padding:26px 3.1% 20px; }
+    .screen { display:none; } .screen.active { display:block; animation:fadein .25s ease; }
+    @keyframes fadein { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:none;} }
+    .masthead { display:flex; align-items:center; justify-content:space-between; margin-bottom:21px; flex-wrap:wrap; gap:12px; }
+    .eyebrow { font:500 10px var(--mono); letter-spacing:1.5px; text-transform:uppercase; } .eyebrow span { color:var(--orange); margin-right:8px; }
+    h1 { margin:5px 0 0; font:700 38px/.95 var(--display); letter-spacing:.5px; } .race-meta { display:flex; align-items:center; gap:26px; font:11px var(--mono); }
+    .race-meta .weather { border-left:1px solid var(--line); padding-left:25px; } .race-meta b { display:block; margin-bottom:5px; font-weight:500; } .race-meta small { color:#7b7d71; font-size:10px; }
+    .broadcast { position:relative; height:570px; min-height:480px; background:#899890; border:1px solid #292f28; overflow:hidden; box-shadow:0 5px 13px #262b2216; }
+    #scene { display:block; width:100%; height:100%; } .vignette { position:absolute; inset:0; pointer-events:none; background:linear-gradient(0deg,#0b130caa,transparent 25%,transparent 65%,#15221b25); box-shadow:inset 0 0 80px #101d191f; }
+    .feed-label { position:absolute; left:22px; top:20px; display:flex; font:600 10px var(--mono); color:#fff7e3; letter-spacing:1px; }
+    .feed-label .live { background:#dc5b2e; padding:7px 10px; display:flex; align-items:center; gap:7px; } .feed-label .live .dot { background:#fff8e3; } .feed-label .channel { background:#20271fe6; padding:7px 10px; }
+    .timing { position:absolute; left:22px; top:66px; width:222px; color:#e9e7d8; background:#1b231eeb; box-shadow:0 3px 20px #17261c26; }
+    .timing-head { display:flex; align-items:center; justify-content:space-between; background:#dedecd; color:#252c25; padding:9px 11px; font:700 13px var(--display); letter-spacing:1px; }
+    .timing-head strong { font:700 17px var(--display); } .timing-sub { display:flex; justify-content:space-between; padding:8px 11px; font:9px var(--mono); color:#9fa998; border-bottom:1px solid #ffffff17; }
+    #standings { height:330px; position:relative; }
+    .driver-row { position:absolute; height:33px; left:0; right:0; display:grid; grid-template-columns:23px 4px 1fr 49px 14px; align-items:center; gap:8px; padding:0 10px; border-bottom:1px solid #ffffff0b; transition:transform .65s cubic-bezier(.22,1,.36,1),background .3s; cursor:pointer; }
+    .driver-row:hover,.driver-row.selected { background:#ffffff0f; } .driver-row.selected { box-shadow:inset 2px 0 var(--orange); } .driver-row .pos { font:600 13px var(--display); color:#b7bfaa; text-align:center; } .driver-row:first-child .pos { color:var(--orange); }
+    .stripe { height:15px; width:3px; } .driver-row .name { font:600 15px var(--display); letter-spacing:.55px; } .driver-row .gap { font:10px var(--mono); text-align:right; color:#d6dbca; } .compound { border:1px solid currentColor; width:13px; height:13px; border-radius:50%; font:8px/11px var(--mono); text-align:center; } .soft { color:#f28369; } .medium { color:#e0c975; } .hard { color:#e6e8dd; }
+    .timing-foot { padding:9px 11px; font:9px var(--mono); letter-spacing:.3px; color:#9da995; display:flex; justify-content:space-between; }
+    .tv-logo { position:absolute; top:22px; right:24px; color:#f4f1da; text-align:right; text-shadow:0 1px 5px #263123aa; } .tv-logo b { font:italic 800 26px/.9 var(--display); letter-spacing:.5px; } .tv-logo small { display:block; font:8px var(--mono); letter-spacing:2.8px; margin-top:7px; }
+    .camera-indicator { position:absolute; top:79px; right:24px; color:#f0efdd; font:9px var(--mono); letter-spacing:1px; background:#27382b88; padding:7px 9px; }
+    .map-box { position:absolute; bottom:93px; right:23px; width:165px; height:120px; opacity:.88; } .map-box svg { width:100%; height:100%; overflow:visible; } .map-track { fill:none; stroke:#f2efd588; stroke-width:6; } .map-edge { fill:none; stroke:#1a261dbb; stroke-width:10; }
+    .map-car { stroke:#fff3d3; stroke-width:1; transition:cx .2s,cy .2s; }
+    .intro { position:absolute; left:280px; bottom:80px; right:214px; color:#fff2d8; text-shadow:0 2px 15px #18231788; } .intro .eyebrow { color:#f4d39a; } .intro h2 { font:800 46px/.94 var(--display); margin:10px 0 11px; letter-spacing:.8px; } .intro p { font-size:12px; color:#f0ebd9; margin:0; line-height:1.6; }
+    .intro-line { width:40px; height:3px; background:var(--orange); margin-bottom:13px; }
+    .start-lights { position:absolute; top:24px; left:50%; transform:translateX(-50%); padding:10px 15px; background:#141b15d9; display:none; gap:9px; border-bottom:3px solid #b1b4a4; } .start-lights i { width:22px; height:22px; border-radius:50%; background:#471f1a; border:3px solid #080e0a; } .start-lights i.on { background:#ff452b; box-shadow:0 0 15px #f83b2b88; }
+    .onboard-hud { position:absolute; right:25px; bottom:225px; color:#f0efdf; text-align:right; display:none; } .onboard-hud strong { font:700 45px var(--display); } .onboard-hud small { font:9px var(--mono); }
+    .event-overlay { position:absolute; left:50%; top:25px; transform:translateX(-50%) translateY(-100px); transition:transform .35s; padding:11px 19px; border-left:4px solid var(--orange); background:#18221ce8; color:#efeedb; min-width:260px; text-align:left; pointer-events:none; } .event-overlay.show { transform:translateX(-50%) translateY(0); } .event-overlay strong { display:block; font:700 20px var(--display); letter-spacing:1px; } .event-overlay span { font:10px var(--mono); color:#c2c9b3; }
+    .broadcast-bottom { position:absolute; bottom:0; left:0; right:0; height:57px; border-top:1px solid #ffffff27; display:flex; align-items:center; justify-content:space-between; padding:0 22px; color:#e8e9d5; background:#19261ec9; }
+    .view-controls { display:flex; gap:6px; align-items:center; } .view-controls span { font:9px var(--mono); color:#a7b09b; margin-right:8px; } .view-controls button { border:1px solid #e3e7d529; color:#d5ddc8; background:none; padding:7px 10px; font:9px var(--mono); } .view-controls button.active { background:#e4e6d6; color:#2d3729; border-color:#e4e6d6; }
+    .director-status { font:9px var(--mono); display:flex; align-items:center; gap:8px; } .director-status .dot { background:#bace9b; }
+    .safety-badge { position:absolute; top:24px; left:50%; transform:translateX(-50%); padding:8px 16px; background:#e0b52dee; color:#221c08; font:800 13px var(--display); letter-spacing:1.5px; display:none; }
+    .safety-badge.show { display:block; } .safety-badge.sc { background:#e0b52dee; } .safety-badge.vsc { background:#8fae5cee; } .safety-badge.red { background:#c93a2eee; color:#fdf0e4; }
+    .transport { display:flex; align-items:center; justify-content:space-between; padding:15px 0; border-bottom:1px solid var(--line); gap:15px; flex-wrap:wrap; }
+    .primary { border:1px solid #cc5228; background:var(--orange); color:#fff7e6; padding:13px 25px; display:flex; gap:22px; align-items:center; font:700 15px var(--display); letter-spacing:1.2px; box-shadow:inset 0 1px #fda97566; } .primary .play { font-size:12px; }
+    .secondary-btn { border:1px solid #8f9682; background:none; color:#3d4536; padding:13px 20px; font:700 12px var(--display); letter-spacing:1px; }
+    .transport-left { display:flex; gap:13px; align-items:center; flex-wrap:wrap; } .race-state { padding-left:13px; border-left:1px solid var(--line); font:10px var(--mono); color:#6e7567; } .race-state b { display:block; color:#2c3529; font:600 11px var(--mono); margin-bottom:3px; }
+    .playback { display:flex; gap:17px; align-items:center; } .speed-group { display:flex; gap:2px; padding:3px; border:1px solid #cecec1; } .speed-group button { background:none; border:0; color:#78806e; padding:6px 11px; font:10px var(--mono); } .speed-group button.active { background:#29332a; color:var(--paper); }
+    .icon-button { background:none; border:0; color:#5c6655; padding:8px; font:11px var(--mono); display:flex; align-items:center; gap:7px; } .icon-button svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.7; }
+    .lower-grid { display:grid; grid-template-columns:1fr 1.05fr 1.13fr; gap:23px; padding-top:22px; } .panel { min-width:0; } .panel+.panel { border-left:1px solid var(--line); padding-left:23px; }
+    .panel-heading { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; } .panel-heading h3 { font:700 17px var(--display); letter-spacing:.8px; margin:0; } .panel-heading span { font:9px var(--mono); color:#818777; }
+    .circuit-info { display:flex; gap:14px; align-items:center; } #circuit-preview { width:115px; height:76px; flex-shrink:0; } .circuit-name { font:700 22px/.95 var(--display); } .circuit-location { margin:6px 0 10px; font:9px var(--mono); color:#7c8272; } .facts { display:flex; gap:20px; flex-wrap:wrap; } .facts b { font:600 12px var(--mono); } .facts small { display:block; font:8px var(--mono); color:#828675; margin-top:4px; }
+    .driver-profile { display:flex; gap:13px; align-items:center; } .driver-number { font:italic 800 47px var(--display); min-width:55px; padding-right:13px; border-right:3px solid var(--orange); color:#cd5931; } .driver-fullname { font:700 22px var(--display); } .driver-team { font:9px var(--mono); color:#7b816f; margin-top:3px; } .driver-profile .flag { margin-left:auto; width:28px; height:18px; background:linear-gradient(#77b6d0 33%,#f6f0de 33% 66%,#77b6d0 66%); position:relative; } .flag::after { content:''; background:#d5a448; width:4px; height:4px; border-radius:50%; position:absolute; top:7px; left:12px; }
+    .telemetry { margin-top:16px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; } .telemetry label { display:block; font:8px var(--mono); color:#868976; margin-bottom:4px; } .telemetry strong { font:600 16px var(--display); } .telemetry .unit { font:8px var(--mono); color:#777f6c; } .tire-bar { display:inline-block; width:37px; height:4px; background:#d3d5c5; margin:0 0 3px 4px; } .tire-bar i { display:block; height:100%; background:#657154; width:100%; }
+    #event-log { height:105px; overflow:auto; scrollbar-width:thin; } .log-item { display:flex; gap:12px; padding-bottom:10px; font-size:11px; line-height:1.35; } .log-time { font:9px var(--mono); color:#969a87; min-width:35px; padding-top:2px; } .log-item strong { font-weight:600; } .log-item em { color:#ac633f; font-style:normal; }
+    footer { display:flex; justify-content:space-between; font:8px var(--mono); color:#939680; letter-spacing:.8px; margin-top:24px; padding-top:12px; border-top:1px solid var(--line); flex-wrap:wrap; gap:6px; }
+    .modal-backdrop { position:fixed; inset:0; background:#101910bb; backdrop-filter:blur(7px); z-index:30; display:none; align-items:center; justify-content:center; padding:22px; } .modal-backdrop.open { display:flex; } .modal { background:var(--paper); padding:30px; width:min(760px,95vw); max-height:88vh; overflow:auto; border-top:5px solid var(--orange); box-shadow:0 25px 90px #0006; position:relative; } .modal h2 { font:800 34px var(--display); margin:5px 0 20px; } .close-modal { position:absolute; right:18px; top:17px; background:none; border:0; font-size:27px; color:#68715b; } .modal p { font-size:13px; line-height:1.7; color:#67715d; }
+    .roster { width:100%; border-collapse:collapse; font:11px var(--mono); } .roster th { text-align:left; color:#818874; font-size:9px; padding:10px 6px; } .roster td { padding:11px 6px; border-top:1px solid #cacdbd; } .roster td:nth-child(2) { font:600 17px var(--display); } .roster tr { cursor:pointer; } .roster tr:hover { background:#fff5; }
+    .strategy-choice { display:flex; gap:8px; margin:18px 0; flex-wrap:wrap; } .strategy-choice button { background:none; border:1px solid #aab09b; padding:10px 16px; font:10px var(--mono); } .strategy-choice button.active { color:#f4eedc; background:#2b352b; }
+    .podium { display:flex; align-items:flex-end; justify-content:center; gap:12px; margin:22px 0; } .podium-step { text-align:center; width:29%; background:#d8d9c9; padding:16px 5px; border-top:4px solid var(--orange); } .podium-step:first-child { order:2; height:156px; background:#29352b; color:#efeeda; } .podium-step:nth-child(2) { order:1; height:128px; } .podium-step:nth-child(3) { order:3; height:110px; } .podium-step b { font:800 34px var(--display); } .podium-step strong { display:block; font:700 20px var(--display); } .podium-step small { font:8px var(--mono); }
+    .loading { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#f3eddb; font:14px var(--mono); background:#28372a; z-index:5; }
+    /* ---- Manager UI ---- */
+    .dash-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; } .stat-tile { background:#20251f; color:var(--paper); padding:16px 18px; border-top:3px solid var(--orange); } .stat-tile label { display:block; font:9px var(--mono); letter-spacing:1px; color:#a7ac9f; margin-bottom:8px; } .stat-tile strong { font:700 26px var(--display); display:block; } .stat-tile small { font:9px var(--mono); color:#8b9280; }
+    .panel-block { background:#f2efe4; border:1px solid var(--line); padding:20px; margin-bottom:18px; } .panel-block h3 { margin:0 0 14px; font:700 19px var(--display); letter-spacing:.6px; }
+    .cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:14px; }
+    .part-card { background:#20251f; color:var(--paper); padding:14px; border-top:4px solid var(--rc,#9aa08d); position:relative; } .part-card .rarity-tag { font:8px var(--mono); letter-spacing:1.5px; color:var(--rc,#9aa08d); } .part-card h4 { margin:6px 0 10px; font:700 18px var(--display); } .part-card .lvl { font:9px var(--mono); color:#a7ac9f; margin-bottom:8px; } .part-card .stats-mini { font:9px var(--mono); color:#c8cbba; line-height:1.7; } .part-card button { width:100%; margin-top:10px; background:var(--orange); color:#fff7e6; border:0; padding:8px; font:700 10px var(--mono); letter-spacing:.5px; }
+    .body-card { cursor:pointer; border:2px solid var(--line); background:#f7f4ea; padding:14px; } .body-card.active { border-color:var(--orange); background:#fbe9de; } .body-card h4 { margin:0 0 6px; font:700 17px var(--display); } .body-card small { font:9px var(--mono); color:#7c8272; }
+    .pack-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px; }
+    .pack-card { background:#20251f; color:#f4f1da; text-align:center; padding:24px 14px; border:1px solid #3a4235; cursor:pointer; } .pack-card:hover { border-color:var(--orange); } .pack-card .pack-icon { font-size:38px; margin-bottom:10px; } .pack-card h4 { margin:6px 0; font:800 18px var(--display); letter-spacing:.6px; } .pack-card .cost { font:9px var(--mono); color:#dc7046; }
+    .fragment-card { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; border-bottom:1px solid var(--line); font:11px var(--mono); }
+    .driver-card-manager { display:flex; gap:14px; align-items:center; background:#f7f4ea; border:1px solid var(--line); padding:14px; margin-bottom:10px; } .driver-card-manager .num { font:italic 800 30px var(--display); color:var(--orange); min-width:44px; } .driver-card-manager .info b { display:block; font:700 15px var(--display); } .driver-card-manager .info span { font:9px var(--mono); color:#7c8272; } .driver-card-manager .dstats { margin-left:auto; display:flex; gap:10px; font:9px var(--mono); text-align:center; } .driver-card-manager .dstats div strong { display:block; font:700 14px var(--display); }
+    .market-list { display:flex; flex-direction:column; gap:10px; }
+    .slider-row { margin-bottom:16px; } .slider-row label { display:flex; justify-content:space-between; font:10px var(--mono); letter-spacing:.5px; margin-bottom:6px; color:#5c6655; } .slider-row input[type=range] { width:100%; accent-color:var(--orange); }
+    .champ-table { width:100%; border-collapse:collapse; font:11px var(--mono); } .champ-table th { text-align:left; padding:8px 6px; color:#818874; font-size:9px; border-bottom:1px solid var(--line); } .champ-table td { padding:8px 6px; border-bottom:1px solid #d8d5c7; } .champ-table tr.me { background:#fbe9de; }
+    .cal-summary { display:flex; flex-wrap:wrap; gap:26px; align-items:center; } .cal-summary .big { font:700 44px var(--display); line-height:1; } .cal-summary small { display:block; font:10px var(--mono); letter-spacing:1.5px; color:#7c8272; margin-top:4px; }
+    .cal-bar { flex:1 1 240px; height:8px; background:#e6e2d4; border-radius:4px; overflow:hidden; } .cal-bar i { display:block; height:100%; background:var(--orange); }
+    .cal-races { display:grid; grid-template-columns:repeat(auto-fill,minmax(310px,1fr)); gap:14px; }
+    .cal-race { background:#fff; border:1px solid var(--line); padding:14px 16px; display:flex; flex-direction:column; gap:8px; position:relative; } .cal-race.done { opacity:.55; } .cal-race.now { border-color:var(--orange); box-shadow:0 0 0 2px var(--orange) inset; }
+    .cal-race .top { display:flex; align-items:center; gap:12px; } .cal-race .rn { font:700 30px var(--display); min-width:44px; color:var(--orange); } .cal-race h4 { margin:0; font:700 16px var(--display); letter-spacing:.5px; } .cal-race .date { font:10.5px var(--mono); color:#7c8272; letter-spacing:.6px; }
+    .cal-race .flag { height:14px; border-radius:2px; vertical-align:-2px; margin-right:5px; box-shadow:0 0 0 1px #0002; } .cal-race p { margin:0; font-size:12px; color:#4b5044; line-height:1.4; }
+    .cal-race .chips { display:flex; flex-wrap:wrap; gap:6px; } .cal-race .chips span { font:10px var(--mono); border:1px solid var(--line); padding:3px 7px; letter-spacing:.4px; } .cal-race .st { position:absolute; top:12px; right:12px; font:700 9px var(--mono); letter-spacing:1px; padding:3px 7px; background:#eef1e6; }
+    .cal-race.now .st { background:var(--orange); color:#fff; }
+    .calendar-row { display:flex; align-items:center; gap:14px; padding:11px 4px; border-bottom:1px solid var(--line); font:11px var(--mono); } .calendar-row.done { opacity:.5; } .calendar-row.now { background:#fbe9de; } .calendar-row .rnum { font:700 20px var(--display); min-width:36px; color:var(--orange); }
+    .sponsor-card { background:#f7f4ea; border:1px solid var(--line); padding:16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; } .sponsor-card h4 { margin:0 0 6px; font:700 18px var(--display); } .sponsor-card small { font:9px var(--mono); color:#7c8272; }
+    .command-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-top:14px; } .command-group label { display:block; font:9px var(--mono); color:#7c8272; margin-bottom:6px; letter-spacing:1px; } .command-group { display:flex; flex-direction:column; gap:5px; } .command-group button { border:1px solid #aab09b; background:#f7f4ea; padding:8px 4px; font:9px var(--mono); } .command-group button.active { background:#29332a; color:#f4eedc; border-color:#29332a; }
+    .toggle-driver { display:flex; gap:8px; margin-bottom:10px; } .toggle-driver button { flex:1; border:1px solid #aab09b; background:#f7f4ea; padding:8px; font:10px var(--mono); } .toggle-driver button.active { background:var(--orange); color:#fff7e6; border-color:#cc5228; }
+    .feedback-line { padding:8px 0; border-bottom:1px solid var(--line); font-size:12px; line-height:1.5; } .feedback-line em { color:#ac633f; font-style:normal; font-weight:600; }
+    .weather-widget { display:flex; align-items:center; gap:8px; font:10px var(--mono); }
+    .news-item { padding:8px 0; border-bottom:1px solid var(--line); font-size:11px; } .news-item small { display:block; color:#7c8272; font:9px var(--mono); margin-top:2px; }
+    .vote-option { border:1px solid var(--line); padding:14px; margin-bottom:10px; cursor:pointer; background:#f7f4ea; } .vote-option.active { border-color:var(--orange); background:#fbe9de; } .vote-option h4 { margin:0 0 5px; font:700 15px var(--display); }
+    .bottom-nav { display:none; }
+    @media(min-width:1500px) { .broadcast { height:650px; } .intro h2 { font-size:60px; } }
+    @media(max-width:1000px) { .network { display:none; } .topbar { padding:0 22px; } nav.mainnav { gap:16px; } main { padding:22px 20px; } .race-meta { gap:15px; } .broadcast { height:550px; } .intro { left:268px; right:20px; bottom:95px; } .intro h2 { font-size:40px; } .map-box { display:none; } .director-status { display:none; } .lower-grid { gap:15px; } .panel+.panel { padding-left:15px; } #circuit-preview { width:85px; } .facts { gap:13px; } .dash-grid { grid-template-columns:repeat(2,1fr); } .command-grid { grid-template-columns:repeat(3,1fr); } }
+    @media(max-width:700px) { .topbar { height:64px; padding:0 15px; } .brand-name { font-size:24px; } .brand-mark { width:26px; height:26px; background-size:14px 14px; } .brand-tag { font-size:7px; } nav.mainnav { display:none; } main { padding:16px 12px 80px; } h1 { font-size:28px; } .eyebrow { font-size:8px; } .race-meta>div:first-child { display:none; } .race-meta .weather { padding-left:12px; font-size:9px; } .broadcast { height:480px; } .feed-label { left:12px; top:13px; } .timing { left:12px; top:53px; width:174px; } .driver-row { grid-template-columns:16px 3px 1fr 42px 12px; gap:5px; padding:0 7px; height:29px; } .driver-row .name { font-size:13px; } #standings { height:290px; } .timing-head { padding:7px 9px; } .timing-head strong { font-size:15px; } .timing-sub { font-size:8px; } .tv-logo { right:12px; top:16px; } .tv-logo b { font-size:22px; } .tv-logo small { font-size:6px; } .camera-indicator { top:55px; right:12px; font-size:7px; } .intro { left:22px; bottom:79px; right:15px; } .intro h2 { font-size:33px; margin:7px 0; } .intro p { font-size:10px; } .intro-line { display:none; } .intro .eyebrow { font-size:8px; } .broadcast-bottom { padding:0 12px; height:53px; } .view-controls span { display:none; } .view-controls button { font-size:8px; padding:8px 9px; } .transport { align-items:flex-start; } .transport-left { gap:8px 0; } .primary { padding:12px 15px; font-size:14px; gap:13px; } .race-state { display:none; } .playback { gap:3px; flex-wrap:wrap; justify-content:flex-end; } .speed-group button { padding:6px 8px; } .icon-button { padding:7px; font-size:0; } .lower-grid { grid-template-columns:1fr 1fr; row-gap:23px; } .panel:last-child { grid-column:1/-1; padding:17px 0 0; border-left:0; border-top:1px solid var(--line); } .circuit-info { gap:7px; } #circuit-preview { width:64px; } .circuit-name { font-size:20px; } .facts { gap:9px; } .facts b { font-size:10px; } .driver-number { font-size:35px; min-width:35px; padding-right:7px; } .driver-fullname { font-size:19px; } .driver-team { font-size:7px; } .driver-profile { gap:8px; } .driver-profile .flag { display:none; } .telemetry { gap:5px; } .telemetry label { font-size:7px; } .telemetry strong { font-size:14px; } .tire-bar { width:22px; } .panel-heading h3 { font-size:15px; } .panel-heading span { font-size:7px; } .event-overlay { top:400px; max-width:95%; min-width:240px; opacity:0; } .event-overlay.show { opacity:1; } .start-lights { top:100px; left:72%; gap:4px; padding:8px; } .start-lights i { width:17px; height:17px; } footer span:last-child { display:none; } .roster { font-size:9px; } .roster td:nth-child(2) { font-size:14px; } .modal { padding:23px 15px; } .dash-grid { grid-template-columns:1fr 1fr; gap:10px; } .stat-tile { padding:12px 14px; } .stat-tile strong { font-size:21px; } .command-grid { grid-template-columns:repeat(2,1fr); } .bottom-nav { display:flex; position:fixed; left:0; right:0; bottom:0; background:#20251f; border-top:3px solid var(--orange); z-index:15; overflow-x:auto; } .bottom-nav button { flex:1; background:none; border:0; color:#a7ac9f; font:600 8px var(--mono); padding:10px 4px; letter-spacing:.3px; white-space:nowrap; } .bottom-nav button.active { color:var(--orange); } }
+  </style>
+  <link rel="stylesheet" href="motorsport.css">
+<script src="../touchline-bridge.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="LRO inicio" id="brand-home"><img src="../assets/logos/lro-sm.png" alt="" style="height:44px;width:auto"><div><div class="brand-name">LRO</div><div class="brand-tag">LIGA RACING ONLINE · GT3</div></div></a>
+    <nav class="mainnav" aria-label="Navegación" id="mainnav">
+      <button class="active" data-screen="home">HOME</button>
+      <button data-screen="garage">GARAGE</button>
+      <button data-screen="drivers">DRIVERS</button>
+      <button data-screen="market">MARKET</button>
+      <button data-screen="championship">CHAMPIONSHIP</button>
+      <button data-screen="calendar">CALENDARIO</button>
+      <button data-screen="practice">PRACTICE</button>
+      <button data-screen="race">RACE CENTER</button>
+      <button data-screen="sponsors">SPONSORS</button>
+      <button data-screen="regulations">REGULATIONS</button>
+    </nav>
+    <div class="network"><span class="dot"></span> <span id="team-credits-badge">$0</span></div>
+  </header>
+  <main>
+
+    <!-- ===================== HOME ===================== -->
+    <section class="screen active" id="screen-home">
+      <div class="masthead"><div><div class="eyebrow"><span id="home-season">TEMPORADA 1</span> RONDA <span id="home-round">1</span> / <span id="home-total-rounds">8</span> · <span id="home-round-date"></span></div><h1 id="home-team-name">MI EQUIPO</h1></div></div>
+      <div class="career-hero">
+        <div class="hero-stripes"></div><div class="hero-watermark" aria-hidden="true">GT3</div>
+        <div class="hero-copy"><h2>GT3 <em>SERIE NACIONAL</em></h2><p>Gestiona el garage, los pilotos y la estrategia de carrera.</p><div class="hero-actions"><button id="hero-race" class="primary">IR A LA PARRILLA <span>→</span></button><button id="hero-garage" class="secondary-btn">MI GARAGE</button></div></div>
+        <div id="home-hero-art" class="hero-car"></div><div class="hero-car-caption"><span>FACTORY SPEC / <b id="hero-rating">0</b> OVR</span><strong id="hero-model">CLASSIC GT</strong><small id="hero-driver"></small></div>
+      </div>
+      <div class="section-kicker"><span>TEAM CONTROL</span></div>
+      <div class="dash-grid">
+        <div class="stat-tile"><label>PRESUPUESTO</label><strong id="home-credits">$0</strong><small id="home-materials">0 materiales</small></div>
+        <div class="stat-tile"><label>POSICIÓN EQUIPOS</label><strong id="home-team-pos">—</strong><small id="home-team-pts">0 PTS</small></div>
+        <div class="stat-tile"><label>POSICIÓN PILOTOS</label><strong id="home-driver-pos">—</strong><small id="home-driver-name">—</small></div>
+        <div class="stat-tile"><label>CONDICIÓN DEL COCHE</label><strong id="home-car-cond">100%</strong><small id="home-body-name">—</small></div>
+      </div>
+      <div class="panel-block">
+        <h3>PRÓXIMO EVENTO</h3>
+        <div class="circuit-info"><svg id="home-track-preview" viewBox="0 0 200 135" style="width:120px;height:80px;flex-shrink:0"></svg>
+          <div><div class="circuit-name" id="home-track-name">—</div><div class="circuit-location" id="home-track-loc">—</div><div class="facts"><div><b id="home-track-len">—</b><small>KM</small></div><div><b id="home-track-wet">—</b><small>PROB. LLUVIA</small></div><div><b id="home-penalty-flag" style="color:#c93a2e">—</b><small>ESTADO MOTOR</small></div></div></div>
+        </div>
+        <button class="primary" id="home-goto-event" style="margin-top:16px"><span class="play">▶</span>GO TO EVENT</button>
+      </div>
+      <div class="panel-block">
+        <h3>PATROCINADORES</h3>
+        <div id="home-sponsors-list"></div>
+      </div>
+      <div class="panel-block">
+        <h3>NOTICIAS RECIENTES</h3>
+        <div id="home-news"></div>
+      </div>
+    </section>
+
+    <!-- ===================== GARAGE ===================== -->
+    <section class="screen" id="screen-garage">
+      <div class="masthead"><div><div class="eyebrow"><span>GARAGE</span> COCHE Y PIEZAS</div><h1>GARAGE</h1></div></div>
+      <div id="garage-showroom" class="garage-showroom"></div>
+      <div class="garage-links"><a href="#body-cards">01 / CARROCERÍAS</a><a href="#parts-cards">02 / COMPONENTES</a><a href="#pack-cards">03 / SOBRES</a></div>
+      <div class="panel-block">
+        <h3>COLECCIÓN DE CARROCERÍAS <small>11 MODELOS / 5 NUEVOS</small></h3>
+        <div class="cards-grid" id="body-cards"></div>
+      </div>
+      <div class="panel-block">
+        <h3>PIEZAS INSTALADAS</h3>
+        <div class="cards-grid" id="parts-cards"></div>
+      </div>
+      <div class="panel-block">
+        <h3>SOBRES</h3>
+        <div class="pack-grid" id="pack-cards"></div>
+      </div>
+      <div class="panel-block">
+        <h3>FRAGMENTOS</h3>
+        <div id="fragments-list"></div>
+      </div>
+    </section>
+
+    <!-- ===================== DRIVERS ===================== -->
+    <section class="screen" id="screen-drivers">
+      <div class="masthead"><div><div class="eyebrow"><span>PLANTILLA</span> MIS PILOTOS</div><h1>PILOTOS</h1></div></div>
+      <div class="panel-block">
+        <h3>PILOTO ACTIVO ESTA FECHA</h3>
+        <div id="active-driver-toggle" class="toggle-driver"></div>
+      </div>
+      <div class="panel-block">
+        <h3>ENTRENAMIENTO DE PILOTOS</h3>
+        <p style="font-size:12px;color:#8a9">Cada fecha tus pilotos suman puntos de entrenamiento en el área elegida. Intensa progresa más rápido pero cuesta créditos; los pilotos jóvenes mejoran más.</p>
+        <div id="train-intensity" class="toggle-driver"></div>
+      </div>
+      <div id="my-drivers-list"></div>
+    </section>
+
+    <!-- ===================== MARKET ===================== -->
+    <section class="screen" id="screen-market">
+      <div class="masthead"><div><div class="eyebrow"><span>MERCADO</span> FICHAJES</div><h1>MERCADO DE PILOTOS</h1></div></div>
+      <div class="panel-block market-list" id="market-list"></div>
+    </section>
+
+    <!-- ===================== CHAMPIONSHIP ===================== -->
+    <section class="screen" id="screen-championship">
+      <div class="masthead"><div><div class="eyebrow"><span>SERIE NACIONAL</span> GT3</div><h1>CAMPEONATO</h1></div></div>
+      <div class="panel-block"><h3>CAMPEONATO DE PILOTOS</h3><table class="champ-table" id="drivers-champ-table"></table></div>
+      <div class="panel-block"><h3>CAMPEONATO DE EQUIPOS</h3><table class="champ-table" id="teams-champ-table"></table></div>
+      <div class="panel-block"><h3>HISTORIAL DE TEMPORADAS</h3><table class="champ-table" id="season-history-table"></table></div>
+      <div class="panel-block"><h3>CALENDARIO</h3><div id="calendar-list"></div></div>
+    </section>
+
+    <!-- ===================== CALENDARIO ===================== -->
+    <section class="screen" id="screen-calendar">
+      <div class="masthead"><div><div class="eyebrow"><span>SERIE NACIONAL</span> GT3</div><h1>CALENDARIO</h1></div></div>
+      <div class="panel-block" id="cal-summary"></div>
+      <div class="cal-races" id="cal-races"></div>
+    </section>
+
+    <!-- ===================== PRACTICE ===================== -->
+    <section class="screen" id="screen-practice">
+      <div class="masthead"><div><div class="eyebrow"><span>PRÁCTICA</span> SETUP</div><h1>PRÁCTICA</h1></div></div>
+      <div class="panel-block">
+        <h3>AJUSTES</h3>
+        <div id="setup-sliders"></div>
+        <button class="primary" id="run-practice-btn"><span class="play">▶</span>SIMULAR VUELTA</button>
+      </div>
+      <div class="panel-block">
+        <h3>RESULTADO</h3>
+        <div class="dash-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="stat-tile"><label>TIEMPO ESTIMADO</label><strong id="practice-laptime">—</strong></div>
+          <div class="stat-tile"><label>SETUP SCORE</label><strong id="practice-score">0</strong></div>
+          <div class="stat-tile"><label>CONFIANZA PILOTO</label><strong id="practice-confidence">0%</strong></div>
+        </div>
+        <div id="practice-feedback"></div>
+      </div>
+    </section>
+
+    <!-- ===================== RACE CENTER ===================== -->
+    <section class="screen" id="screen-race">
+      <section class="masthead"><div><div class="eyebrow"><span id="rc-round-label">FECHA 01</span> SERIE NACIONAL · GT3</div><h1 id="rc-title">CARRERA</h1></div><div class="race-meta"><div><b id="rc-track-name">SAN ESTEBAN</b><small id="rc-track-country">Buenos Aires, Argentina</small></div><div class="weather"><b><span id="rc-weather-icon">☀</span> <span id="rc-weather-label">DESPEJADO</span></b><small id="rc-weather-detail">PISTA 31°C</small></div></div></section>
+      <section class="broadcast" aria-label="Transmisión 3D de la carrera">
+        <canvas id="scene"></canvas><div class="vignette"></div><div class="loading" id="loading">PREPARANDO EL AUTÓDROMO…</div>
+        <div class="safety-badge" id="safety-badge"></div>
+        <div class="feed-label"><span class="live"><i class="dot"></i> EN VIVO</span><span class="channel">SEÑAL 01 / HD</span></div>
+        <aside class="timing"><div class="timing-head"><span id="session-label">PARRILLA DE SALIDA</span><strong id="lap-display">V 0 / 4</strong></div><div class="timing-sub"><span>PILOTO</span><span id="gap-label">INTERVALO</span></div><div id="standings"></div><div class="timing-foot"><span id="flag-label">10 EQUIPOS</span><span id="race-clock">00:00</span></div></aside>
+        <div class="tv-logo"><b>LRO<span style="color:#e97843">.</span></b><small>RACING ONLINE</small></div>
+        <div class="camera-indicator" id="camera-label">CAM 01 · GRILLA</div>
+        <div class="start-lights" id="start-lights"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="event-overlay" id="event-overlay"><strong id="event-title"></strong><span id="event-detail"></span></div>
+        <div class="onboard-hud" id="onboard-hud"><strong id="hud-speed">0</strong> <small>KM/H</small><br><small id="hud-state">RACING</small></div>
+        <div class="intro" id="intro"><div class="intro-line"></div><h2>CARRERA</h2><p>10 equipos en pista. Pulsa START RACE para comenzar.</p></div>
+        <div class="map-box"><svg id="minimap" viewBox="0 0 200 135" aria-label="Mapa de posiciones en vivo"></svg></div>
+        <div class="broadcast-bottom"><div class="view-controls"><span>CÁMARA</span><button data-camera="auto" class="active">◉ AUTO TV</button><button data-camera="track">CIRCUITO</button><button data-camera="chase">PERSECUCIÓN</button><button data-camera="onboard">A BORDO</button></div><div class="director-status"><i class="dot"></i><span id="director-label">DIRECTOR IA ACTIVADO</span></div></div>
+      </section>
+      <section class="transport" aria-label="Controles de carrera"><div class="transport-left"><button class="secondary-btn" id="quali-button">SIMULAR CLASIFICACIÓN</button><button class="secondary-btn" id="strategy-button">ESTRATEGIA</button><button class="primary" id="start-button"><span class="play">▶</span><span id="start-label">START RACE</span></button><div class="race-state"><b id="status-label">TODO LISTO EN LA PARRILLA</b><span id="status-detail">Carrera corta</span></div></div><div class="playback"><div class="speed-group" aria-label="Velocidad"><button data-speed="0.5">0.5×</button><button data-speed="1" class="active">1×</button><button data-speed="2">2×</button></div><button class="icon-button" id="restart-button" title="Reiniciar carrera" aria-label="Reiniciar carrera"><svg viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 8M4 4v6h6"/></svg>REINICIAR</button><button class="icon-button" id="sound-button" title="Activar sonido" aria-label="Activar sonido"><svg viewBox="0 0 24 24"><path d="M11 4 5 9H2v6h3l6 5ZM16 9l6 6m0-6-6 6" id="sound-icon"/></svg></button><button class="icon-button" id="fullscreen-button" title="Pantalla completa" aria-label="Pantalla completa"><svg viewBox="0 0 24 24"><path d="M3 9V3h6m6 0h6v6m0 6v6h-6m-6 0H3v-6"/></svg></button></div></section>
+      <section class="panel-block" id="commands-panel" style="display:none">
+        <h3>DIRECCIÓN DE CARRERA</h3>
+        <div class="toggle-driver" id="command-car-toggle"></div>
+        <div class="command-grid">
+          <div class="command-group" data-cmd="pace"><label>RITMO</label><button data-val="push">PUSH</button><button data-val="standard" class="active">STANDARD</button><button data-val="conserve">CONSERVE</button></div>
+          <div class="command-group" data-cmd="tyres"><label>NEUMÁTICOS</label><button data-val="push">PUSH TYRES</button><button data-val="standard" class="active">STANDARD</button><button data-val="save">SAVE TYRES</button></div>
+          <div class="command-group" data-cmd="pit"><label>BOXES</label><button data-val="now">PIT NOW</button><button data-val="next">PIT NEXT LAP</button><button data-val="stay" class="active">STAY OUT</button></div>
+          <div class="command-group" data-cmd="overtake"><label>ADELANTAMIENTO</label><button data-val="attack">ATTACK</button><button data-val="standard" class="active">STANDARD</button><button data-val="defend">DEFEND</button></div>
+          <div class="command-group" data-cmd="fuel"><label>COMBUSTIBLE</label><button data-val="push">PUSH</button><button data-val="standard" class="active">STANDARD</button><button data-val="save">SAVE</button></div>
+        </div>
+      </section>
+      <section class="lower-grid">
+        <article class="panel"><div class="panel-heading"><h3>EL ESCENARIO</h3><span id="rc-track-tag">CIRCUITO</span></div><div class="circuit-info"><svg id="circuit-preview" viewBox="0 0 200 135"></svg><div><div class="circuit-name" id="rc-circuit-name">AUTÓDROMO<br>SAN ESTEBAN</div><div class="circuit-location">34°36′ S &nbsp; 58°22′ O</div><div class="facts"><div><b id="track-length">1.82</b><small>KILÓMETROS</small></div><div><b>12</b><small>CURVAS</small></div><div><b>4</b><small>VUELTAS</small></div></div></div></div></article>
+        <article class="panel"><div class="panel-heading"><h3>PILOTO EN FOCO</h3><span id="focus-position">POS. 01</span></div><div class="driver-profile"><div class="driver-number" id="focus-number">07</div><div><div class="driver-fullname" id="focus-name">MATEO MARTÍN</div><div class="driver-team" id="focus-team">ESCUDERÍA DEL SUR</div></div><div class="flag"></div></div><div class="telemetry"><div><label>VELOCIDAD</label><strong id="focus-speed">0</strong> <span class="unit">KM/H</span></div><div><label>NEUMÁTICOS</label><strong id="focus-tire">M · 100%</strong><span class="tire-bar"><i id="tire-bar-fill"></i></span></div><div><label>ESTADO</label><strong id="focus-state">EN PARRILLA</strong></div><div><label>COMBUSTIBLE</label><strong id="focus-fuel">100</strong><span class="unit">%</span></div><div><label>DELTA VUELTA</label><strong id="focus-delta">—</strong></div><div><label>DAÑO</label><strong id="focus-damage">0%</strong></div></div></article>
+        <article class="panel"><div class="panel-heading"><h3>LO QUE PASA EN PISTA</h3><span>RACE CONTROL</span></div><div id="event-log" aria-live="polite"><div class="log-item"><span class="log-time">—</span><div><strong>El silencio antes de la largada.</strong><br>Diez escuderías. Una sola bandera a cuadros.</div></div></div></article>
+      </section>
+      <footer><span>LRO · GT3 © 2026</span><span>100% IA · FÍSICA EN TIEMPO REAL · GESTIÓN COMPLETA</span><span>PROTOTIPO V.02</span></footer>
+    </section>
+
+    <!-- ===================== SPONSORS ===================== -->
+    <section class="screen" id="screen-sponsors">
+      <div class="masthead"><div><div class="eyebrow"><span>PATROCINIO</span> CONTRATOS</div><h1>PATROCINADORES</h1></div></div>
+      <div class="panel-block"><h3>CONTRATOS ACTIVOS</h3><div id="active-sponsors"></div></div>
+      <div class="panel-block"><h3>OFERTAS DISPONIBLES</h3><div id="sponsor-offers"></div></div>
+    </section>
+
+    <!-- ===================== REGULATIONS ===================== -->
+    <section class="screen" id="screen-regulations">
+      <div class="masthead"><div><div class="eyebrow"><span>FIA GT3</span> REGLAMENTO</div><h1>REGLAMENTO</h1></div></div>
+      <div class="panel-block" id="regulations-summary"></div>
+      <div class="panel-block" id="vote-panel" style="display:none"><h3>VOTACIÓN DE REGLAMENTO — FIN DE TEMPORADA</h3><div id="vote-options"></div><button class="primary" id="submit-vote" style="margin-top:14px">CONFIRMAR VOTO</button></div>
+    </section>
+
+  </main>
+  <div class="modal-backdrop" id="modal-backdrop"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><button class="close-modal" id="close-modal" aria-label="Cerrar">×</button><div id="modal-content"></div></section></div>
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="active" data-screen="home">HOME</button>
+    <button data-screen="garage">GARAGE</button>
+    <button data-screen="drivers">PILOTOS</button>
+    <button data-screen="market">MERCADO</button>
+    <button data-screen="championship">TABLA</button>
+    <button data-screen="calendar">FECHAS</button>
+    <button data-screen="practice">PRÁCTICA</button>
+    <button data-screen="race">CARRERA</button>
+    <button data-screen="sponsors">SPONSORS</button>
+    <button data-screen="regulations">REGLAS</button>
+  </nav>
+  <!-- Three.js is the only dependency. The simulation, data model and all artwork below are editable source. -->
+  <script src="vendor/three.min.js"></script>
+  <script src="game-data.js"></script>
+  <script src="circuits.js"></script>
+  <script src="motorsport-art.js"></script>
+  <script src="game-ui.js"></script>
+  <script src="../assets/nations/nations.js"></script>
+  <script src="../assets/tribuna/tribuna.js"></script>
+  <script src="tribuna-lro.js"></script>
+  <script src="../assets/broadcast/broadcast.js"></script>
+  <script src="broadcast-lro.js"></script>
+  <script src="engine.js"></script>
+  <script>
+  (function(){
+    'use strict';
+    if (typeof window.Touchline === 'undefined' || typeof saveCareer !== 'function' || typeof playerTeam !== 'function') return;
+    var lastCredits = playerTeam(window.Career).credits;
+    var origSaveCareer = saveCareer;
+    saveCareer = function(career){
+      var team = playerTeam(career);
+      var delta = Math.round((team.credits - lastCredits) * 100) / 100;
+      if (delta > 0) window.Touchline.addSilver(delta);
+      else if (delta < 0) window.Touchline.removeSilver(-delta);
+      lastCredits = team.credits;
+      return origSaveCareer(career);
+    };
+    window.Touchline.onBalances(function(b){
+      if (!b || typeof b.silver !== 'number') return;
+      var team = playerTeam(window.Career);
+      if (b.silver === team.credits) return;
+      team.credits = b.silver;
+      lastCredits = b.silver;
+      if (typeof refreshTopBadge === 'function') refreshTopBadge();
+      if (typeof refreshAll === 'function') refreshAll();
+    });
+    window.Touchline.getBalances().then(function(r){
+      if (!r || !r.ok || !r.balances) return;
+      var team = playerTeam(window.Career);
+      team.credits = r.balances.silver;
+      lastCredits = r.balances.silver;
+      if (typeof refreshTopBadge === 'function') refreshTopBadge();
+      if (typeof refreshAll === 'function') refreshAll();
+    });
+  })();
+  </script>
+</body>
+</html>

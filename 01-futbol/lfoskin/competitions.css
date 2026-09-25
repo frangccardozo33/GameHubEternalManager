@@ -1,0 +1,77 @@
+/* =============================================================================
+   COMPETICIONES (manager) — una tarjeta por trofeo, cada una con la marca de su competición.
+   · LIGA (LFO): azul cielo #7fb2e5 / azul profundo #003366 / oro #daa520 (paleta de lfo-skin.css)
+   · LA CUPIDITÉ: esmeralda #27d468 sobre negro #050807 (paleta de cupidite.css)
+   Logos: equiposfut/ligadefutbolonlinelogo.png y equiposfut/cupidite/icon.png.
+   ========================================================================== */
+.cmp-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
+@media (max-width: 1000px) { .cmp-cards { grid-template-columns: 1fr; } }
+.cmp-card { position: relative; overflow: hidden; border-radius: 12px; padding: 18px 20px 16px; display: flex; flex-direction: column; gap: 12px; }
+.cmp-brand { display: flex; align-items: center; gap: 14px; }
+.cmp-brand small { display: block; letter-spacing: .18em; font-size: 10.5px; font-weight: 700; }
+.cmp-brand h3 { margin: 2px 0 0; font-family: "Barlow Condensed", sans-serif; font-style: italic; font-weight: 800; font-size: 30px; letter-spacing: .03em; line-height: 1; }
+.cmp-logo { width: 62px; height: 62px; flex: 0 0 auto; background-position: center; background-repeat: no-repeat; background-size: contain; }
+.cmp-logo.big { width: 116px; height: 116px; }
+.cmp-logo.cup { background-image: url("../equiposfut/cupidite/icon.png"); filter: drop-shadow(0 0 12px #27d468aa); }
+.cmp-diamond { width: 54px; height: 54px; flex: 0 0 auto; background: url("../equiposfut/cupidite/icon.png") center/contain no-repeat; filter: drop-shadow(0 0 10px #27d468aa); }
+.cmp-trophy small { display: block; letter-spacing: .2em; font-size: 10.5px; font-weight: 800; margin-bottom: 6px; }
+.cmp-cand { display: flex; align-items: center; gap: 12px; }
+.cmp-cand b { display: block; font-family: "Barlow Condensed", sans-serif; font-size: 24px; letter-spacing: .03em; line-height: 1.05; }
+.cmp-cand span { font-size: 12px; opacity: .85; }
+.cmp-meter { height: 6px; border-radius: 3px; overflow: hidden; }
+.cmp-meter i { display: block; height: 100%; border-radius: 3px; }
+.cmp-chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.cmp-chips span { border-radius: 8px; padding: 8px 6px; text-align: center; min-width: 0; }
+.cmp-chips b { display: block; font-family: "Barlow Condensed", sans-serif; font-size: 22px; line-height: 1.1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cmp-chips small { display: block; font-size: 9px; letter-spacing: .12em; font-weight: 700; margin-top: 2px; opacity: .8; }
+.cmp-note { margin: 0; font-size: 12.5px; line-height: 1.45; }
+.cmp-note .ok { color: #6fffa6; } .cmp-note .warn { color: #ffcf6b; }
+.cmp-card .tlm-btn { align-self: flex-start; margin-top: auto; }
+.cmp-flag { height: 13px; width: auto; border-radius: 2px; vertical-align: -2px; box-shadow: 0 0 0 1px #ffffff33; }
+.cmp-tag { display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: .1em; padding: 2px 6px; border-radius: 999px; background: #ffffff18; color: #dfe8ee; vertical-align: 1px; margin-left: 4px; }
+.cmp-tag.cup { background: #27d46826; color: #6fffa6; border: 1px solid #27d46866; }
+
+/* ---- tarjeta de la liga: azul LFO con oro ---- */
+.cmp-card.lfo { color: #eaf3fc; border: 1px solid #7fb2e5; background: radial-gradient(120% 90% at 0 0, #0a4a86 0%, #012347 55%, #05121f 100%); box-shadow: 0 0 0 1px #ffffff14 inset, 0 8px 26px #0007; }
+.cmp-card.lfo .cmp-brand small { color: #a9cef2; }
+.cmp-card.lfo .cmp-brand h3 { color: #fff; }
+.cmp-card.lfo .cmp-trophy small { color: #daa520; }
+.cmp-card.lfo .cmp-meter { background: #ffffff1c; } .cmp-card.lfo .cmp-meter i { background: linear-gradient(90deg, #7fb2e5, #daa520); }
+.cmp-card.lfo .cmp-chips span { background: #ffffff10; border: 1px solid #7fb2e544; }
+.cmp-card.lfo .cmp-chips b { color: #fff; }
+.cmp-card.lfo .cmp-note b { color: #f4d27a; }
+
+/* ---- tarjeta de La Cupidité: negro y esmeralda ---- */
+.cmp-card.cup { color: #e9fff2; border: 1px solid #27d468; background: linear-gradient(90deg, #030807f2 10%, #030807b8 60%, #030807e8 100%), url("cupidite/poster.jpg") center 35%/cover no-repeat, #050807; box-shadow: 0 0 24px #27d46833, 0 8px 26px #0008; }
+.cmp-card.cup .cmp-brand small { color: #6fffa6; }
+.cmp-card.cup .cmp-brand h3 { color: #27d468; text-shadow: 0 0 18px #27d46877; }
+.cmp-card.cup .cmp-trophy small { color: #6fffa6; }
+.cmp-card.cup .cmp-meter { background: #ffffff18; } .cmp-card.cup .cmp-meter i { background: #27d468; }
+.cmp-card.cup .cmp-chips span { background: #0c2a1e; border: 1px solid #1a5a3a; }
+.cmp-card.cup .cmp-chips b { color: #6fffa6; }
+.cmp-card.cup .cmp-note b { color: #6fffa6; }
+
+/* ---- pestañas de detalle ---- */
+.cmp-tabs button.cup.on { background: #27d46822; color: #6fffa6; border-bottom-color: #27d468; }
+.cmp-tabs button.cup { letter-spacing: .06em; font-style: italic; }
+.cmp-detail.lfo .lfo-panel { border-color: #7fb2e566; background: linear-gradient(180deg, #0c1c2b, #08131d); }
+.cmp-detail.lfo .lfo-panel h3 { color: #a9cef2; }
+.cmp-detail.cup .cup-panel { border-color: #1a5a3a; background: linear-gradient(180deg, #0a1f16, #050f0a); }
+.cmp-detail.cup .cup-panel h3 { color: #6fffa6; font-family: "Barlow Condensed", sans-serif; font-style: italic; letter-spacing: .08em; text-transform: uppercase; }
+.cmp-detail.cup .tlm-table td, .cmp-detail.cup .tlm-list li { border-color: #ffffff12; }
+.cmp-detail.cup .cup-panel .muted { color: #8fb0a0; }
+.cmp-detail.cup .tlm-alert.info { border-color: #27d46866; background: #27d46814; color: #d8ffe8; }
+.cmp-detail.cup .cup-seeds li.me, .cmp-detail.cup tr.me td { color: #6fffa6; font-weight: 700; }
+.cmp-detail.cup .cup-col.prelim h4 { color: #ffcf6b; }
+.cmp-detail.cup .cup-col.prelim .cup-tie { border-style: dashed; }
+.cup-rules li { margin-bottom: 4px; }
+.lfo-hero { display: flex; align-items: center; gap: 20px; padding: 20px 26px; border-radius: 10px; margin-bottom: 14px; border: 1px solid #7fb2e5; background: linear-gradient(90deg, #012347, #0a4a86 70%, #003366); box-shadow: 0 0 20px #4a84c455; }
+.lfo-hero h2 { margin: 0; font-family: "Barlow Condensed", sans-serif; font-style: italic; font-weight: 800; font-size: 40px; color: #fff; letter-spacing: .03em; }
+.lfo-hero p { margin: 4px 0 0; color: #a9cef2; letter-spacing: .14em; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+.cmp-detail.lfo tr.lead td { background: #daa52016; } .cmp-detail.lfo tr.lead td:first-child { color: #daa520; font-weight: 800; }
+.cmp-detail .tlm-alert { display: block; line-height: 1.5; }
+.cmp-detail .tlm-alert .tlm-btn { margin-left: 8px; }
+.cmp-detail .tlm-table { width: 100%; }
+.cmp-detail.cup .cup-col.prelim { justify-content: flex-start; }
+.tlm-rounds button.cupmark { box-shadow: inset 0 -3px #27d468; color: #6fffa6; }
+.cal-cup { margin-top: 14px; border-color: #1a5a3a; background: linear-gradient(180deg, #0a1f16, #050f0a); } .cal-cup h3 { color: #6fffa6; font-style: italic; }

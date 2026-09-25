@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#0c1119"><meta name="description" content="LGO, Liga de Gridiron Online: simulador de fútbol americano 11 contra 11 en 3D."><title>LGO — Liga de Gridiron Online</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%239be3a6'/%3E%3Cpath d='M9 12h22v5H14v11h12v-5h-7v-5h12v15H9z' fill='%23101819'/%3E%3C/svg%3E"><script src="../touchline-bridge.js"></script>
+</head>
+<body data-page="dashboard" data-tab="live">
+<div class="shell">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="content">
+    <header class="topbar" id="topbar"></header>
+    <div id="manager-root" class="mroot"></div>
+    <div id="page-match" class="hidden">
+      <div id="prematch" class="mroot"></div>
+      <div id="match-live" class="hidden">
+        <div class="match-tabs" role="tablist"><button class="nav-item active" data-tab="live">Partido</button><button class="nav-item" data-tab="stats">Estadísticas</button><button class="nav-item" data-tab="playbook">Playbook</button><span class="match-tabs-fill"></span><button class="ghost-button" id="exhibition-button" title="Partido de exhibición">Exhibición ↗</button></div>
+        <main class="match-main">
+    <section class="scoreboard" aria-label="Marcador">
+      <div class="team team-home"><div class="crest home-crest"><svg viewBox="0 0 64 64"><path d="M9 13l17 9 7-12 7 12 16-9-5 28-18 13L14 41z"/><path d="M19 29l10 5-9 3m25-8-10 5 9 3M28 44l5-5 5 5-5 5"/></svg></div><div class="team-name"><small>NORTH</small><strong>WOLVES</strong><div class="timeouts" id="timeouts-0"></div></div><span class="possession-dot" id="possession-0" title="Posesión"></span><strong class="score" id="score-0">0</strong></div>
+      <div class="score-center"><div class="match-status" id="match-status"><i></i> LISTO PARA KICKOFF</div><div class="clock-row"><span id="quarter">1Q</span><strong id="game-clock">5:00</strong></div><div class="down-chip" id="down">KICKOFF</div></div>
+      <div class="team team-away"><strong class="score" id="score-1">0</strong><span class="possession-dot" id="possession-1" title="Posesión"></span><div class="team-name"><small>AUSTIN</small><strong>OUTLAWS</strong><div class="timeouts" id="timeouts-1"></div></div><div class="crest away-crest"><svg viewBox="0 0 64 64"><path d="M12 25l9-14h22l9 14-9 4H21zM7 29h50v6H7zM16 39l12 2 4 8 4-8 12-2-4 13-12 7-12-7z"/></svg></div></div>
+    </section>
+    <div class="workspace" id="match-workspace">
+      <section class="match-panel">
+        <div class="panel-toolbar"><div class="view-label"><span class="live-dot"></span> CAMPO EN VIVO <span class="separator">/</span><span id="stadium-label">North Field</span></div><div class="camera-tabs" role="group" aria-label="Cámara"><button class="active" data-camera="broadcast">Broadcast</button><button data-camera="wide">Wide</button><button data-camera="close">Close</button></div></div>
+        <div class="viewport" id="viewport">
+          <div class="scene-top"><span class="scene-badge"><i></i><span id="state-label">PREPARADO</span></span><span class="weather">NORTH FIELD <span>·</span> 21°C <span>·</span> DESPEJADO</span></div>
+          <div class="scene-watermark">G</div>
+          <div class="start-overlay" id="start-overlay"><span class="eyebrow">PARTIDO</span><h2>Listos para el kickoff</h2><p>Dos equipos, cuatro cuartos.</p><button id="start-match" class="primary-button"><span>▶</span> Iniciar partido <span class="button-arrow">↗</span></button><small>11 vs 11</small></div>
+          <div class="result-overlay hidden" id="result-overlay"><small id="result-detail"></small><strong id="result-title"></strong><span id="result-yards"></span></div>
+          <div class="replay-badge hidden" id="replay-badge">REPLAY <span>0.5×</span></div>
+          <div class="field-legend"><span><i class="legend-line blue"></i>Line of scrimmage</span><span><i class="legend-line yellow"></i>First down</span></div>
+          <button class="expand-button" id="fullscreen" title="Pantalla completa" aria-label="Pantalla completa">⛶</button>
+          <div id="player-label" class="player-tooltip hidden"></div>
+        </div>
+        <div class="playback"><div class="playback-left"><button id="play-pause" class="transport-button" title="Iniciar o pausar (Espacio)" aria-label="Iniciar o pausar">▶</button><button id="next-play" class="icon-button" title="Simular hasta siguiente jugada" aria-label="Siguiente jugada">▸▏</button><div class="speed-controls" aria-label="Velocidad"><button data-speed="0.5">0.5×</button><button class="active" data-speed="1">1×</button><button data-speed="2">2×</button><button data-speed="4">4×</button><button data-speed="8">8×</button></div></div><div class="playback-right"><button id="sim-rest" title="Simular el resto del partido sin animación">⏭ <span>Simular resto</span></button><button id="replay-button" disabled>↶ <span>Replay</span></button><button id="audio-button" aria-pressed="false">♪ <span>Audio off</span></button><button id="debug-button" aria-pressed="false"><span class="debug-icon">⌘</span> <span>Debug</span></button></div></div>
+      </section>
+      <aside class="tactics-panel">
+        <div class="section-title"><h2>Dentro de la jugada</h2><span class="subtle-tag" id="play-count">#001</span></div>
+        <div class="tactic-tabs"><button class="active" data-side="offense">Ofensiva</button><button data-side="defense">Defensiva</button></div>
+        <div class="play-heading"><div><span class="eyebrow" id="personnel">SPECIAL TEAMS</span><h3 id="play-name">Kickoff</h3></div><span class="play-type" id="play-type">KICK</span></div>
+        <div class="diagram-wrap"><canvas id="diagram" width="600" height="400" aria-label="Diagrama táctico de asignaciones"></canvas><div class="diagram-caption"><span><i class="dot blue-dot"></i> Ataque</span><span><i class="dot orange-dot"></i> Defensa</span><span>→ Dirección</span></div></div>
+        <div class="assignment-summary"><div><span>Formación</span><strong id="formation-name">Special teams</strong></div><div><span>Cobertura rival</span><strong id="coverage-name">Cover 2</strong></div><div><span>Lectura del QB</span><strong id="qb-read">—</strong></div></div>
+        <div class="pressure-box"><div><span>PRESIÓN EN EL POCKET</span><strong id="pressure-value">0%</strong></div><div class="meter"><span id="pressure-meter"></span></div></div>
+        <div class="ai-note"><span class="ai-glyph">✧</span><p id="ai-note">Se evalúan down, distancia y cobertura antes de cada snap.</p></div>
+      </aside>
+    </div>
+    <section id="coach-board" class="detail-view coach-board hidden"></section>
+    <section id="stats-view" class="detail-view hidden"><div class="section-title"><h2>El partido, en números</h2><span>ESTADÍSTICAS EN TIEMPO REAL</span></div><div id="stats-content"></div></section>
+    <section id="playbook-view" class="detail-view hidden"><div class="section-title"><h2>Playbook de la simulación</h2><span>16 CONCEPTOS · 7 COBERTURAS</span></div><p class="muted">Elige una jugada para probarla en el siguiente snap ofensivo. Las patadas y conversiones conservan su lógica situacional.</p><div class="playbook-controls"><label>Ofensiva<select id="forced-play"><option value="">Automático · IA situacional</option></select></label><label>Defensiva<select id="forced-defense"><option value="">Automático · IA situacional</option></select></label></div><div class="playbook-grid" id="playbook-grid"></div></section>
+    <section id="debug-panel" class="detail-view hidden"><div class="section-title"><h2>Asignaciones</h2><span id="debug-state">HUDDLE</span></div><div class="table-scroll"><table><thead><tr><th>Jugador</th><th>Rol</th><th>Asignación</th><th>Ruta / zona / gap</th><th>Target / bloqueo</th><th>Estado</th></tr></thead><tbody id="debug-rows"></tbody></table></div></section>
+    <div class="bottom-grid"><section class="drive-panel"><div class="section-title"><h2>La posesión</h2><span id="drive-label">DRIVE 01</span></div><div class="drive-summary"><div><span>POSICIÓN</span><strong id="field-position">ATX 35<small>YD</small></strong></div><div><span>JUGADAS</span><strong id="drive-plays">0</strong></div><div><span>YARDAS</span><strong id="drive-yards">0<small>YD</small></strong></div><div class="drive-direction"><span id="drive-team">AUSTIN OUTLAWS</span><strong>→</strong></div></div><div class="drive-track"><div class="track-grid"></div><div class="track-progress" id="track-progress"></div><span class="track-ball" id="track-ball">◆</span></div><div class="yard-labels"><span>OWN 0</span><span>25</span><span>50</span><span>25</span><span>OPP 0</span></div></section><section class="feed-panel"><div class="section-title"><h2>Play-by-play</h2><span class="live-text"><i></i> LIVE</span></div><div id="event-feed"><div class="empty-feed">El primer snap es solo el comienzo.<small>Los eventos del partido aparecerán aquí.</small></div></div></section></div>
+    <footer class="match-footer"><span><i></i> DETERMINISTIC ENGINE <span class="footer-separator">/</span> <span id="seed-label">SEED 42</span></span><button id="export-button">Exportar partido ↗</button></footer>
+  </main>
+      </div>
+    </div>
+  </div>
+</div>
+<dialog id="modal" class="modal"><div id="modal-body"></div></dialog>
+  <dialog id="settings-dialog"><form id="settings-form"><div class="section-title"><h2>Partido de exhibición</h2><button type="button" id="close-settings" class="icon-button" aria-label="Cerrar">×</button></div><p class="muted">Partido de exhibición con los equipos base. No afecta a tu temporada.</p><label>Duración de cada cuarto<select id="quarter-length"><option value="180">3 minutos · Rápido</option><option value="300" selected>5 minutos · Exhibición</option><option value="900">15 minutos · Reglamentario</option></select></label><label>Semilla de simulación<input id="seed-input" type="number" value="42" min="1" max="999999" required></label><div class="settings-columns"><label>Wolves · Ataque<select id="style-home"></select></label><label>Outlaws · Ataque<select id="style-away"></select></label></div><div class="settings-columns"><label>Wolves · Defensa<select id="defense-home"></select></label><label>Outlaws · Defensa<select id="defense-away"></select></label></div><label class="checkbox-label"><input type="checkbox" id="penalties-input" checked> Penalizaciones simplificadas</label><p class="settings-note">Reglas simplificadas, sin overtime. Los empates son válidos. La simulación rápida usa exactamente el mismo motor.</p><button class="primary-button" type="submit">Crear partido de exhibición <span>↗</span></button></form></dialog>
+  <div id="toast" class="toast hidden" role="status"></div>
+  <script type="module" src="./src/main.js"></script>
+</body></html>
