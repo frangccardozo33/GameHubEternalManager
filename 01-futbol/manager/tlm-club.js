@@ -13,7 +13,7 @@
     const cap = cfg.capacity || 15000;
     const club = {
       id, name: cfg.name, shortName: (cfg.shortName || cfg.name.slice(0, 3)).toUpperCase().slice(0, 4), crest: cfg.crest || null, nation: cfg.nation || (g.LFONations && g.LFONations.forClub(cfg.name)) || null,
-      primaryColor: cfg.primaryColor || '#4a8fbf', secondaryColor: cfg.secondaryColor || '#ffffff',
+      primaryColor: cfg.primaryColor || '#4a8fbf', secondaryColor: cfg.secondaryColor || '#ffffff', kitPattern: cfg.kitPattern || null,
       stadium: { name: cfg.stadium || 'Estadio ' + cfg.name, capacity: cap, level: cfg.level || 1 },
       finances: { balance: cfg.balance != null ? cfg.balance : 20e6, ledger: [], seasonIncome: 0, seasonExpense: 0, debtRounds: 0, ticketPrice: TLM.DEFAULTS.ticketPrice },
       squad: [], reputation: cfg.rep || 50, controlledBy: cfg.controlledBy || 'ai', aiProfile: cfg.profile || 'balanced',

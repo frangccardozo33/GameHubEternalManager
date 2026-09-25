@@ -784,6 +784,8 @@ lucide.createIcons({icons});\``);
       short: "ARG",
       color: "#8edbff",
       colorAlt: "#0b2f52",
+      kitTrim: "#ffffff",
+      kitPattern: "stripes",
       crest: "equiposfut/ligadefutbolonlinelogo.png",
       formation: "4-3-3",
       mentality: "balanced",
@@ -807,6 +809,7 @@ lucide.createIcons({icons});\``);
       short: "IBU",
       color: "#f77986",
       colorAlt: "#5c1420",
+      kitPattern: "hoops",
       crest: "equiposfut/olympiquedeiberia.png",
       formation: "4-3-3",
       mentality: "balanced",
@@ -35780,7 +35783,16 @@ Object.assign(zm.prototype, {
   createBallBumpTexture() {
     return LFO_BALL.bump(this.canvasMap.bind(this), this.seeded.bind(this));
   },
+  // Apariencia de la camiseta: la del jugador (modo carrera) o la del equipo (exhibición). Diseños en kits.js (LFOKits).
+  kitAppearance(p) {
+    const K = window.LFOKits, gk = p.role === "GK";
+    if (p.appearance) return p.appearance;
+    const t = this.match && this.match.teams ? this.match.teams[p.team] : null;
+    return K ? K.defaultFor(p.team, t, gk) : null;
+  },
   createJerseyTexture(p) {
+    const K = window.LFOKits, ap = this.kitAppearance(p);
+    if (K && ap) return this.canvasMap(512, 512, (c, w, h) => K.paint(c, w, h, ap));
     if (p.appearance) return this.canvasMap(512, 512, (c, w, h) => {
       const a = p.appearance;
       c.fillStyle = a.kit; c.fillRect(0, 0, w, h); c.fillStyle = a.trim;
@@ -35909,24 +35921,27 @@ Object.assign(zm.prototype, {
       0.158,
       m.body,
     );
-    const number = this.canvasMap(256, 256, (c) => {
-      c.fillStyle = home && !gk ? "#173349" : "#ece7d5";
-      c.font = "bold 140px Arial";
-      c.textAlign = "center";
-      c.fillText(p.number, 128, 205);
-      c.font = "bold 23px Arial";
-      c.fillText(p.name.split(" ").slice(-1)[0].toUpperCase(), 128, 48, 240);
+    // Dorsal grande con contorno de contraste (color según la camiseta) y apellido arriba.
+    const ns = window.LFOKits ? window.LFOKits.numberStyle(this.kitAppearance(p)) : { fill: home && !gk ? "#173349" : "#ece7d5", stroke: "#000000" };
+    const number = this.canvasMap(256, 320, (c) => {
+      c.textAlign = "center"; c.lineJoin = "round";
+      c.font = "900 210px 'Barlow Condensed', Arial Black, Arial";
+      c.lineWidth = 14; c.strokeStyle = ns.stroke; c.strokeText(p.number, 128, 290);
+      c.fillStyle = ns.fill; c.fillText(p.number, 128, 290);
+      c.font = "800 34px 'Barlow Condensed', Arial";
+      c.lineWidth = 6; c.strokeText(p.name.split(" ").slice(-1)[0].toUpperCase(), 128, 52, 236);
+      c.fillText(p.name.split(" ").slice(-1)[0].toUpperCase(), 128, 52, 236);
     });
     const back = this.mesh(
-      new T3.PlaneGeometry(0.29, 0.32),
+      new T3.PlaneGeometry(0.3, 0.375),
       matBasic("#ffffff", {
         map: number,
         transparent: true,
         depthWrite: false,
       }),
       0,
-      1.27,
-      -0.156,
+      1.25,
+      -0.162,
       m.body,
     );
     back.rotation.y = Math.PI;
@@ -39502,6 +39517,7 @@ dialog{overflow:hidden}
 <script src="stadium-fx.js"></script>
 <script src="goalfx.js"></script>
 <script src="stadium-loader.js"></script>
+<script src="kits.js"></script>
 <script src="cardlook.js"></script>
 <script src="celebrationost/manifest.js"></script>
 <script src="celebration-cosmetics.js"></script>

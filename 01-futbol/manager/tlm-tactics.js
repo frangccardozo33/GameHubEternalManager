@@ -222,7 +222,14 @@
     for (const c of pool) { const sc = Math.min(cdist(c, club.primaryColor), opp ? cdist(c, opp.primaryColor) : 999, cdist(c, club.secondaryColor) * 0.8); if (sc > bs) { bs = sc; best = c; } }
     return best;
   }
-  const kitPattern = (club) => ['stripes', 'band', 'sash', 'plain'][Math.floor(TLM.hash01(club.id, 'kit') * 4) % 4];
+  // Diseño de camiseta: el del club (tlm-data) o, en partidas viejas / clubes creados, uno fijo según el nombre (kits.js).
+  const KIT_BY_NAME = {};
+  [...((TLM.WORLD_CONFIG && TLM.WORLD_CONFIG.clubs) || []), ...(TLM.GUEST_CLUBS || [])].forEach((c) => { if (c.kitPattern) KIT_BY_NAME[c.name] = c.kitPattern; });
+  const kitPattern = (club) => {
+    if (club.kitPattern) return club.kitPattern;
+    const ids = (g.LFOKits && g.LFOKits.ids) || ['stripes', 'band', 'sash', 'plain'];
+    return KIT_BY_NAME[club.name] || ids[Math.floor(TLM.hash01(club.id, 'kit') * ids.length) % ids.length];
+  };
   function sideConfig(state, club, instructions, opp) {
     repairLineup(state, club);
     const f = club.tactics.formation, slots = TLM.FORMATIONS[f];
