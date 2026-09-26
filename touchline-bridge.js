@@ -201,10 +201,9 @@
     showBtn = h('button', 'tlc-show', '💬'); showBtn.type = 'button'; showBtn.hidden = true; showBtn.title = 'Mostrar el chat del partido';
     root.append(bar, feed, pick, form, showBtn); document.body.appendChild(root);
     stage = h('div'); stage.id = 'tlc-stage'; stage.hidden = true;
-    stage.innerHTML = '<div class="tlc-sh"><b></b><button type="button" aria-label="Cerrar">×</button></div><video playsinline></video><div class="tlc-hint" hidden>Tocá para activar el sonido</div>';
-    document.body.appendChild(stage); sv = stage.querySelector('video'); hint = stage.querySelector('.tlc-hint');
+    stage.innerHTML = '<div class="tlc-sh"><b></b><button type="button" aria-label="Cerrar">×</button></div><video playsinline></video>';
+    document.body.appendChild(stage); sv = stage.querySelector('video');
     stage.querySelector('button').onclick = stopStage; sv.onended = stopStage;
-    hint.onclick = function () { sv.muted = false; sv.play().catch(function () {}); hint.hidden = true; };
     muteBtn.onclick = function () { post('mute'); }; hideBtn.onclick = function () { post('hide'); }; showBtn.onclick = function () { post('show'); };
     form.addEventListener('submit', function (e) { e.preventDefault(); var t = input.value.trim(); if (t && st.room) { post('sendText', { text: t }); input.value = ''; } input.blur(); });
     ['keydown', 'keyup', 'keypress'].forEach(function (k) { input.addEventListener(k, function (e) { e.stopPropagation(); if (k === 'keydown' && e.key === 'Escape') { input.blur(); pick.hidden = true; } }); });
@@ -241,8 +240,8 @@
   }
   function playSticker(m) {
     build(); if (st.sound === false) return; stage.hidden = false; stage.querySelector('b').textContent = m.who + ' · ' + m.label;
-    clearTimeout(stageT); sv.pause(); sv.src = m.url; sv.volume = st.vol; sv.muted = false; sv.currentTime = 0; hint.hidden = true;
-    var p = sv.play(); if (p && p.catch) p.catch(function () { sv.muted = true; sv.play().catch(function () {}); hint.hidden = false; document.addEventListener('pointerdown', function () { sv.muted = false; hint.hidden = true; }, { once: true }); });
+    clearTimeout(stageT); sv.pause(); sv.src = m.url; sv.volume = st.vol; sv.muted = false; sv.currentTime = 0;
+    var p = sv.play(); if (p && p.catch) p.catch(function () { sv.muted = true; sv.play().catch(function () {}); document.addEventListener('pointerdown', function () { sv.muted = false; }, { once: true }); });
     stageT = setTimeout(stopStage, 15000); remount();
   }
   function stopStage() { if (!stage || stage.hidden) return; clearTimeout(stageT); sv.pause(); sv.removeAttribute('src'); sv.load(); stage.hidden = true; post('stickerDone'); }

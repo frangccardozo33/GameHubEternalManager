@@ -72,7 +72,8 @@
   UI.actions.closeModal = () => UI.closeModal();
 
   // ---------- navegación ----------
-  const NAV = [['home', 'HOME', '⌂'], ['squad', 'SQUAD', '◍'], ['tactics', 'TACTICS', '✜'], ['transfers', 'TRANSFERS', '⇄'], ['scout', 'SCOUT', '◎'], ['club', 'CLUB', '⛨'], ['competitions', 'COMPETICIONES', '☰'], ['calendar', 'CALENDAR', '▦'], ['matchday', 'MATCHDAY', '▶'], ['news', 'NEWS', '✎'], ['wardrobe', 'VESTUARIO', '✦']];
+  const NAV = [['home', 'HOME', '⌂'], ['squad', 'SQUAD', '◍'], ['tactics', 'TACTICS', '✜'], ['transfers', 'TRANSFERS', '⇄'], ['scout', 'SCOUT', '◎'], ['club', 'CLUB', '⛨'], ['competitions', 'COMPETICIONES', '☰'], ['calendar', 'CALENDAR', '▦'], ['matchday', 'MATCHDAY', '▶'], ['news', 'NEWS', '✎'], ['sponsors', 'PATROCINIOS', '★'], ['wardrobe', 'VESTUARIO', '✦']];
+  const MAIN_TABS = ['home', 'squad', 'tactics', 'matchday'];
   UI.go = (screen, params) => { if (screen === 'cup') { screen = 'competitions'; params = Object.assign({}, params, { tab: 'cup' }); } UI.screen = screen; UI.params = params || {}; UI.closeModal(); UI.render(); const main = $('tlm-main'); if (main) main.scrollTop = 0; };
   UI.refresh = () => UI.render();
 
@@ -108,7 +109,8 @@
         <nav>${NAV.map(([id, label, ic]) => `<button class="${UI.screen === id ? 'on' : ''} ${(id === 'matchday' || (id === 'competitions' && cupHot)) && f && f.status !== 'played' ? 'hot' : ''}" data-act="go" data-screen="${id}"><i>${ic}</i>${label}${badge[id] ? `<em>${badge[id]}</em>` : ''}</button>`).join('')}</nav>
         <div class="tlm-side-foot"><button data-act="saveNow" class="tlm-btn ghost sm">Guardar</button><button data-act="exportSave" class="tlm-btn ghost sm">Exportar</button><button data-act="quitCareer" class="tlm-btn ghost sm">Menú</button><button data-act="closeManager" class="tlm-btn ghost sm">Salir al partido de exhibición</button></div></aside>
       <section class="tlm-content"><header class="tlm-top"><div class="tlm-chip"><small>SALDO</small><b class="${u.finances.balance < 0 ? 'neg' : ''}">${M(u.finances.balance)}</b></div><div class="tlm-chip"><small>POSICIÓN</small><b>${(c.table().find((r) => r.clubId === u.id) || {}).pos || '-'}° / ${c.comp.teams.length}</b></div><div class="tlm-chip"><small>PLANTILLA</small><b>${u.squad.length}</b></div><div class="tlm-chip"><small>MORAL</small><b>${moraleAvg()}</b></div><span class="tlm-grow"></span>${f && f.status !== 'played' ? `<button class="tlm-btn primary" data-act="go" data-screen="matchday">▶ ${esc(TLM.fixtureLabel(s, f).short)}: ${esc(vsLabel(f))}</button>` : f ? `<button class="tlm-btn primary" data-act="go" data-screen="matchday">${TLM.isCupFixture(f) ? 'Partido de copa jugado' : 'Jornada jugada'} · cerrar</button>` : `<button class="tlm-btn" data-act="go" data-screen="matchday">Descansás esta jornada</button>`}</header>
-        <main id="tlm-main" class="tlm-main">${main}</main></section></div>`;
+        <main id="tlm-main" class="tlm-main">${main}</main></section>
+      <nav class="tlm-tabbar" aria-label="Secciones">${MAIN_TABS.map((id) => { const n = NAV.find((x) => x[0] === id); return `<button class="${UI.screen === id ? 'on' : ''} ${id === 'matchday' && f && f.status !== 'played' ? 'hot' : ''}" data-act="go" data-screen="${id}"><i>${n[2]}</i><span>${n[1]}</span>${badge[id] ? `<em>${badge[id]}</em>` : ''}</button>`; }).join('')}<button class="${MAIN_TABS.includes(UI.screen) ? '' : 'on'}" data-act="moreMenu"><i>☰</i><span>MÁS</span>${badge.transfers ? `<em>${badge.transfers}</em>` : ''}</button></nav></div>`;
     UI.hydrateCards();
     if (UI.afterRender) UI.afterRender();
   };
@@ -119,6 +121,14 @@
   // ---------- eventos ----------
   const A = UI.actions;
   A.go = (el) => UI.go(el.dataset.screen, el.dataset.param ? JSON.parse(el.dataset.param) : {});
+  // menú «Más» (teléfonos): todas las secciones del modo carrera + acciones de la partida + salidas al sitio
+  A.moreMenu = () => {
+    const c = UI.career; if (!c) return;
+    UI.modal(`<h3>Secciones</h3><div class="tlm-more">${NAV.map(([id, label, ic]) => `<button class="${UI.screen === id ? 'on' : ''}" data-act="go" data-screen="${id}"><i>${ic}</i><span>${label}</span></button>`).join('')}</div>
+      <h4>Partida</h4><div class="tlm-more sm"><button data-act="saveNow"><i>💾</i><span>Guardar</span></button><button data-act="exportSave"><i>⇩</i><span>Exportar</span></button><button data-act="quitCareer"><i>☰</i><span>Menú</span></button></div>
+      <h4>Ir a</h4><div class="tlm-more sm"><button data-act="siteNav" data-target="album-nav"><i>▤</i><span>Archivo de tribuna</span></button><button data-act="siteNav" data-target="match-nav"><i>▶</i><span>Centro de partidos</span></button><button data-act="closeManager"><i>✕</i><span>Salir al partido de exhibición</span></button></div>`, 'tlm-moremodal');
+  };
+  A.siteNav = (el) => { UI.closeModal(); const b = document.getElementById(el.dataset.target); if (b) b.click(); };
   A.saveNow = () => { const r = UI.career.save(); UI.toast(r.ok ? 'Carrera guardada.' : r.reason, r.ok ? 'ok' : 'bad'); };
   A.exportSave = () => { const b = new Blob([UI.career.toJSON()], { type: 'application/json' }), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `lfo-${UI.career.user.shortName}-${UI.career.state.season}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); };
   A.quitCareer = () => { UI.career.save(); UI.career = null; UI.render(); };

@@ -17,7 +17,7 @@
   const REPO = new URL('../', ROOT).href;                                // raíz del proyecto
   const P = location.pathname;
   const MOD = /01-futbol/.test(P) ? 'futbol' : /02-musica/.test(P) ? 'musica' : /03-casino/.test(P) ? 'casino' : /04-mma/.test(P) ? 'mma' : /05-basquet/.test(P) ? 'basquet' : /06-nfl/.test(P) ? 'nfl' : /07-carreras/.test(P) ? 'carreras' : '';
-  if (!MOD || MOD === 'musica') return;
+  if (!MOD || MOD === 'musica' || MOD === 'casino') return; // música y casino no llevan capa de transmisión ni patrocinios
   const ACC = { futbol: '#27d468', basquet: '#ff9a3c', nfl: '#5ec98a', mma: '#d9463b', carreras: '#e97843', casino: '#e0b84a' }[MOD];
   const NAME = { futbol: 'Liga de Fútbol Online', basquet: 'Liga de Básquet Online', nfl: 'Liga de Gridiron Online', mma: 'Liga Lucha Online', carreras: 'Liga Racing Online', casino: 'Casino' }[MOD];
   const LOGO = { basquet: 'lbo-sm', nfl: 'lgo-sm', mma: 'llo-sm', carreras: 'lro-sm' }[MOD];
@@ -61,6 +61,7 @@
 @keyframes emcelin{from{transform:scale(.4);opacity:0}}
 .em-tab{position:fixed;left:0;top:44%;z-index:2147481900;background:#0a1018d8;color:#fff;border:1px solid #ffffff2a;border-left:0;padding:10px 6px;font:800 11px "Barlow Condensed",Arial;letter-spacing:.2em;writing-mode:vertical-rl;text-orientation:mixed;cursor:pointer;opacity:.5;transition:opacity .2s;pointer-events:auto}.em-tab:hover,.em-tab:focus-visible{opacity:1;background:var(--a);color:#000}
 .em-modal{position:fixed;inset:0;z-index:2147483100;background:#000000b8;display:flex;align-items:center;justify-content:center;pointer-events:auto;font-family:"Barlow","DM Sans",Arial,sans-serif}
+.em-panel.em-inline{width:auto;max-width:none;max-height:none;overflow:visible;margin:0;border-radius:10px;box-shadow:none}
 .em-panel{width:min(760px,calc(100vw - 24px));max-height:calc(100vh - 32px);overflow:auto;background:#0d141d;color:#fff;border:1px solid #ffffff26;border-top:4px solid var(--a);padding:18px 20px 20px;--a:${ACC}}
 .em-panel h2{margin:0 0 2px;font:italic 900 28px "Barlow Condensed",Arial;letter-spacing:.05em;text-transform:uppercase}.em-panel .sub{color:#8fa2b8;font-size:12px;margin-bottom:12px}
 .em-panel h3{font:800 12px "Barlow Condensed";letter-spacing:.22em;color:var(--a);margin:16px 0 8px;text-transform:uppercase}
@@ -83,6 +84,21 @@
 @keyframes emtape{from{transform:translateX(0)}to{transform:translateX(calc(-100% - 100vw))}}
 body.em-carreras .em-pop{left:auto;right:12px;top:auto;bottom:196px}
 @media(max-width:700px){.em-pop{top:70px}.em-ad{bottom:56px}.em-tab{top:auto;bottom:90px}}
+/* ---- teléfono: todo se mide contra el visor de la transmisión ---- */
+@media(max-width:760px){
+.em-pop{width:min(310px,calc(100% - 20px));left:8px;top:auto;bottom:74px;font-size:12px}
+.em-ad{width:calc(100% - 16px);gap:10px;padding:8px 10px;bottom:52px}.em-ad b{font-size:17px}.em-ad small{font-size:9px}.em-ad .em-ad-lg{width:42px;height:42px}
+.em-cams{left:6px;right:6px;bottom:34px;max-width:calc(100% - 12px);overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch}.em-cams::-webkit-scrollbar{display:none}.em-cams button,.em-cams span{flex:none}.em-cams button{min-height:30px;padding:0 9px}
+.em-tk{height:24px}.em-tk .tag{width:66px;font-size:10px;line-height:24px}.em-tk .tape span{font-size:12px;line-height:24px}
+.em-modal>*{max-width:calc(100vw - 14px);max-height:calc(var(--em-vh,1vh)*94);overflow:auto}
+.em-toast{max-width:calc(100% - 16px);top:56px}
+.em-camhelp{max-width:calc(100% - 16px);font-size:11px}
+}
+@media(max-height:520px) and (orientation:landscape){
+.em-pop{width:250px;top:44px;left:calc(8px + env(safe-area-inset-left,0px))}.em-ad{width:min(430px,62%);bottom:44px}.em-ad b{font-size:15px}.em-ad .em-ad-lg{width:34px;height:34px}
+.em-cams{bottom:30px}.em-toast{top:44px}
+}
+html.em-touch .em-modal button{min-height:38px}
 @media(prefers-reduced-motion:reduce){.em-pop,.em-ad,.em-bug,.em-lower,.em-tr i{transition:none}}`;
   document.head.appendChild(css);
   const host = document.createElement('div'); host.className = 'em-host';
@@ -393,27 +409,26 @@ body.em-carreras .em-pop{left:auto;right:12px;top:auto;bottom:196px}
     toast(`${m.active[0] ? sponsorLogo(m.active[0].id, '', 30) : '💼'}<div><b>Patrocinadores: +${money(tot)}</b><br><small>Base ${money(base)}${bonus ? ' · Bonus ' + money(bonus) : ''}${ended.length ? ' · Terminó el contrato de ' + esc(ended.join(', ')) : ''}</small></div>`, 8000);
     play('cash');
   }
-  function sponsorPanel() {
-    const modal = document.createElement('div'); modal.className = 'em-modal'; modal.style.setProperty('--a', ACC);
+  function sponsorPanel(target, o2) {
+    const inline = !!(target && target.nodeType === 1), only = !!(o2 && o2.optionsOnly) || MOD === 'carreras', modal = inline ? target : document.createElement('div'); if (!inline) modal.className = 'em-modal'; modal.style.setProperty('--a', ACC);
     const draw = () => {
       const st = sponsorsState(), m = st.mods[MOD] || { active: [], played: 0 }, offers = offersFor(MOD), full = m.active.length >= 3;
-      modal.innerHTML = `<div class="em-panel" role="dialog" aria-label="Patrocinadores" style="position:relative"><button class="em-x" aria-label="Cerrar">×</button><h2>Patrocinadores</h2><div class="sub">${esc(NAME)} · hasta 3 contratos a la vez. Cobrás por cada ${UNIT[MOD]} y hay bonus si se cumple la condición. Terminar antes de tiempo cuesta una penalidad.</div>
+      modal.innerHTML = `<div class="em-panel${inline ? ' em-inline' : ''}" role="${inline ? 'region' : 'dialog'}" aria-label="Patrocinadores" style="position:relative">${inline ? '' : '<button class="em-x" aria-label="Cerrar">×</button>'}<h2>Patrocinadores</h2><div class="sub">${esc(NAME)} · hasta 3 contratos a la vez. Cobrás por cada ${UNIT[MOD]} y hay bonus si se cumple la condición. Terminar antes de tiempo cuesta una penalidad.</div>
       <h3>Contratos activos (${m.active.length}/3)</h3>${[0, 1, 2].map((i) => { const a = m.active[i]; return a ? `<div class="em-sp"><span class="lg">${sponsorLogo(a.id, a.name, 46)}</span><div class="in"><b>${esc(a.name)}</b><small>${money(a.base)} por ${UNIT[MOD]} · ${a.bonus ? '+' + money(a.bonus) + ' ' + esc(a.bonusLabel) : 'sin bonus'} · quedan ${a.left}</small></div><button class="alt" data-drop="${i}">Rescindir</button></div>` : `<div class="em-empty">Espacio libre — elegí una oferta.</div>`; }).join('')}
       <h3>Ofertas disponibles</h3>${offers.map((o, i) => `<div class="em-sp"><span class="lg">${sponsorLogo(o.id, o.name, 46)}</span><div class="in"><b>${esc(o.name)}</b><small>“${esc(o.slogan)}” · ${money(o.base)} por ${UNIT[MOD]} · ${o.dur} ${UNIT[MOD] === 'carrera' ? 'carreras' : UNIT[MOD] === 'combate' ? 'combates' : UNIT[MOD] === 'partido' ? 'partidos' : 'sesiones'}${o.bonus ? ' · +' + money(o.bonus) + ' ' + esc(o.bonusLabel) : ''}</small></div><button data-acc="${i}" ${full ? 'disabled' : ''}>Aceptar</button></div>`).join('')}
       <h3>Ajustes de transmisión</h3><div class="em-opts">${[['ads', 'Anuncios'], ['pops', 'Pop-ups informativos'], ['sfx', 'Sonidos extra'], ['trans', 'Transiciones']].map(([k, l]) => `<label><input type="checkbox" data-opt="${k}" ${opt[k] ? 'checked' : ''}> ${l}</label>`).join('')}</div></div>`;
-      modal.querySelector('.em-x').onclick = () => modal.remove();
+      if (only) { const pn = modal.querySelector('.em-panel'), ah = [...pn.querySelectorAll('h3')].find((x) => /Ajustes/.test(x.textContent)), h2 = pn.querySelector('h2'), sb = pn.querySelector('.sub'); if (h2) h2.textContent = 'Ajustes de transmisión'; if (sb) sb.textContent = NAME + ' · elegí qué elementos de transmisión querés ver durante las carreras.'; const first = pn.querySelector('h3'); if (first && ah && first !== ah) { let n = first; while (n && n !== ah) { const nx = n.nextElementSibling; n.remove(); n = nx; } } }
+      const xb = modal.querySelector('.em-x'); if (xb) xb.onclick = () => modal.remove();
       modal.querySelectorAll('[data-acc]').forEach((b) => { b.onclick = () => { const o = offers[+b.dataset.acc], s2 = sponsorsState(), mm = s2.mods[MOD] = s2.mods[MOD] || { active: [], played: 0 }; if (mm.active.length >= 3) return; mm.active.push({ id: o.id, name: o.name, base: o.base, bonus: o.bonus, bonusKey: o.bonusKey, bonusLabel: o.bonusLabel, left: o.dur }); saveSp(s2); play('cash'); draw(); }; });
       modal.querySelectorAll('[data-drop]').forEach((b) => { b.onclick = () => { const s2 = sponsorsState(), mm = s2.mods[MOD], a = mm.active[+b.dataset.drop]; if (!a) return; const pen = a.base; if (!confirm(`Rescindir con ${a.name} cuesta ${money(pen)}. ¿Continuar?`)) return; const done = () => { mm.active.splice(+b.dataset.drop, 1); saveSp(s2); draw(); }; if (g.Touchline && g.Touchline.removeSilver) g.Touchline.removeSilver(pen).then((r) => { if (r && r.ok) done(); else alert('No te alcanza la Plata para pagar la penalidad.'); }); else done(); }; });
       modal.querySelectorAll('[data-opt]').forEach((c) => { c.onchange = () => { opt[c.dataset.opt] = c.checked; saveOpt(); }; });
     };
-    draw(); modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); }); document.addEventListener('keydown', function k(e) { if (e.key === 'Escape') { modal.remove(); document.removeEventListener('keydown', k); } });
+    draw(); if (inline) return;
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); }); document.addEventListener('keydown', function k(e) { if (e.key === 'Escape') { modal.remove(); document.removeEventListener('keydown', k); } });
     host.appendChild(modal);
   }
-  function addTab() {
-    if (MOD === 'carreras') { const b = document.createElement('button'); b.className = 'em-tab'; b.textContent = 'AJUSTES DE TRANSMISIÓN'; b.style.pointerEvents = 'auto'; b.onclick = sponsorPanel; host.appendChild(b); return; }
-    const b = document.createElement('button'); b.className = 'em-tab'; b.textContent = 'PATROCINIOS'; b.title = 'Contratos de patrocinio y ajustes de anuncios'; b.onclick = sponsorPanel; host.appendChild(b);
-  }
-  addTab();
+  // los patrocinios ya no llevan botón lateral: cada módulo los muestra como una pestaña más de su modo campaña (EM.sponsors.mount)
+
   // sesiones de casino: cada 10 min de juego activo
   if (MOD === 'casino') { let b0 = null; g.Touchline && Touchline.getBalances().then((r) => { if (r && r.balances) b0 = r.balances.silver; }); setInterval(() => { if (document.hidden || !g.Touchline) return; Touchline.getBalances().then((r) => { if (!r || !r.balances) return; const now = r.balances.silver, prof = b0 == null ? 0 : now - b0; settle({ profit: prof, profitPct: b0 ? prof / b0 * 100 : 0 }); b0 = now; }); }, 10 * 60 * 1000); }
 
@@ -459,7 +474,7 @@ body.em-carreras .em-pop{left:auto;right:12px;top:auto;bottom:196px}
   const M = { last: null, finalDone: false, amb: null };
   function ambientStart() { if (!opt.ambient || M.amb) return; const n = MOD === 'basquet' ? 'crowd_basket' : MOD === 'nfl' ? 'crowd_nfl' : MOD === 'mma' ? 'crowd_loop' : null; if (n) M.amb = play(n, { loop: true, vol: .3 }); }
   function ambientStop() { if (M.amb) { M.amb.stop(); M.amb = null; } }
-  function matchOn(on) { if (EMx.matchActive === on) return; EMx.matchActive = on; tickerShow(on); if (on) { ambientStart(); if (MOD !== 'futbol') { setTimeout(() => banner(pickSponsor(), 'lower'), 9000); setTimeout(() => pop('dato'), 22000); } } else ambientStop(); }
+  function matchOn(on) { if (EMx.matchActive === on) return; EMx.matchActive = on; tickerShow(on); try { dispatchEvent(new CustomEvent('em:match', { detail: { on, mount: MOUNT } })); } catch (e) {} if (on) { ambientStart(); if (MOD !== 'futbol') { setTimeout(() => banner(pickSponsor(), 'lower'), 9000); setTimeout(() => pop('dato'), 22000); } } else ambientStop(); }
   const onTick = safe((sport, b) => {
     if (!b || !b.scores) return;
     EMx.ctx = { scores: b.scores, names: b.names, period: b.period };
@@ -531,10 +546,10 @@ body.em-carreras .em-pop{left:auto;right:12px;top:auto;bottom:196px}
     const bar = document.createElement('div'); bar.className = 'em-cams';
     bar.innerHTML = '<span>CÁMARA</span><button data-m="__o">Original</button>' + Object.keys(EXT).map((k) => `<button data-m="${k}">${EXT[k]}</button>`).join('');
     const mount = cfg.mount || cfg.dom.parentElement; if (mount) { if (getComputedStyle(mount).position === 'static') mount.style.position = 'relative'; mount.appendChild(bar); }
-    const paint = () => bar.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.m === (EXT[ctrl.mode] ? ctrl.mode : '__o')));
+    const paint = () => { bar.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.m === (EXT[ctrl.mode] ? ctrl.mode : '__o'))); try { window.EMMobile && EMMobile.dronePad(ctrl.mode === 'drone', cfg.dom); } catch (e) {} };
     const helpEl = document.createElement('div'); helpEl.className = 'em-camhelp'; if (mount) mount.appendChild(helpEl); let ht = 0;
     function help(t) { helpEl.textContent = t; helpEl.classList.add('on'); clearTimeout(ht); ht = setTimeout(() => helpEl.classList.remove('on'), 6000); }
-    bar.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; e.stopPropagation(); ctrl.mode = b.dataset.m === '__o' ? (st.orig && !EXT[st.orig] ? st.orig : cfg.defaultMode || 'broadcast') : b.dataset.m; paint(); if (ctrl.mode === 'drone') help('DRON · WASD mover · Q/E bajar-subir · arrastrá para mirar · rueda: velocidad · Shift: turbo'); });
+    bar.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; e.stopPropagation(); ctrl.mode = b.dataset.m === '__o' ? (st.orig && !EXT[st.orig] ? st.orig : cfg.defaultMode || 'broadcast') : b.dataset.m; paint(); if (ctrl.mode === 'drone') help(window.EMMobile && EMMobile.touch ? 'DRON · cruz izquierda: mover · ↑↓: subir/bajar · ⚡ turbo · arrastrá la escena para mirar' : 'DRON · WASD mover · Q/E bajar-subir · arrastrá para mirar · rueda: velocidad · Shift: turbo'); });
     addEventListener('keydown', (e) => { if (ctrl.mode === 'drone' && /^(KeyW|KeyA|KeyS|KeyD|KeyQ|KeyE|ShiftLeft|ShiftRight)$/.test(e.code) && !/INPUT|SELECT|TEXTAREA/.test((document.activeElement || {}).tagName)) { st.d.keys[e.code] = true; e.stopImmediatePropagation(); e.preventDefault(); } }, true);
     addEventListener('keyup', (e) => { delete st.d.keys[e.code]; });
     let drag = null; const dom = cfg.dom;
@@ -578,5 +593,5 @@ body.em-carreras .em-pop{left:auto;right:12px;top:auto;bottom:196px}
     const c = CAT[((side + 1) * 5 + (seed || 0)) % 12]; return { id: c.id, name: c.name, hue: c.hue };
   }
   function allSponsors(side) { const act = (sponsorsState().mods[MOD] || { active: [] }).active; return side === 0 ? act.map((a) => ({ id: a.id, name: (BYID[a.id] && BYID[a.id].name) || a.name, hue: BYID[a.id] ? BYID[a.id].hue : hashHue(a.id) })) : []; }
-  g.EM = { module: MOD, kitSponsor, allSponsors, setMount, opt, sfx: { play, list: sfxList, enabled, get master() { return S.master; } }, pop, popKinds: KINDS, ads: { banner, videoBreak, pickSponsor }, transition, sponsors: { panel: sponsorPanel, catalog: CAT, settle }, sponsorLogo, sponsorName, celebrate, toast, cams: { wrap: wrapCam }, match: { on: matchOn, end: matchEnd, start: matchStart }, ctx: EMx, loaded: true };
+  g.EM = { module: MOD, kitSponsor, allSponsors, setMount, opt, sfx: { play, list: sfxList, enabled, get master() { return S.master; } }, pop, popKinds: KINDS, ads: { banner, videoBreak, pickSponsor }, transition, sponsors: { panel: sponsorPanel, mount: sponsorPanel, catalog: CAT, settle }, sponsorLogo, sponsorName, celebrate, toast, cams: { wrap: wrapCam }, match: { on: matchOn, end: matchEnd, start: matchStart }, ctx: EMx, loaded: true };
 })(window);

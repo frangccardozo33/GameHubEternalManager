@@ -13,10 +13,6 @@ window.LFO_CELEBRATION_SONGS = [
   "title": "Abel Pintos - Sin Principio Ni Final (Official Video)"
  },
  {
-  "file": "Ahí Ahí (Lyric Video).m4a",
-  "title": "Ahí Ahí (Lyric Video)"
- },
- {
   "file": "Al Gusto (Album Version).mp3",
   "title": "Al Gusto (Album Version)"
  },
@@ -119,10 +115,6 @@ window.LFO_CELEBRATION_SONGS = [
  {
   "file": "El Pete de Wanda.m4a",
   "title": "El Pete de Wanda"
- },
- {
-  "file": "Eminem - Houdini (Lyrics).mp3",
-  "title": "Eminem - Houdini (Lyrics)"
  },
  {
   "file": "Extra#U00f1o Infantil.m4a",
@@ -303,10 +295,6 @@ window.LFO_CELEBRATION_SONGS = [
  {
   "file": "Si Llega el Finde.m4a",
   "title": "Si Llega el Finde"
- },
- {
-  "file": "Slushii - All I Need [Rocket League Intro Song].mp3",
-  "title": "Slushii - All I Need [Rocket League Intro Song]"
  },
  {
   "file": "Soda Stereo - De M#U00fasica Ligera (Official Video).mp3",

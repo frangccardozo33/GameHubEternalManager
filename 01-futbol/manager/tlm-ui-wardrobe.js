@@ -42,6 +42,11 @@
     return `<select data-chg="wardrobeEquip" data-wtype="${type}" data-wslot="${slot}">${options.join('')}</select>`;
   }
 
+  // Patrocinios: pestaña del modo carrera; el panel lo aporta la capa común (assets/common/em-common.js, sólo dentro del hub)
+  UI.screens.sponsors = () => {
+    setTimeout(() => { const el = document.getElementById('em-sp-host'); if (!el) return; if (window.EM && EM.sponsors) EM.sponsors.mount(el); else el.innerHTML = '<p class="muted">Los patrocinios están disponibles al jugar dentro de Eternal Manager.</p>'; }, 0);
+    return '<h2 class="tlm-h">Patrocinios <small>contratos, ingresos por partido y ajustes de la transmisión</small></h2><div id="em-sp-host"></div>';
+  };
   UI.screens.wardrobe = () => {
     if (!g.Touchline) {
       return `<h2 class="tlm-h">Vestuario</h2><p class="muted">La personalización de festejos solo está disponible cuando este módulo corre dentro del hub.</p>`;

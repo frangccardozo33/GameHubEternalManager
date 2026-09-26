@@ -29,12 +29,12 @@ const RacingArt = (() => {
   function cyl(g,m,r,h,x=0,y=0,z=0,n=32){return mesh(g,new T.CylinderGeometry(r,r,h,n),m,x,y,z);}
   function ball(g,m,r,x=0,y=0,z=0){return mesh(g,new T.SphereGeometry(r,32,20),m,x,y,z);}
   function tube(g,m,points,r){return mesh(g,new T.TubeGeometry(new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p))),32,r,8,false),m);}
-  function shell(g,m,sections){
-    const vertices=[],indices=[];
-    sections.forEach(([z,w,base,top,tw])=>vertices.push(-w,base,z,w,base,z,tw,top,z,-tw,top,z));
+  function shell(g,m,sections,uvf){
+    const vertices=[],indices=[],uvs=[];
+    sections.forEach(([z,w,base,top,tw])=>{vertices.push(-w,base,z,w,base,z,tw,top,z,-tw,top,z);if(uvf)uvf(z,w,base,top,tw).forEach(p=>uvs.push(p[0],p[1]));});
     for(let i=0;i<sections.length-1;i++)for(let j=0;j<4;j++){const a=i*4+j,b=i*4+(j+1)%4,c=a+4,d=b+4;indices.push(a,b,c,b,d,c);}
     indices.push(0,2,1,0,3,2);let e=(sections.length-1)*4;indices.push(e,e+1,e+2,e,e+2,e+3);
-    const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));geo.setIndex(indices);geo.computeVertexNormals();return mesh(g,geo,m);
+    const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));if(uvf)geo.setAttribute('uv',new T.Float32BufferAttribute(uvs,2));geo.setIndex(indices);geo.computeVertexNormals();return mesh(g,geo,m);
   }
   // Cartel de anunciante: fondo de color según el nombre y texto ajustado al ancho (no lleva logo raster para no depender de imágenes).
   function sponsorDecal(name){
@@ -57,8 +57,80 @@ const RacingArt = (() => {
     const shape=new T.Shape();points.forEach(([x,y],i)=>i?shape.lineTo(x,y):shape.moveTo(x,y));shape.closePath();
     return mesh(g,new T.ShapeGeometry(shape),m,0,0,z);
   }
+  // ---------------------------------------------------------------------------------------------------------
+  // LIVERY COMO TEXTURA. La carrocería (shell) lleva UV: u = posición a lo largo del auto (0 trasera … 1 trompa) y
+  // v recorre el perímetro de la sección: 0 = zócalo izquierdo, .30 = línea de cintura izquierda, .70 = línea de cintura
+  // derecha, 1 = zócalo derecho. Toda la decoración (franjas, números, anunciantes) se pinta en UNA textura de 1024×512,
+  // así se adapta a la forma del modelo en vez de ser bloques pegados encima.
+  //   franja izquierda  -> y 358..512 (arriba físico = arriba del canvas)
+  //   franja superior   -> y 154..358 (capó, techo y baúl; arriba del canvas = lado derecho del auto)
+  //   franja derecha    -> y   0..154 (invertida: se dibuja girada 180°)
+  const LIV_KEYS = ['center', 'twin', 'side', 'nose', 'dual', 'chevron', 'checker', 'diag'];
+  const livCache = new Map();
+  function liveryTexture(liv, number, cabinU, roofU) {
+    const key = JSON.stringify([liv.primary, liv.secondary, liv.accent, liv.roof, liv.pattern, liv.sponsors, number, cabinU.toFixed(2), roofU[0].toFixed(2), roofU[1].toFixed(2)]);
+    if (livCache.has(key)) return livCache.get(key);
+    const W = 1024, H = 512, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+    const P = liv.primary || '#e73549', S = liv.secondary || '#f2f5f3', A = liv.accent || '#111820', pat = liv.pattern || 'none';
+    const TOP0 = 154, TOP1 = 358, MID = 256;
+    x.fillStyle = P; x.fillRect(0, 0, W, H);
+    // --- diseños (8) ---
+    const topRect = (px, py, pw, ph, col) => { x.fillStyle = col; x.fillRect(px, py, pw, ph); };
+    const side = (right, fn) => { x.save(); if (right) { x.translate(W, TOP0); x.rotate(Math.PI); } else x.translate(0, TOP1); x.beginPath(); x.rect(0, 0, W, 154); x.clip(); fn(right ? (f) => (1 - f) * W : (f) => f * W, right); x.restore(); };
+    if (pat === 'center') {
+      topRect(0, MID - 38, W, 76, S); topRect(0, MID - 52, W, 8, A); topRect(0, MID + 44, W, 8, A);
+    } else if (pat === 'twin') {
+      topRect(0, MID - 46, W, 22, S); topRect(0, MID + 24, W, 22, S); topRect(0, MID - 20, W, 6, A); topRect(0, MID + 14, W, 6, A);
+    } else if (pat === 'side') {
+      [false, true].forEach((r) => side(r, () => { x.fillStyle = S; x.beginPath(); x.moveTo(0, 96); x.lineTo(W, 60); x.lineTo(W, 96); x.lineTo(0, 132); x.closePath(); x.fill(); x.fillStyle = A; x.beginPath(); x.moveTo(0, 132); x.lineTo(W, 96); x.lineTo(W, 106); x.lineTo(0, 142); x.closePath(); x.fill(); }));
+      topRect(0, TOP0, W, 14, S); topRect(0, TOP1 - 14, W, 14, S);
+    } else if (pat === 'nose') {
+      x.fillStyle = S; x.beginPath(); x.moveTo(W * .68, 0); x.lineTo(W, 0); x.lineTo(W, H); x.lineTo(W * .62, H); x.closePath(); x.fill();
+      x.fillStyle = A; x.beginPath(); x.moveTo(W * .655, 0); x.lineTo(W * .68, 0); x.lineTo(W * .625, H); x.lineTo(W * .60, H); x.closePath(); x.fill();
+    } else if (pat === 'dual') {
+      x.fillStyle = S; x.fillRect(0, MID, W, H - MID); topRect(0, MID - 5, W, 10, A);
+    } else if (pat === 'chevron') {
+      for (let k = -1; k < 13; k++) { const px = k * 96 + 20; x.fillStyle = k % 2 ? A : S; x.beginPath(); x.moveTo(px, MID - 78); x.lineTo(px + 58, MID); x.lineTo(px, MID + 78); x.lineTo(px + 36, MID + 78); x.lineTo(px + 94, MID); x.lineTo(px + 36, MID - 78); x.closePath(); x.fill(); }
+      [false, true].forEach((r) => side(r, () => { for (let k = -1; k < 24; k++) { const px = k * 52; x.fillStyle = k % 2 ? A : S; x.beginPath(); x.moveTo(px, 70); x.lineTo(px + 26, 96); x.lineTo(px, 122); x.lineTo(px + 14, 122); x.lineTo(px + 40, 96); x.lineTo(px + 14, 70); x.closePath(); x.fill(); } }));
+    } else if (pat === 'checker') {
+      const sq = 17;
+      [false, true].forEach((r) => side(r, () => { for (let i = 0; i < W / sq; i++) for (let j = 0; j < 2; j++) { x.fillStyle = (i + j) % 2 ? S : A; x.fillRect(i * sq, 84 + j * sq, sq, sq); } }));
+      for (let i = 0; i < 4; i++) for (let j = 0; j < Math.ceil((TOP1 - TOP0) / sq); j++) { x.fillStyle = (i + j) % 2 ? S : A; x.fillRect(W - (i + 1) * sq, TOP0 + j * sq, sq, sq); }
+      for (let i = 0; i < 4; i++) for (let j = 0; j < Math.ceil((TOP1 - TOP0) / sq); j++) { x.fillStyle = (i + j) % 2 ? S : A; x.fillRect(i * sq, TOP0 + j * sq, sq, sq); }
+    } else if (pat === 'diag') {
+      x.save(); x.beginPath(); x.rect(0, TOP0, W, TOP1 - TOP0); x.clip();
+      for (let k = -3; k < 16; k++) { const px = k * 78; x.fillStyle = S; x.beginPath(); x.moveTo(px, TOP1); x.lineTo(px + 34, TOP1); x.lineTo(px + 34 + 110, TOP0); x.lineTo(px + 110, TOP0); x.closePath(); x.fill(); x.fillStyle = A; x.beginPath(); x.moveTo(px + 44, TOP1); x.lineTo(px + 52, TOP1); x.lineTo(px + 52 + 110, TOP0); x.lineTo(px + 44 + 110, TOP0); x.closePath(); x.fill(); }
+      x.restore();
+      [false, true].forEach((r) => side(r, () => { x.fillStyle = S; x.fillRect(0, 100, W, 16); x.fillStyle = A; x.fillRect(0, 120, W, 6); }));
+    }
+    // techo de otro color (opcional)
+    if (liv.roof) { const r0 = Math.max(0, roofU[0]) * W, r1 = Math.min(1, roofU[1]) * W; x.fillStyle = liv.roof; x.fillRect(r0, MID - 78, r1 - r0, 156); }
+    // zócalo oscuro (se ve en los dos costados)
+    x.fillStyle = 'rgba(0,0,0,.55)'; x.fillRect(0, H - 12, W, 12); x.fillRect(0, 0, W, 12);
+    // --- cartel de anunciante ---
+    const spBox = (name, bx, by, bw, bh) => {
+      let h = 0; for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0; h %= 360;
+      const g = x.createLinearGradient(bx, by, bx + bw, by); g.addColorStop(0, `hsl(${h} 70% 38%)`); g.addColorStop(1, `hsl(${(h + 30) % 360} 75% 26%)`);
+      x.fillStyle = g; x.fillRect(bx, by, bw, bh); x.strokeStyle = 'rgba(255,255,255,.75)'; x.lineWidth = 3; x.strokeRect(bx + 1.5, by + 1.5, bw - 3, bh - 3);
+      let fs = Math.round(bh * .62); x.font = `italic 900 ${fs}px Arial`; while (x.measureText(name).width > bw - 14 && fs > 10) { fs -= 2; x.font = `italic 900 ${fs}px Arial`; }
+      x.fillStyle = '#fff'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(name, bx + bw / 2, by + bh / 2 + 2);
+    };
+    const roundel = (cx, cy, r) => { x.fillStyle = '#f4efdb'; x.beginPath(); x.arc(cx, cy, r, 0, 7); x.fill(); x.lineWidth = 4; x.strokeStyle = A; x.stroke(); x.fillStyle = '#111927'; x.font = `900 ${r * 1.15}px Arial`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(number, cx, cy + 3); };
+    const sp = liv.sponsors || [];
+    [false, true].forEach((r) => side(r, (X) => { roundel(X(.605), 78, 40); if (sp[r ? 1 : 0]) spBox(sp[r ? 1 : 0], X(.40) - 78, 54, 156, 48); }));
+    // capó: número + anunciante; techo: número; baúl: anunciante
+    const top = (fn) => { x.save(); x.beginPath(); x.rect(0, TOP0, W, TOP1 - TOP0); x.clip(); fn(); x.restore(); };
+    top(() => {
+      roundel(W * .74, MID, 46);
+      if (sp[2]) spBox(sp[2], W * .90 - 75, MID - 32, 150, 64);
+      if (sp[3]) spBox(sp[3], W * .10 - 90, MID - 30, 180, 60);
+      roundel(cabinU * W, MID, 52);
+    });
+    const tex = new T.CanvasTexture(c); tex.colorSpace = T.SRGBColorSpace; tex.anisotropy = 4;
+    livCache.set(key, tex); return tex;
+  }
   function car(key='classic',color,number='07'){
-    const liv=color&&typeof color==='object'?color:null;if(liv)color=liv.primary;
+    const liv0=color&&typeof color==='object'?color:{primary:color||(specs[key]||specs.classic).color,secondary:'#f2f5f3',accent:'#111820',pattern:'none',sponsors:[]},liv=liv0;color=liv.primary;
     const s=specs[key]||specs.classic,g=new T.Group(),body=new T.Group();g.add(body);
     g.userData.bodyType=key;g.userData.model=BODIES[key]?.name||key;
     const paint=mat(color||s.color,.48,.28),carbon=mat('#111820',.25,.5),chrome=mat('#adbdca',.8,.25),glass=mat('#122735',.65,.17),white=mat('#f2f5f3',.2,.4);
@@ -76,14 +148,16 @@ const RacingArt = (() => {
       for(const axle of [-s.axle,s.axle]){const dz=Math.abs(z-axle);if(dz<.67)base=Math.max(base,.61+Math.sqrt(.67*.67-dz*dz));}
       sections.push([z,width,Math.min(base,top-.045),top,width-.16]);
     }
-    shell(body,paint,sections);
+    const cabinU=(s.cabin+3.1)/6.2,roofU=[(s.cabin-s.roofLen/2+3.1)/6.2,(s.cabin+s.roofLen/2+3.1)/6.2];
+    const bodyMat=new T.MeshStandardMaterial({map:liveryTexture(liv,number,cabinU,roofU),metalness:.42,roughness:.3});
+    shell(body,bodyMat,sections,(z,w,b,t,tw)=>{const u=(z+3.1)/6.2;return [[u,0],[u,1],[u,.7],[u,.3]];});
     block(body,carbon,2.6,.13,6.22,0,.41,0);
     // A separate greenhouse changes the actual silhouette of every model.
     const back=s.cabin-s.roofLen/2,front=s.cabin+s.roofLen/2;
     const rearFoot=key==='valkyr'?-2.65:back-(s.mid?.63:1.0);
     const cabSections=[[rearFoot,1.12,1.35,1.39,1.05],[back-.25,1.13,1.37,s.roof-.15,.96],[back,1.13,1.37,s.roof, .94],[front,1.13,1.34,s.roof-.035,.94],[front+.82,1.12,1.32,1.38,1.08]];
     shell(body,glass,cabSections);
-    shell(body,paint,[[back-.21,.96,s.roof-.13,s.roof-.1,.94],[back,.97,s.roof-.015,s.roof+.035,.93],[front,.97,s.roof-.04,s.roof,.93]]);
+    shell(body,bodyMat,[[back-.21,.96,s.roof-.13,s.roof-.1,.94],[back,.97,s.roof-.015,s.roof+.035,.93],[front,.97,s.roof-.04,s.roof,.93]],(z,w,b,t,tw)=>{const u=(z+3.1)/6.2,vx=x=>.5+.2*(x/1.35);return [[u,vx(-w)],[u,vx(w)],[u,vx(tw)],[u,vx(-tw)]];});
     // Windscreen frames, door seams, broad fenders and GT side skirts.
     for(const side of [-1,1]){
       tube(body,paint,[[side*1.11,1.39,front+.82],[side*.95,s.roof,front],[side*.95,s.roof+.02,back],[side*1.11,1.4,rearFoot]],.05);
@@ -93,8 +167,6 @@ const RacingArt = (() => {
       block(body,carbon,.21,.09,.13,side*1.44,1.18,s.cabin-.5);
       block(body,carbon,.25,.07,.23,side*1.48,1.48,front+.28);
       block(body,paint,.29,.15,.36,side*1.63,1.51,front+.29);
-      const l=mesh(body,new T.PlaneGeometry(2.15,.38),decal(s.grille.toUpperCase()),side*1.451,.89,-.1);l.rotation.y=side*Math.PI/2;
-      const n=mesh(body,new T.PlaneGeometry(.58,.43),decal(number,'#111927','#f4efdb'),side*1.475,1.08,.73);n.rotation.y=side*Math.PI/2;
       if(key==='touring')block(body,carbon,.024,.5,.025,side*1.445,.96,-.6);
       if(s.mid||key==='track'){
         block(body,carbon,.06,.55,.7,side*1.46,1.06,-.95);
@@ -162,8 +234,6 @@ const RacingArt = (() => {
     if(s.mid)for(let j=0;j<7;j++)block(body,carbon,1.45,.03,.06,0,1.43,-1.7-j*.13);
     if(key==='spectre'||key==='corsair')for(const x of [-.87,.87])shell(body,paint,[[-2.65,.08,1.32,1.4,.05],[-1.25,.10,1.33,1.68,.04],[-.95,.08,1.34,1.75,.04]]).position.x=x;
     if(key==='classic'||key==='sprint')shell(body,carbon,[[1.0,.38,1.36,1.5,.31],[1.8,.4,1.3,1.43,.32],[2.65,.32,s.nose,1.33,.25]]);
-    const hood=mesh(body,new T.PlaneGeometry(.63,.63),decal(number),0,1.405,1.22);hood.rotation.x=-Math.PI/2;hood.rotation.z=Math.PI;
-    const roofNumber=mesh(body,new T.PlaneGeometry(.73,.68),decal(number),0,s.roof+.065,s.cabin);roofNumber.rotation.x=-Math.PI/2;roofNumber.rotation.z=Math.PI;
     const wheels=[],rubber=mat('#101115',.02,.95),rimMat=mat(key==='valkyr'?'#dfbd66':'#697985',.8,.28);
     for(const x of [-1.47,1.47])for(const z of [-s.axle,s.axle]){
       const w=new T.Group();w.position.set(x,.61,z);body.add(w);
@@ -175,30 +245,6 @@ const RacingArt = (() => {
       const hub=cyl(w,chrome,.08,.48,0,0,0,12);hub.rotation.z=Math.PI/2;wheels.push(w);
     }
     body.scale.set(s.width,1,s.length);
-    if(liv&&liv.pattern&&liv.pattern!=='none'){
-      const sec=mat(liv.secondary||'#f2f5f3',.4,.35),acc=mat(liv.accent||'#111820',.4,.35),front=s.cabin+s.roofLen/2,back2=s.cabin-s.roofLen/2;
-      const S=(m,w,h,d,x,y,z)=>{const o=block(body,m,w,h,d,x,y,z);o.castShadow=false;return o;};
-      const pat=liv.pattern;
-      if(pat==='center'||pat==='twin'){
-        const xs=pat==='center'?[0]:[-.2,.2],w=pat==='center'?.42:.13;
-        xs.forEach(x=>{S(sec,w,.03,2.3,x,1.415,front+1.15+.3);S(sec,w,.03,s.roofLen,x,s.roof+.05,s.cabin);S(sec,w,.03,1.6,x,1.4,back2-.95);
-          if(pat==='center')S(acc,.1,.032,2.3,x+.3,1.417,front+1.45),S(acc,.1,.032,2.3,x-.3,1.417,front+1.45);});
-      }else if(pat==='side'){
-        [-1,1].forEach(sd=>{S(sec,.04,.16,4.2,sd*1.52,.84,0);S(acc,.045,.05,4.2,sd*1.525,.66,0);});
-      }else if(pat==='nose'){
-        S(sec,2.2,.03,1.3,0,1.36,2.35);S(acc,2.2,.032,.14,0,1.365,1.68);
-      }else if(pat==='dual'){
-        S(sec,1.2,.03,4.3,0,1.41,.2);S(acc,.14,.032,4.3,-.7,1.412,.2);S(acc,.14,.032,4.3,.7,1.412,.2);
-      }
-    }
-    if(liv&&liv.sponsors&&liv.sponsors.length){
-      // huecos libres: lateral alto sobre el nombre del modelo (lejos del número), capó delantero y tapa del baúl
-      const sp=liv.sponsors,pick=(i)=>sp[i%sp.length];
-      for(const side of [-1,1]){const m=mesh(body,new T.PlaneGeometry(1.05,.26),sponsorDecal(pick(side<0?0:1)),side*1.478,1.21,-.72);m.rotation.y=side*Math.PI/2;m.castShadow=false;}
-      const hd=mesh(body,new T.PlaneGeometry(.95,.24),sponsorDecal(pick(2)),0,1.425,2.32);hd.rotation.x=-Math.PI/2;hd.rotation.z=Math.PI;hd.castShadow=false;
-      const tk=mesh(body,new T.PlaneGeometry(1.0,.26),sponsorDecal(pick(3)),0,1.41,-2.35);tk.rotation.x=-Math.PI/2;tk.castShadow=false;
-    }
-    if(liv&&liv.roof){block(body,mat(liv.roof,.4,.35),1.5,.03,Math.max(.8,s.roofLen-.3),0,s.roof+.055,s.cabin).castShadow=false;}
     return {group:g,body,wheels,paint};
   }
   function part(type,color='#40baff'){

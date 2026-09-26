@@ -1,0 +1,17 @@
+{
+  "name": "Eternal Manager",
+  "short_name": "Eternal Manager",
+  "description": "Siete módulos de gestión deportiva y de entretenimiento con una cuenta y una cartera compartidas.",
+  "start_url": "hub.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0c1520",
+  "theme_color": "#0c1520",
+  "lang": "es",
+  "icons": [
+    { "src": "assets/icons/em-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icons/em-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/icons/em-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

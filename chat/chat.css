@@ -90,3 +90,24 @@
 .emc-st-show{pointer-events:auto;align-self:flex-start;width:40px;height:40px;border-radius:50%;background:#0a121acc;border:1px solid #ffffff33;font-size:17px;opacity:.7}.emc-st-show:hover{opacity:1}.emc-st-show[hidden]{display:none}
 @keyframes emcin{from{transform:translateX(-10px);opacity:0}}
 @media(prefers-reduced-motion:reduce){.emc-st-msg{animation:none}}
+
+/* ===== móvil ===== */
+@media(max-width:700px){
+.emc-fab{right:12px;bottom:calc(74px + env(safe-area-inset-bottom));width:44px;height:44px;opacity:.92}
+.emc-drawer{right:8px;left:8px;width:auto;bottom:calc(66px + env(safe-area-inset-bottom));max-height:calc(var(--em-vh,1vh)*72)}
+.emc-stream{width:min(250px,68vw);font-size:12px}
+.emc-stream input{font-size:16px;min-height:36px}.emc-stream .emc-st-form button{min-height:36px;min-width:36px}
+.emc-st-feed{max-height:78px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
+}
+@media(max-height:520px) and (orientation:landscape){.emc-fab{width:40px;height:40px;bottom:58px}.emc-drawer{max-height:calc(var(--em-vh,1vh)*88);bottom:54px;width:min(400px,60vw);left:auto}.emc-stream{width:min(240px,34vw)}}
+
+/* botón de cerrar el chat en teléfonos (el cajón tapaba el botón flotante y no había forma de cerrarlo) */
+.emc-dr-x{display:none}
+@media(max-width:700px){
+.emc-drawer{top:calc(60px + env(safe-area-inset-top));bottom:calc(126px + env(safe-area-inset-bottom));max-height:none;height:auto}
+.emc-drawer:not([hidden])~.emc-dr-x{display:grid;position:fixed;z-index:96;right:16px;top:calc(66px + env(safe-area-inset-top));width:38px;height:38px;place-items:center;border-radius:50%;border:1px solid #ffffff44;background:#0a1018f0;color:#fff;font:700 16px system-ui;padding:0;min-height:0}
+}
+@media(max-height:520px) and (orientation:landscape){
+.emc-drawer{top:6px;bottom:6px;max-height:none;height:auto}
+.emc-drawer:not([hidden])~.emc-dr-x{display:grid;position:fixed;z-index:96;right:12px;top:10px;width:34px;height:34px;place-items:center;border-radius:50%;border:1px solid #ffffff44;background:#0a1018f0;color:#fff;font:700 15px system-ui;padding:0;min-height:0}
+}

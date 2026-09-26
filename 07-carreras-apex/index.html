@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script src="../assets/common/em-mobile.js"></script>
   <meta name="theme-color" content="#080d19">
   <title>LRO — Liga Racing Online</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -108,6 +109,7 @@
     @media(max-width:700px) { .topbar { height:64px; padding:0 15px; } .brand-name { font-size:24px; } .brand-mark { width:26px; height:26px; background-size:14px 14px; } .brand-tag { font-size:7px; } nav.mainnav { display:none; } main { padding:16px 12px 80px; } h1 { font-size:28px; } .eyebrow { font-size:8px; } .race-meta>div:first-child { display:none; } .race-meta .weather { padding-left:12px; font-size:9px; } .broadcast { height:480px; } .feed-label { left:12px; top:13px; } .timing { left:12px; top:53px; width:174px; } .driver-row { grid-template-columns:16px 3px 1fr 42px 12px; gap:5px; padding:0 7px; height:29px; } .driver-row .name { font-size:13px; } #standings { height:290px; } .timing-head { padding:7px 9px; } .timing-head strong { font-size:15px; } .timing-sub { font-size:8px; } .tv-logo { right:12px; top:16px; } .tv-logo b { font-size:22px; } .tv-logo small { font-size:6px; } .camera-indicator { top:55px; right:12px; font-size:7px; } .intro { left:22px; bottom:79px; right:15px; } .intro h2 { font-size:33px; margin:7px 0; } .intro p { font-size:10px; } .intro-line { display:none; } .intro .eyebrow { font-size:8px; } .broadcast-bottom { padding:0 12px; height:53px; } .view-controls span { display:none; } .view-controls button { font-size:8px; padding:8px 9px; } .transport { align-items:flex-start; } .transport-left { gap:8px 0; } .primary { padding:12px 15px; font-size:14px; gap:13px; } .race-state { display:none; } .playback { gap:3px; flex-wrap:wrap; justify-content:flex-end; } .speed-group button { padding:6px 8px; } .icon-button { padding:7px; font-size:0; } .lower-grid { grid-template-columns:1fr 1fr; row-gap:23px; } .panel:last-child { grid-column:1/-1; padding:17px 0 0; border-left:0; border-top:1px solid var(--line); } .circuit-info { gap:7px; } #circuit-preview { width:64px; } .circuit-name { font-size:20px; } .facts { gap:9px; } .facts b { font-size:10px; } .driver-number { font-size:35px; min-width:35px; padding-right:7px; } .driver-fullname { font-size:19px; } .driver-team { font-size:7px; } .driver-profile { gap:8px; } .driver-profile .flag { display:none; } .telemetry { gap:5px; } .telemetry label { font-size:7px; } .telemetry strong { font-size:14px; } .tire-bar { width:22px; } .panel-heading h3 { font-size:15px; } .panel-heading span { font-size:7px; } .event-overlay { top:400px; max-width:95%; min-width:240px; opacity:0; } .event-overlay.show { opacity:1; } .start-lights { top:100px; left:72%; gap:4px; padding:8px; } .start-lights i { width:17px; height:17px; } footer span:last-child { display:none; } .roster { font-size:9px; } .roster td:nth-child(2) { font-size:14px; } .modal { padding:23px 15px; } .dash-grid { grid-template-columns:1fr 1fr; gap:10px; } .stat-tile { padding:12px 14px; } .stat-tile strong { font-size:21px; } .command-grid { grid-template-columns:repeat(2,1fr); } .bottom-nav { display:flex; position:fixed; left:0; right:0; bottom:0; background:#20251f; border-top:3px solid var(--orange); z-index:15; overflow-x:auto; } .bottom-nav button { flex:1; background:none; border:0; color:#a7ac9f; font:600 8px var(--mono); padding:10px 4px; letter-spacing:.3px; white-space:nowrap; } .bottom-nav button.active { color:var(--orange); } }
   </style>
   <link rel="stylesheet" href="motorsport.css">
+  <link rel="stylesheet" href="lro-mobile.css">
 <script src="../touchline-bridge.js"></script>
 </head>
 <body>
@@ -283,6 +285,7 @@
       <div class="masthead"><div><div class="eyebrow"><span>PATROCINIO</span> CONTRATOS</div><h1>PATROCINADORES</h1></div></div>
       <div class="panel-block"><h3>CONTRATOS ACTIVOS</h3><div id="active-sponsors"></div></div>
       <div class="panel-block"><h3>OFERTAS DISPONIBLES</h3><div id="sponsor-offers"></div></div>
+      <div class="panel-block"><h3>AJUSTES DE TRANSMISIÓN</h3><div id="em-sp-host"></div></div>
     </section>
 
     <!-- ===================== REGULATIONS ===================== -->

@@ -251,10 +251,10 @@ function currentTrack(career){ const r = currentRound(career); return TRACKS.fin
 function activeDriver(career, team){ return career.driversPool.find(d => d.id === team.activeDriverId) || career.driversPool.find(d => d.id === team.driverIds[0]); }
 function teamDrivers(career, team){ return team.driverIds.map(id => career.driversPool.find(d => d.id === id)).filter(Boolean); }
 
-const LIVERY_PATTERNS = {none:'Liso',center:'Franja central',twin:'Doble línea',side:'Franjas laterales',nose:'Trompa',dual:'Bandas de capó'};
+const LIVERY_PATTERNS = {none:'Liso',center:'Franja central',twin:'Doble línea',side:'Cinta lateral',nose:'Trompa bicolor',dual:'Bicolor dividido',chevron:'Chevrones',checker:'Cuadros',diag:'Cortes diagonales'};
 const hexColor = n => '#' + (n >>> 0).toString(16).padStart(6,'0').slice(-6);
 function liveryFor(team){
-  const pats = ['center','side','twin','nose','dual'];
+  const pats = ['center','side','twin','nose','dual','chevron','checker','diag'];
   const base = team.livery || {primary:hexColor(team.color), secondary:'#f2f5f3', accent:'#111820', roof:null, pattern:pats[team.id % pats.length]};
   // anunciantes: los contratos del jugador; los rivales llevan dos anunciantes ficticios fijos
   const sp = team.isPlayer ? (team.sponsors||[]).filter(Boolean).map(x => x.name) : [SPONSOR_POOL[(team.id*2)%SPONSOR_POOL.length].name, SPONSOR_POOL[(team.id*2+1)%SPONSOR_POOL.length].name];

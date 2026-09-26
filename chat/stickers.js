@@ -229,5 +229,15 @@ window.EM_STICKERS = [
   "id": "zidanesorpresa",
   "file": "zidanesorpresa.mp4",
   "label": "Zidanesorpresa"
+ },
+ {
+  "id": "donde-esta-cr7",
+  "file": "Donde Esta CR7.mp4",
+  "label": "Donde Esta CR7"
+ },
+ {
+  "id": "give-me-penalty-or-i-will-retire",
+  "file": "give me penalty or i will retire.mp4",
+  "label": "give me penalty or i will retire"
  }
 ];

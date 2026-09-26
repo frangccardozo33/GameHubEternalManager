@@ -130,3 +130,42 @@ body.tlm-manager-match #configure-button{display:none}
 /* bandera de la nación del jugador (naciones ficticias) */
 .tlm-flag { vertical-align: -2px; border-radius: 2px; box-shadow: 0 0 0 1px #0006; width: auto; }
 .tlm-rule{padding:7px 9px;margin:6px 0;border:1px solid #ffffff14;border-radius:7px;background:#ffffff05}.tlm-rule.on{border-color:#9be36b66;background:#9be36b0d}.tlm-rule p{margin:3px 0 0}.tlm-rparams{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}.tlm-rparams label{display:flex;flex-direction:column;gap:3px;font-size:10.5px;color:var(--mute)}.tlm-rparams input{width:88px;padding:3px 6px}
+
+/* ===== teléfono (ver assets/common/em-mobile.js) ===== */
+.tlm button,.tlm select,.tlm a{touch-action:manipulation}
+.tlm-start>*,.tlm-grid>*,.tlm-tgrid>*,.tlm-wizard *{min-width:0}
+.tlm-tabbar{display:none}
+.tlm-more{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px}.tlm-more.sm{grid-template-columns:repeat(3,1fr)}
+.tlm-more button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:64px;padding:8px 4px;background:#1e2c33;border:1px solid #33444b;color:#eae6d8;font:700 11px 'DM Sans',sans-serif;letter-spacing:.4px;text-transform:uppercase;cursor:pointer;text-align:center;touch-action:manipulation}
+.tlm-more button i{font-style:normal;font-size:18px;color:#d3bc81}.tlm-more button.on{border-color:#d3bc81;background:#2a3a41}
+.tlm-moremodal{max-width:520px}
+@media (max-width:760px),(max-height:520px) and (orientation:landscape){
+  .tlm{inset:60px 0 0 0}
+  .tlm-shell{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);height:calc(100% - 54px)}
+  .tlm-side{display:none}
+  .tlm-shell>*,.tlm-content,.tlm-main{min-width:0;max-width:100%}
+  .tlm-content{width:100%;overflow-x:hidden}
+  .tlm-top{max-width:100%}
+  .tlm-tabbar{display:flex;position:absolute;left:0;right:0;bottom:0;height:calc(54px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:#0c1317;border-top:1px solid var(--line);z-index:5}
+  .tlm-tabbar button{flex:1 1 0;min-width:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:transparent;border:0;color:var(--mute);font:700 10.5px 'DM Sans',sans-serif;letter-spacing:.5px;text-transform:uppercase;cursor:pointer}
+  .tlm-tabbar button i{font-style:normal;font-size:17px}
+  .tlm-tabbar button.on{color:var(--brass);box-shadow:inset 0 2px 0 var(--brass)}
+  .tlm-tabbar button.hot i{color:var(--brass)}
+  .tlm-tabbar button em{position:absolute;top:5px;left:calc(50% + 6px);background:var(--brass);color:#1a1408;font:700 9px 'DM Sans';font-style:normal;padding:1px 5px;border-radius:8px}
+  .tlm-main{padding:12px 12px 24px}
+  .tlm-start{padding:14px 12px;gap:16px;grid-template-columns:minmax(0,1fr)}
+  .tlm h2.tlm-h{font-size:24px}
+  .tlm table{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tlm-row{flex-wrap:wrap}
+  .tlm select,.tlm input:not([type=range]):not([type=checkbox]):not([type=radio]){max-width:100%;font-size:16px}
+  .tlm-top{flex-wrap:nowrap;gap:6px;padding:8px 10px;overflow-x:auto}
+  .tlm-top .tlm-chip:nth-child(n+2){display:none}
+  .tlm-top .tlm-btn{white-space:nowrap;flex:none}
+  .tlm-modal-bg{padding:8px;align-items:end}.tlm-modal{max-height:88vh;padding:16px}
+}
+@media (max-height:520px) and (orientation:landscape){
+  .tlm{inset:44px 0 0 0}
+  .tlm-shell{height:calc(100% - 44px)}
+  .tlm-tabbar{height:calc(44px + env(safe-area-inset-bottom,0px))}
+  .tlm-tabbar button{flex-direction:row;gap:6px;font-size:11px}
+}

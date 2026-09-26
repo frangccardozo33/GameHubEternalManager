@@ -14,14 +14,15 @@ import { matchPage } from './pages/match.js';
 import { draftPages } from './pages/draft.js';
 import { tribunaPages } from './pages/tribuna.js';
 import { copaPages } from './pages/copa.js';
+import { sponsorPages } from './pages/sponsors.js';
 
 const $ = id => document.getElementById(id);
-export const PAGES = [...corePages, ...squadPages, ...strategyPages, ...businessPages, ...draftPages, ...copaPages, ...tribunaPages, matchPage];
+export const PAGES = [...corePages, ...squadPages, ...strategyPages, ...businessPages, ...draftPages, ...copaPages, ...sponsorPages, ...tribunaPages, matchPage];
 const byId = Object.fromEntries(PAGES.map(p => [p.id, p]));
 const NAV = [
   ['Club', ['dashboard', 'roster', 'depth', 'player', 'contracts', 'finances', 'news']],
   ['Estrategia', ['tactics', 'gameplan', 'training']],
-  ['Competición', ['match', 'results', 'schedule', 'standings', 'copa', 'tribuna']],
+  ['Competición', ['match', 'results', 'schedule', 'standings', 'copa', 'sponsors', 'tribuna']],
   ['Mercado', ['market', 'draft']],
 ];
 

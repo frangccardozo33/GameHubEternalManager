@@ -21,7 +21,7 @@
         bar.querySelectorAll('[data-camera]').forEach((b) => b.classList.toggle('active', b === button));
         if (state.cameraMode === 'drone') droneInit();
         layoutPips();
-        showHelp(state.cameraMode === 'drone' ? 'DRON LIBRE · WASD mover · Q/E bajar-subir · arrastrar con el mouse para mirar · rueda: velocidad · Shift: turbo' : '');
+        showHelp(state.cameraMode === 'drone' ? (window.EMMobile && EMMobile.touch ? 'DRON LIBRE · cruz izquierda: mover · ↑/↓: subir-bajar · ⚡ turbo · arrastrá la escena para mirar' : 'DRON LIBRE · WASD mover · Q/E bajar-subir · arrastrar con el mouse para mirar · rueda: velocidad · Shift: turbo') : '');
       };
     });
   }
@@ -36,6 +36,7 @@
   }
   window.addEventListener('keydown', (e) => { if (state.cameraMode === 'drone' && /^(KeyW|KeyA|KeyS|KeyD|KeyQ|KeyE|ShiftLeft|ShiftRight)$/.test(e.code) && !/INPUT|SELECT|TEXTAREA/.test((document.activeElement || {}).tagName)) { drone.keys[e.code] = true; e.stopPropagation(); } }, true);
   window.addEventListener('keyup', (e) => { delete drone.keys[e.code]; });
+  setInterval(() => { try { window.EMMobile && EMMobile.dronePad(state.cameraMode === 'drone' && !document.hidden, dom); } catch (e) {} }, 400);
   let drag = null;
   dom.addEventListener('pointerdown', (e) => { if (state.cameraMode === 'drone') { drag = { x: e.clientX, y: e.clientY }; dom.setPointerCapture(e.pointerId); } });
   dom.addEventListener('pointermove', (e) => { if (!drag) return; drone.yaw -= (e.clientX - drag.x) * .005; drone.pitch = Math.max(-1.5, Math.min(1.2, drone.pitch - (e.clientY - drag.y) * .004)); drag = { x: e.clientX, y: e.clientY }; });
@@ -179,7 +180,7 @@
     PIP.cars[2] = state.cars.find((c) => c !== fc && c !== PIP.cars[0] && !c.finished && (c.state === 'Spin' || c.state === 'PitStop' || c.state === 'PitEntry')) || null;
   }
   function layoutPips() {
-    const r = dom.getBoundingClientRect(); const w = Math.max(150, Math.min(250, r.width * .2)), h = Math.round(w * 9 / 16), x0 = r.width - w - 14, y0 = 116;
+    const r = dom.getBoundingClientRect(); const nar = r.width < 560, short = r.height < 420, w = nar ? Math.max(96, Math.min(130, r.width * .27)) : short ? 130 : Math.max(150, Math.min(250, r.width * .2)), h = Math.round(w * 9 / 16), x0 = r.width - w - (nar ? 8 : 14), y0 = nar ? 128 : short ? 74 : 116;
     PIP.rects = [];
     PIP.wins.forEach((d, i) => {
       const show = PIP.on && isRace() && state.phase !== 'finished' && !(window.Q && Q.active) && PIP.cars[i] && state.cameraMode !== 'onboard'; const y = y0 + i * (h + 8);

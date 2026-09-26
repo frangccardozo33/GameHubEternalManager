@@ -50,3 +50,19 @@ select.f,input.f{background:#0f191f;color:#dae4df;border:1px solid #34464f;borde
 .tbl tr.cup-row td{background:#0f2f3c;color:#d7f3ff}.tbl tr.cup-row td b{color:#ffcc66}
 
 .crest-dot{width:18px;height:18px;object-fit:contain;vertical-align:-4px;margin-right:6px;background:#fff;border-radius:3px;padding:1px}.teamcard .crest-dot{width:22px;height:22px}
+
+/* ===== móvil (ver assets/common/em-mobile.js) ===== */
+@media(max-width:850px){.match-sidebar{display:block !important;contain:none;height:auto;max-height:none;margin-top:12px}.match-sidebar .sidebar-content{max-height:380px}}
+@media(max-width:850px){.playback-bar{padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right))}}
+@media(orientation:landscape) and (max-height:520px){
+  .site-header{height:44px}.page-heading,.site-footer,.bottom-info{display:none}main{padding-top:6px}
+  #court-view{height:calc(100vh - 44px - 6px - 60px - 8px);height:calc(100dvh - 44px - 6px - 60px - 8px);min-height:170px;max-height:none}
+  .scoreboard{top:8px;height:52px;min-width:0;transform:translateX(-50%) scale(.82);transform-origin:top center}
+  .playback-bar{height:60px}.court-bottom{bottom:8px}.match-sidebar{display:none !important}
+}
+.playback-tools button,.playback-main button,.speed-control button{touch-action:manipulation}
+@media(pointer:coarse){.icon-button{min-width:38px;min-height:38px}.speed-control button{min-width:34px;min-height:34px}.sidebar-tabs button{min-height:38px}}
+.sl>*{min-width:0}.sl select,.sl input{width:100%}
+@media(max-width:600px){.sl[style*="grid-template-columns"]{grid-template-columns:104px minmax(0,1fr) !important}#app select,#app input{max-width:100%}}
+@media(max-width:540px){.site-header{height:54px}main{padding-top:14px}.page-heading{margin-bottom:12px}.page-heading p{display:none}h1{font-size:26px}}
+@media(max-width:600px){.tbl .pill{display:none}.tbl th,.tbl td{padding:7px 6px;font-size:11px}.scroll{position:relative;-webkit-overflow-scrolling:touch}.scroll .tbl td:first-child,.scroll .tbl th:first-child{position:sticky;left:0;background:#131c21;z-index:1}}

@@ -137,10 +137,9 @@
   function ensureStage() {
     if (stage) return stage;
     stage = document.createElement("div"); stage.className = "emc-stage"; stage.hidden = true;
-    stage.innerHTML = '<div class="emc-stage-head"><b></b><button type="button" aria-label="Cerrar sticker">×</button></div><video playsinline></video><div class="emc-stage-hint" hidden>Tocá para activar el sonido</div>';
+    stage.innerHTML = '<div class="emc-stage-head"><b></b><button type="button" aria-label="Cerrar sticker">×</button></div><video playsinline></video>';
     document.body.appendChild(stage);
     $("button", stage).onclick = stopStage;
-    $(".emc-stage-hint", stage).onclick = () => { const v = $("video", stage); v.muted = false; v.play().catch(() => {}); $(".emc-stage-hint", stage).hidden = true; };
     return stage;
   }
   function playOnStage(sid, who, own) {
@@ -148,9 +147,9 @@
     if (S.frame) { fpost({ kind: "sticker", url: absUrl(s), who, label: s.label }); S.hooks.onStickerPlay && S.hooks.onStickerPlay(true); clearTimeout(S.frameDuck); S.frameDuck = setTimeout(() => S.hooks.onStickerPlay && S.hooks.onStickerPlay(false), STAGE_MAX_MS); return; }
     const st = ensureStage(), v = $("video", st);
     $("b", st).textContent = who + " · " + s.label; st.hidden = false; st.classList.toggle("own", !!own);
-    clearTimeout(stageT); v.pause(); v.src = stickerUrl(s); v.volume = S.prefs.vol; v.muted = false; v.currentTime = 0; $(".emc-stage-hint", st).hidden = true;
+    clearTimeout(stageT); v.pause(); v.src = stickerUrl(s); v.volume = S.prefs.vol; v.muted = false; v.currentTime = 0;
     v.onended = stopStage;
-    const p = v.play(); if (p && p.catch) p.catch(() => { v.muted = true; v.play().catch(() => {}); $(".emc-stage-hint", st).hidden = false; const un = () => { v.muted = false; $(".emc-stage-hint", st).hidden = true; }; document.addEventListener("pointerdown", un, { once: true }); });
+    const p = v.play(); if (p && p.catch) p.catch(() => { v.muted = true; v.play().catch(() => {}); const un = () => { v.muted = false; }; document.addEventListener("pointerdown", un, { once: true }); });
     stageT = setTimeout(stopStage, STAGE_MAX_MS);
     S.hooks.onStickerPlay && S.hooks.onStickerPlay(true);
   }

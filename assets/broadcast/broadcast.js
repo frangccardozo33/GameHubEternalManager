@@ -97,6 +97,23 @@
 .bc-studio .st-say p{margin:0;padding:8px 14px;background:linear-gradient(90deg,#0b0f13f0,#0b0f13b0);border-left:4px solid var(--a);font-size:19px;line-height:1.25;font-weight:600;animation:bcin .5s both}.bc-studio .st-say p.b{border-left-color:#fff}
 .bc-studio .st-say small{display:block;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--a);font-weight:800}
 .bc-studio button{font:800 14px "Barlow Condensed",Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#0b0f13;background:var(--a);border:0;border-radius:4px;padding:9px 20px;cursor:pointer}
+/* ---- móvil / contenedores angostos o bajos (se mide el visor de la transmisión, no la pantalla) ---- */
+.bc-layer{container-type:size}
+@container (max-width:640px){
+.bc-plate{min-width:0;width:min(88%,340px);padding:8px 22px 10px}.bc-plate b{font-size:30px}.bc-plate small{font-size:11px;letter-spacing:.16em}
+.bc-intro{gap:9px;padding:14px 12px;overflow-y:auto;justify-content:safe center}.bc-intro .lg{height:38px}.bc-intro .comp{font-size:12px;letter-spacing:.22em}
+.bc-intro .vs{gap:14px}.bc-intro .tm small{font-size:11px}.bc-intro .meta{font-size:12px}
+.bc-intro .lines{gap:12px;font-size:12px;line-height:1.35;width:100%}.bc-intro .lines div{min-width:0;flex:1}.bc-intro .lines div:first-child{text-align:right}.bc-intro .lines h5{font-size:10px}.bc-intro .lines i{min-width:18px}.bc-intro .cr{width:clamp(56px,16vw,84px);height:clamp(56px,16vw,84px)}.bc-intro .mid{font-size:26px}
+.bc-studio{gap:6px;padding:10px;overflow-y:auto;justify-content:safe center}.bc-studio .st-top img{height:24px}.bc-studio .st-top b{font-size:14px}
+.bc-studio .st-set{gap:clamp(24px,9vw,90px);width:96%}.bc-studio .st-host svg{width:clamp(74px,26vw,130px)}.bc-studio .st-tags b{font-size:12px}.bc-studio .st-tags small{font-size:9px}
+.bc-studio .st-say{min-height:0;gap:4px;margin-top:14px;width:96%}.bc-studio .st-say p{font-size:14px;padding:5px 9px}.bc-studio .st-say p:not(:nth-last-child(-n+3)){display:none}
+.bc-intro button,.bc-studio button{min-height:40px;padding:8px 18px}
+}
+@container (max-height:360px){
+.bc-intro{gap:5px;padding:8px}.bc-intro .lg{height:26px}.bc-intro .cr{width:clamp(44px,9vw,64px);height:clamp(44px,9vw,64px)}.bc-intro .tm b{font-size:clamp(14px,2.6vw,20px)}.bc-intro .lines{display:none}
+.bc-studio{gap:4px;padding:6px}.bc-studio .st-top{display:none}.bc-studio .st-host svg{width:clamp(56px,14vw,96px)}.bc-studio .st-say{margin-top:12px}.bc-studio .st-say p{font-size:13px;padding:4px 8px}.bc-studio .st-say p:not(:nth-last-child(-n+2)){display:none}
+.bc-plate{top:6%}.bc-plate b{font-size:24px}
+}
 @keyframes bctalk{to{transform:scaleY(1.15)}}@keyframes bcblink{0%,95%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}@keyframes bcin{from{opacity:0;transform:translateY(24px) scale(.88)}}@keyframes bcpop{from{opacity:0;transform:scale(2.2) rotate(-10deg)}}
 `;
   function css() { if (g.document.getElementById('bc-css')) return; const s = g.document.createElement('style'); s.id = 'bc-css'; s.textContent = CSS; g.document.head.appendChild(s); }

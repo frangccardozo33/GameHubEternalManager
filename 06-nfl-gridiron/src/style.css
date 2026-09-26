@@ -6,3 +6,12 @@
 @media(max-width:460px){.app-header nav{gap:12px}.nav-item{font-size:10px}.brand{gap:8px;font-size:17px;letter-spacing:1.5px}.brand small{letter-spacing:1px}.app-header{padding:0 13px}.brand-symbol{width:29px}.header-right .icon-button{font-size:18px;padding-right:0}.team-name strong{font-size:17px}.score-center{margin:0 6px;width:120px}.team{gap:5px}.team .crest{width:29px}.crest svg{width:34px}.score{font-size:36px;min-width:26px}.team-name small{font-size:6px}.scoreboard{height:99px}.playback-right button span{display:none}.viewport{height:370px}.camera-tabs button{font-size:9px;padding:5px 6px}.view-label{font-size:8px}.weather{display:none}.tactics-panel{gap:10px 15px}.diagram-caption{font-size:6px;gap:5px}.diagram-caption>span:last-child{display:none}.assignment-summary>div{font-size:9px}.play-heading h3{font-size:16px}.play-type{font-size:7px}.drive-panel,.feed-panel{padding:17px}.stats-grid{gap:18px}.settings-columns{gap:10px}}
 
 .logo-crest{width:44px;height:44px;object-fit:contain;background:#fff;border-radius:9px;padding:3px;flex:none}.logo-crest.lg{width:56px;height:56px}.team-home .crest .logo-crest,.team-away .crest .logo-crest{width:46px;height:46px}
+
+/* ===== móvil (ver assets/common/em-mobile.js) ===== */
+@media(pointer:coarse){button,.nav-item,select{touch-action:manipulation}.speed button,.playback-right button{min-height:38px}}
+@media(max-width:780px){.viewport{height:min(440px,62vh)}}
+@media(orientation:landscape) and (max-height:520px){
+  .app-header{height:44px}.page-heading,.site-footer{display:none}main{padding-top:6px}
+  .viewport{height:calc(100vh - 44px - 6px - 70px);height:calc(100dvh - 44px - 6px - 70px);min-height:170px}
+  .scoreboard{height:62px;margin-bottom:6px}.workspace{grid-template-columns:minmax(0,1fr)}
+}

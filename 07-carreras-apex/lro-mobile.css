@@ -1,0 +1,68 @@
+/* LRO · ajustes para teléfono (portrait y apaisado). Se apoya en las clases de assets/common/em-mobile.js */
+#bottom-nav{padding-bottom:var(--em-sab,0px);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#bottom-nav::-webkit-scrollbar{display:none}
+#bottom-nav button{flex:0 0 auto;min-width:64px;min-height:52px}
+html.em-narrow main{padding-bottom:calc(84px + var(--em-sab,0px))}
+html.em-touch .view-controls{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;flex:1;min-width:0}
+html.em-touch .view-controls::-webkit-scrollbar{display:none}
+html.em-touch .view-controls button{flex:0 0 auto;min-height:36px}
+html.em-touch .broadcast-bottom{padding-left:max(12px,var(--em-sal,0px));padding-right:max(12px,var(--em-sar,0px))}
+
+/* tabla de posiciones: en vertical es una cinta horizontal arriba de la transmisión (un chip por piloto, ordenada por posición) */
+.tw-btn{display:none}
+html.em-narrow.em-portrait .timing{left:0;right:0;top:0;width:auto;border-radius:0;background:#0a1018ee;border:0;border-bottom:1px solid #ffffff22}
+html.em-narrow.em-portrait .timing-head{display:flex;align-items:center;justify-content:space-between;padding:3px 10px;background:var(--red,#e5233d)}
+html.em-narrow.em-portrait .timing-head span{font-size:10px;letter-spacing:.14em}
+html.em-narrow.em-portrait .timing-head strong{font-size:13px}
+html.em-narrow.em-portrait .timing-sub{display:none}
+html.em-narrow.em-portrait .timing #standings{display:flex;flex-direction:row;height:auto !important;overflow-x:auto;overflow-y:hidden;position:relative;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+html.em-narrow.em-portrait .timing #standings::-webkit-scrollbar{display:none}
+html.em-narrow.em-portrait .driver-row{position:relative !important;transform:none !important;left:auto;right:auto;flex:none;display:flex;align-items:center;gap:5px;height:34px;padding:0 9px;border-bottom:0;border-right:1px solid #ffffff1c}
+html.em-narrow.em-portrait .driver-row .pos{font-size:12px;min-width:12px}
+html.em-narrow.em-portrait .driver-row .name{font-size:12px}
+html.em-narrow.em-portrait .driver-row .gap{font-size:9px;min-width:34px;text-align:left}
+html.em-narrow.em-portrait .driver-row .compound{display:none}
+html.em-narrow.em-portrait .driver-row .stripe{height:16px;width:3px}
+html.em-narrow.em-portrait .driver-row.selected{background:#ffffff26;box-shadow:inset 0 -2px 0 var(--orange,#e97843)}
+html.em-narrow.em-portrait .feed-label{top:50px;left:10px}
+html.em-narrow.em-portrait .tv-logo{top:52px;right:10px}
+html.em-narrow.em-portrait .camera-indicator{top:88px;right:10px}
+/* en horizontal (pantalla ancha) la torre sigue vertical con el top-6 y se despliega */
+html.em-narrow:not(.em-portrait) .timing{width:min(184px,50%)}
+html.em-narrow:not(.em-portrait) .timing #standings{height:calc(29px * 6) !important;overflow:hidden}
+html.em-narrow:not(.em-portrait) .timing.tw-open #standings{height:290px !important}
+html.em-narrow:not(.em-portrait) .tw-btn{display:grid;place-items:center;width:34px;height:34px;margin:-6px -6px -6px 0;border:0;background:transparent;color:#fff;font:700 15px system-ui;cursor:pointer;min-height:0!important;flex:none}
+html.em-narrow:not(.em-portrait) .timing.tw-open .tw-btn{transform:rotate(180deg)}
+
+/* mapa y HUD sin pisar la tabla ni los controles */
+html.em-narrow .map-box{transform:scale(.72);transform-origin:right bottom;bottom:60px}
+html.em-narrow .onboard-hud{transform:scale(.85);transform-origin:left bottom}
+
+/* apaisado corto: la transmisión ocupa toda la pantalla visible */
+html.em-land .topbar{height:46px}
+html.em-land .broadcast{height:calc(var(--em-vh,1vh) * 100 - 54px) !important;min-height:0 !important}
+html.em-land main{padding-top:8px}
+html.em-land .timing{top:44px;width:150px}
+html.em-land .timing #standings{height:calc(29px * 6) !important}
+html.em-land .timing.tw-open #standings{height:290px !important}
+html.em-land .intro{bottom:64px}
+html.em-land .intro h2{font-size:26px}
+html.em-land .intro p{display:none}
+html.em-land .broadcast-bottom{height:46px}
+html.em-land .feed-label{top:8px}
+html.em-land .tv-logo{top:8px}
+html.em-land .camera-indicator{top:38px}
+/* pantalla completa (lo pide el botón ⛶ flotante o el de la transmisión) */
+html.em-fs .topbar,html.em-fs #bottom-nav{display:none}
+html.em-fs.em-land .broadcast{height:calc(var(--em-vh,1vh) * 100) !important}
+/* mandos rápidos dentro de la transmisión (▶/⏸, velocidad) — sólo en pantallas táctiles */
+.lm-ctl{display:none;position:absolute;left:50%;top:8px;transform:translateX(-50%);z-index:30;gap:6px}
+html.em-touch .lm-ctl{display:flex}
+.lm-ctl button{min-height:0!important;height:34px;min-width:40px;padding:0 10px;border-radius:17px;border:1px solid #ffffff44;background:#0a1018d0;color:#fff;font:700 12px system-ui,Arial;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);cursor:pointer}
+html.em-narrow:not(.em-land) .lm-ctl{top:auto;bottom:62px}
+/* modales, garage, editor de liveries */
+html.em-narrow .modal{width:calc(100vw - 16px);max-height:calc(var(--em-vh,1vh) * 92)}
+html.em-land:not(.em-fs) .lm-ctl{display:none}
+/* la cinta de posiciones ocupa el borde superior: los botones flotantes bajan */
+html.em-portrait .emm-fab{top:calc(62px + var(--em-sat,0px))}
+html.em-portrait .emm-chat{top:calc(124px + var(--em-sat,0px))}

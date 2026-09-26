@@ -419,6 +419,7 @@ function runPracticeSimulation(){
 
 // ---- SPONSORS ---------------------------------------------------------
 function renderSponsors(){
+  { const el = document.getElementById('em-sp-host'); if (el && !el.dataset.m) { if (window.EM && EM.sponsors) { EM.sponsors.mount(el, { optionsOnly: true }); el.dataset.m = '1'; } else el.innerHTML = '<p class="muted">Disponible al jugar dentro de Eternal Manager.</p>'; } }
   const team = playerTeam(Career);
   $('active-sponsors').innerHTML = team.sponsors.map((s,i) => s ? `
     <div class="sponsor-card"><div style="display:flex;gap:12px;align-items:center">${window.EM&&EM.sponsorLogo?EM.sponsorLogo(s.id,s.name,54):''}<div><h4>${s.name}</h4><small>${money(s.base)} por carrera · ${s.bonus.label} · ${s.roundsLeft} fechas restantes</small></div></div><button data-drop-sponsor="${i}">TERMINAR CONTRATO</button></div>`

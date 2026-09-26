@@ -324,3 +324,34 @@
   buildStandings();
   resetRace(); // aplica hora del día / clima visual al primer render
 })();
+
+// ---- móvil: tabla desplegable y mandos rápidos dentro de la transmisión -------------------------
+(function () {
+  const $ = (q) => document.querySelector(q), bc = $('.broadcast'); if (!bc) return;
+  const head = $('.timing-head'), tm = $('.timing');
+  if (head && tm) { const b = document.createElement('button'); b.className = 'tw-btn'; b.type = 'button'; b.textContent = '▾'; b.setAttribute('aria-label', 'Ver toda la tabla'); b.onclick = (e) => { e.stopPropagation(); tm.classList.toggle('tw-open'); }; head.appendChild(b); }
+  const ctl = document.createElement('div'); ctl.className = 'lm-ctl';
+  ctl.innerHTML = '<button type="button" data-a="go" aria-label="Iniciar o pausar">▶</button><button type="button" data-a="spd" aria-label="Velocidad">1×</button>';
+  bc.appendChild(ctl);
+  const speeds = () => [...document.querySelectorAll('.speed-group [data-speed]')];
+  ctl.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.a === 'go') { const s = $('#start-button'); if (s) s.click(); }
+    else { const l = speeds(), i = l.findIndex((x) => x.classList.contains('active')); const n = l[(i + 1) % l.length]; if (n) n.click(); }
+  });
+  setInterval(() => {
+    const a = speeds().find((x) => x.classList.contains('active')); if (a) ctl.querySelector('[data-a=spd]').textContent = a.textContent;
+    const s = $('#start-label'); if (s) ctl.querySelector('[data-a=go]').textContent = /PAUS|PAUSE/i.test(s.textContent) ? '⏸' : '▶';
+  }, 500);
+})();
+
+// ---- móvil vertical: la cinta de posiciones se ordena por puesto y sigue al piloto seleccionado -------------------------------
+(function () {
+  let lastSel = null;
+  setInterval(() => {
+    const rows = [...document.querySelectorAll('.driver-row')]; if (!rows.length || !document.documentElement.classList.contains('em-portrait')) return;
+    rows.forEach((r) => { const p = parseInt(r.querySelector('.pos').textContent, 10); r.style.order = isNaN(p) ? 99 : p; });
+    const sel = rows.find((r) => r.classList.contains('selected'));
+    if (sel && sel !== lastSel) { lastSel = sel; const box = sel.parentElement; if (box && box.scrollWidth > box.clientWidth) box.scrollTo({ left: Math.max(0, sel.offsetLeft - box.clientWidth / 2 + sel.clientWidth / 2), behavior: 'smooth' }); }
+  }, 350);
+})();

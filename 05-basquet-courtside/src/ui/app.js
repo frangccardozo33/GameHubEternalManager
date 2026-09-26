@@ -19,7 +19,7 @@ const ui = { screen: 'newgame', arg: null, tab: {}, sort: {}, cfg: { ...DEFAULT_
 let game = null, saveTimer = 0;
 
 const NAV = [['dashboard', 'Inicio'], ['roster', 'Plantilla'], ['tactics', 'Tácticas'], ['schedule', 'Calendario'], ['standings', 'Clasificación'], ['stats', 'Estadísticas'],
-  ['market', 'Mercado'], ['contracts', 'Contratos'], ['scouting', 'Scouting y draft'], ['training', 'Entrenamiento'], ['finances', 'Finanzas'], ['copa', 'Copa'], ['tribuna', 'Tribuna']];
+  ['market', 'Mercado'], ['contracts', 'Contratos'], ['scouting', 'Scouting y draft'], ['training', 'Entrenamiento'], ['finances', 'Finanzas'], ['copa', 'Copa'], ['patrocinios', 'Patrocinios'], ['tribuna', 'Tribuna']];
 
 // ---------- utilidades ----------
 const save = () => { clearTimeout(saveTimer); saveTimer = setTimeout(() => game && saveGame(game), 350); };
@@ -38,13 +38,20 @@ function renderNav() {
 function renderHeader() {
   $('hdr-team').textContent = game ? game.user.name : 'MANAGER'; $('hdr-time').textContent = game ? `T${game.s.season} · ${game.timeline()}` : 'Basketball Manager';
 }
+// Patrocinios: pestaña del modo carrera; el panel lo aporta la capa común (assets/common/em-common.js, sólo dentro del hub)
+const spScreen = () => `<h1>Patrocinios<span>.</span></h1><p class="sub">Contratos, ingresos por partido y ajustes de la transmisión.</p><div id="em-sp-host"></div>`;
+function mountSponsors() {
+  const el = app.querySelector('#em-sp-host'); if (!el) return;
+  if (window.EM && EM.sponsors) EM.sponsors.mount(el); else el.innerHTML = '<p class="muted">Los patrocinios están disponibles al jugar dentro de Eternal Manager.</p>';
+}
 function render() {
   const isMatch = ui.screen === 'match' || ui.screen === 'exhibition';
   matchScreen.hidden = !isMatch || !Match.isOpen; app.hidden = isMatch;
   if (!isMatch) {
     if (ui.screen === 'newgame') { const key = JSON.stringify(ui.cfg) + ui.seed; if (ui.previewKey !== key) { ui.preview = Game.create({ ...ui.cfg }, 0, ui.seed); ui.previewKey = key; } }
-    const fn = S[ui.screen] ?? S.dashboard;
+    const fn = ui.screen === 'patrocinios' ? spScreen : (S[ui.screen] ?? S.dashboard);
     app.innerHTML = fn({ g: game, ui, hasSave: !!loadRaw() });
+    if (ui.screen === 'patrocinios') mountSponsors();
     if (ui.screen === 'tactics') bindTactics(app, (k, v) => { game.user.tactics[k] = v; save(); keepScroll(render); });
   }
   renderNav(); renderHeader();

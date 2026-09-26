@@ -244,7 +244,7 @@ function showIntro(then) {
       bc.studio({ kind: 'pre', onDone: then, lines: [
         ['A', `Bienvenidos. ${h.name} recibe a ${a.name}: ${comp}.`],
         ['B', `${h.name} llega con un nivel de plantilla de ${teamOvr(0).toFixed(0)} y ${a.name} con ${teamOvr(1).toFixed(0)}.`],
-        bh && ba ? ['A', `Las figuras: ${bh.name} (${bh.ovr}) por ${h.short} y ${ba.name} (${ba.ovr}) por ${a.short}.`] : null,
+        bh && ba ? ['A', `Las figuras: ${bh.name} (${Math.round(bh.ovr)}) por ${h.short} y ${ba.name} (${Math.round(ba.ovr)}) por ${a.short}.`] : null,
         ['B', `El ritmo va a ser clave: ${h.name} juega a ritmo ${h.tactics.tempo} y ${a.name} a ${a.tactics.tempo}.`]].filter(Boolean) });
     } });
 }

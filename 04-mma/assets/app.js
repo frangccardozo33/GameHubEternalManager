@@ -25711,6 +25711,7 @@ const Zm = [
     ["contracts", "Contratos", "contract"],
     ["finances", "Finanzas", "wallet"],
     ["history", "Historial", "history"],
+    ["sponsors", "Patrocinios", "contract"],
     ["tribuna", "Tribuna", "trophy"],
     ["settings", "Ajustes", "menu"],
   ],
@@ -25757,6 +25758,8 @@ function Jm() {
       return Pl(Dt);
     case "history":
       return Dl(Dt);
+    case "sponsors":
+      return `<section class="page-heading"><div><div class="eyebrow">PATROCINIOS</div><h1>Patrocinios</h1><p>Contratos, ingresos por combate y ajustes de la transmisión.</p></div></section><div id="em-sp-host"></div>`;
     case "settings":
       return Ll(Dt);
     case "fight":
@@ -25777,7 +25780,7 @@ function Qm() {
   <div id="toast" class="toast" hidden></div>`;
 }
 function Zn() {
-  ((rs.innerHTML = Qm()), Dt.warning && (hn(Dt.warning), (Dt.warning = "")));
+  ((rs.innerHTML = Qm()), er === "sponsors" && (function () { const el = document.getElementById("em-sp-host"); if (!el) return; if (window.EM && EM.sponsors) EM.sponsors.mount(el); else el.innerHTML = '<p class="muted">Los patrocinios están disponibles al jugar dentro de Eternal Manager.</p>'; })(), Dt.warning && (hn(Dt.warning), (Dt.warning = "")));
 }
 function hn(i) {
   const t = document.getElementById("toast");

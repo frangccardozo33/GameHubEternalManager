@@ -1,0 +1,16 @@
+/* LLO · ajustes para teléfono (apoyado en assets/common/em-mobile.js) */
+.btn,.nav-item,.tab{touch-action:manipulation}
+html.em-touch .btn{min-height:40px}
+html.em-narrow.em-portrait body.in-hub .topbar-meta{margin-right:0}
+html.em-narrow .fight-viewport{aspect-ratio:4/3}
+html.em-narrow .fight-controls{flex-wrap:wrap;gap:8px}
+html.em-narrow .fight-orders{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+html.em-narrow .fight-orders .btn,html.em-narrow .fight-orders button{flex:0 0 auto}
+html.em-narrow #content,html.em-narrow main{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
+html.em-narrow table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+html.em-land .topbar{padding:6px 14px}
+html.em-land .fight-page .page-heading{display:none}
+html.em-land .fight-shell{gap:8px}
+html.em-land .fight-viewport{aspect-ratio:auto;height:calc(var(--em-vh,1vh) * 100 - 138px);min-height:170px}
+html.em-fs .topbar,html.em-fs .fight-page .page-heading{display:none}
+html.em-fs.em-land .fight-viewport{height:calc(var(--em-vh,1vh) * 100 - 96px)}
