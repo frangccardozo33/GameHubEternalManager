@@ -1,5 +1,5 @@
 import { ROLES, POS_NAMES, TEAM_POOL, TEAM_ROLES, USAGE, ATTRIBUTES, ATTR_LABELS } from '../manager/data.js';
-import { PLAYER_TAGS, valueOf, autoRole } from '../manager/players.js';
+import { PLAYER_TAGS, valueOf, autoRole, PLACEHOLDER } from '../manager/players.js';
 import { LIM, prefYears } from '../manager/market.js';
 import { INTENSITY, facilityCost, capacityOf, REV_KEYS, EXP_KEYS, sumKeys } from '../manager/club.js';
 import { pg, pct, fmt, per36, ts, efg, eff, astTov, usg, teamAdvanced } from '../manager/stats.js';
@@ -120,7 +120,7 @@ export function player({ g, ui }) {
   const hist = p.hist.map(h => seasonRow(`T${h.s} · ${h.team != null ? esc(g.team(h.team)?.short ?? '') : '-'}`, h)).join('');
   const evo = [...p.ovrHist, { s: g.s.season, ovr: p.ovr, pot: p.pot }];
   const c = p.contract;
-  return `<div class="row spread"><div><div class="eyebrow">${team ? teamLink(g, team.id) : 'AGENTE LIBRE'} · #${p.num}</div><h1 style="margin:0">${esc(p.first)} ${esc(p.last)}<span>.</span></h1><p class="sub" style="margin:4px 0 0">${POS_NAMES[p.role]} (${p.role}) · ${p.age} años · ${p.h.toFixed(2)} m · valor de mercado ${money(valueOf(p))}</p></div>
+  return `<div class="row spread"><div class="row" style="align-items:center;gap:14px"><img class="pface" alt="" src="../${esc(p.photo || PLACEHOLDER)}" style="width:84px;height:84px;object-fit:contain;object-position:bottom;background:#ffffff10;border-radius:10px"><div><div class="eyebrow">${team ? teamLink(g, team.id) : 'AGENTE LIBRE'} · #${p.num}${p.nat ? ' · ' + esc(p.nat) : ''}</div><h1 style="margin:0">${esc(p.first)} ${esc(p.last)}<span>.</span></h1><p class="sub" style="margin:4px 0 0">${POS_NAMES[p.role]} (${p.role}) · ${p.age} años · ${p.h.toFixed(2)} m · valor de mercado ${money(valueOf(p))}</p></div></div>
     <div class="row"><div class="kpi"><small>OVR</small><b style="color:${ovrColor(p.ovr)}">${p.ovr}</b></div><div class="kpi"><small>Potencial</small><b>${p.pot}</b></div><div class="kpi"><small>Forma</small><b>${Math.round(p.form)}</b></div><div class="kpi"><small>Condición</small><b>${Math.round(p.cond)}</b></div><div class="kpi"><small>Moral</small><b>${Math.round(p.morale)}</b></div></div></div>
   <div style="margin:10px 0 18px">${PLAYER_TAGS(p).map(t => pill(t, 'pri')).join('')}</div>
   <div class="grid g3"><div class="panel"><h3>Atributos</h3>${radar(p.a)}${attrBars(p.a)}</div>

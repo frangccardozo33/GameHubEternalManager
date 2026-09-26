@@ -212,9 +212,9 @@
     static load(slot) {
       const raw = g.localStorage && g.localStorage.getItem(SAVE_KEY + (slot ? ':' + slot : ''));
       if (!raw) return null;
-      try { return Career.fromJSON(JSON.parse(raw).state); } catch (e) { return null; }
+      try { const st = JSON.parse(raw).state; if (TLM.ROSTER && st.rosterV !== TLM.ROSTER.version) return null; return Career.fromJSON(st); } catch (e) { return null; }   // guardados con la base de jugadores anterior: se descartan
     }
-    static saveInfo(slot) { try { const raw = g.localStorage.getItem(SAVE_KEY + (slot ? ':' + slot : '')); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } }
+    static saveInfo(slot) { try { const raw = g.localStorage.getItem(SAVE_KEY + (slot ? ':' + slot : '')); const o = raw ? JSON.parse(raw) : null; return o && TLM.ROSTER && o.state && o.state.rosterV !== TLM.ROSTER.version ? null : o; } catch (e) { return null; } }
     static clear(slot) { try { g.localStorage.removeItem(SAVE_KEY + (slot ? ':' + slot : '')); } catch (e) {} }
   }
 

@@ -161,6 +161,16 @@ const DRIVERS_EXTRA = [
   { name:'Thiago Roldán', short:'ROLDÁN', number:'44', color:0x4f6d4f, accent:'#e5dcc0', nationality:'PER', age:26, personality:'AGGRESSIVE', stats:[.86,.87,.80,.81,.79,.89,.74,.86] }
 ];
 function makeDriverPool(){
+  // Roster fijo (roster-lro.js): pilotos reales del TC y del GT World Challenge Europe. Índices 0-9 = titulares, 10-19 = segundos, resto = mercado.
+  const R = (typeof window !== 'undefined') && window.LRO_ROSTER;
+  if (R && R.drivers && R.drivers.length >= 20){
+    const legacy = DRIVERS_BASE.concat(DRIVERS_EXTRA), palette = [0xd96a32,0x347f92,0xbac89c,0xd9b752,0xa74438,0xe1ded0,0x343e52,0x589580,0xb688a1,0x73a9b2,0x8b5a44,0x4f6d4f];
+    return R.drivers.map((r, i) => {
+      const rating = Math.round(r.st.reduce((a,b)=>a+b,0)/8*100), lg = legacy[i % legacy.length];
+      return { name:r.n, short:r.s, number:r.num, color: i < 20 ? TEAM_DEFS[i % 10].color : palette[i % palette.length], accent: lg.accent, nationality:r.c, age:r.a, personality:r.p, stats:r.st.slice(),
+        photo:r.ph, rosterId:r.id, id:i, rating, salary: Math.round((2000 + rating*350) / 100) * 100, marketValue: Math.round((rating*rating*30) / 1000) * 1000, contractRounds:0, teamId:null };
+    });
+  }
   let id = 0;
   const all = DRIVERS_BASE.concat(DRIVERS_EXTRA).map(d => {
     const rating = Math.round(d.stats.reduce((a,b)=>a+b,0)/8*100);
@@ -376,6 +386,7 @@ function loadCareer(){
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (!parsed || !parsed.teams || !parsed.driversPool || !parsed.calendar) return null;
+    if (window.LRO_ROSTER && !parsed.driversPool.some(d => d.rosterId)) return null;   // carrera con la base de pilotos anterior: se descarta (empieza una nueva con los pilotos reales)
     return migrateCareer(parsed);
   } catch(e){ console.warn('Save corrupto, se descarta.', e); return null; }
 }

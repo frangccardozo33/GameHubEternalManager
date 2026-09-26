@@ -1,6 +1,6 @@
 import { clamp } from '../simulation/model.js';
 import { ROLES } from './data.js';
-import { makePlayer, valueOf, autoRole } from './players.js';
+import { makePlayer, makeFromRoster, valueOf, autoRole } from './players.js';
 
 export const LIM = { min: 10, max: 15, minContract: 1.0 };
 export const ROLE_LVL = { star: 5, starter: 4, sixth: 3, rotation: 2, bench: 1, prospect: 0 };
@@ -144,7 +144,9 @@ export function install(Game) {
     generateProspects() {
       const s = this.s, rng = this.rng; s.prospects ??= [];
       for (let i = 0; i < s.cfg.teams * 2 + 6; i++) {
-        const p = makePlayer(rng, `P${s.nid.p++}`, { role: rng.pick(ROLES), tier: -8 - Math.pow(rng.next(), 0.7) * 20, age: Math.floor(rng.range(19, 22)) });
+        const e = this.poolTake(20, 58 + rng.range(-6, 8), 23, 18);
+        const p = e ? makeFromRoster(rng, `P${s.nid.p++}`, e) : makePlayer(rng, `P${s.nid.p++}`, { role: rng.pick(ROLES), tier: -8 - Math.pow(rng.next(), 0.7) * 20, age: Math.floor(rng.range(19, 22)) });
+        if (e) p.age = Math.min(p.age, 22);
         p.pot = clamp(Math.round(p.ovr + rng.range(6, 22)), p.ovr, 95); p.prospect = true; p.scout = 0; p.nz = { o: rng.range(-1, 1), p: rng.range(-1, 1) }; p.teamId = null; p.contract = null;
         s.players[p.id] = p; s.prospects.push(p.id);
       }

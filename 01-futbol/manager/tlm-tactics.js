@@ -187,6 +187,7 @@
   function lookOf(p) {
     const h = (k) => TLM.hash01('look', k, p.id), pick = (arr, k) => arr[Math.floor(h(k) * arr.length) % arr.length];
     const out = { hairStyle: p.card.hairStyle, beard: 'ninguna', acc: [], pose: p.card.pose };
+    if (p.card.look) { out.hairStyle = p.card.look.hairStyle || out.hairStyle; out.beard = p.card.look.beard || 'ninguna'; out.acc = (p.card.look.acc || []).slice(); if (h('a3') < 0.05) out.acc.push('brazalete'); if (p.primaryPosition === 'POR' && h('p') < 0.5) out.pose = 'atajada'; return out; }   // aspecto fijo del roster: se parece a la foto
     if (h('h') < 0.6) out.hairStyle = pick(LOOK.hair, 'h2');
     if (h('b') < 0.34) out.beard = pick(LOOK.beard, 'b2');
     if (h('a') < 0.16) out.acc = [pick(LOOK.acc, 'a2')];
@@ -199,7 +200,7 @@
     const club = p.clubId ? state.clubs[p.clubId] : null;
     const gk = p.primaryPosition === 'POR', lk = lookOf(p);
     return { edition: p.card.edition, stars: p.card.stars, year: state.season, foot: p.card.foot, height: p.card.height, build: p.card.build, skin: p.card.skin, hair: p.card.hair, hairStyle: lk.hairStyle, beard: lk.beard, acc: lk.acc,
-      pose: lk.pose, angle: p.card.angle, position: p.primaryPosition, club: club ? club.name : 'Agente libre', country: p.nationality, kit: gk ? gkKit(club, p) : club ? club.primaryColor : '#e7dfc5', accent: club ? club.secondaryColor : '#285f75' };
+      pose: lk.pose, angle: p.card.angle, position: p.primaryPosition, club: club ? club.name : 'Agente libre', country: p.nationality, photo: p.card.photo || null, photoDy: p.card.photoDy || 0, crest: club && TLM.crestURL ? TLM.crestURL(club) : '', flag: (g.LFONations && g.LFONations.flag(p.nationality)) || '', beardColor: p.card.hair, kit: gk ? gkKit(club, p) : club ? club.primaryColor : '#e7dfc5', accent: club ? club.secondaryColor : '#285f75' };
   }
   function playerPayload(state, club, p, slotIdx, slots) {
     const eff = TLM.effectiveStats(p, club);

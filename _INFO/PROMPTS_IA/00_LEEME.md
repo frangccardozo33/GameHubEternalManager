@@ -11,6 +11,7 @@ para que la IA no tenga que conocer el proyecto: dicen qué archivo entrega, con
 | `04_transmision_estudio.md` | Presentadores/estudio, intros y placas de TV de LBO, LGO, LRO y LLO | imagen / diseño |
 | `05_nombres_mundo.md` | Equipos y jugadores de LBO/LGO en el mundo ficticio, apodos de LLO | texto |
 | `06_audio.md` | Cánticos, ambientes, stingers de estudio y de copa para los deportes que no tienen audio real | audio |
+| `10_carreras_ui_y_camara_onboard.md` | UI de la transmisión de LRO (torre de tiempos, placas, controles) y cámara a bordo con cabina | código (Opus 5.5) |
 
 ## Cómo usarlos
 1. Abrí el archivo, copiá el bloque que está bajo **«PROMPT»** (los bloques de código) y pegalo tal cual.

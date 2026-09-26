@@ -165,5 +165,5 @@ export class MatchSimulator {
     }
   }
   simulateToEnd(maxSteps=2000000) { this.start(); let steps=0; while(this.state!=='FINAL'&&steps++<maxSteps) this.step(); if(this.state!=='FINAL') throw new Error(`Match stalled in ${this.state}`); return {score:this.drive.score,plays:this.history.length,stats:this.drive.stats,steps}; }
-  snapshot() { return {state:this.state,offense:this.playOffense,los:this.los,lineToGain:this.drive.lineToGain,ball:{x:this.ball.x,y:this.ball.y,z:this.ball.z,mode:this.ball.mode},players:this.players.map(p=>({id:p.id,role:p.role,side:p.side,x:p.x,z:p.z,heading:p.heading,speed:p.speed,state:p.state,fallen:p.fallen,number:p.number,name:p.name,ovr:p.ovr,engaged:p.engaged})),liveTime:this.liveTime,playNumber:this.playNumber}; }
+  snapshot() { return {state:this.state,offense:this.playOffense,los:this.los,lineToGain:this.drive.lineToGain,ball:{x:this.ball.x,y:this.ball.y,z:this.ball.z,mode:this.ball.mode},players:this.players.map(p=>({id:p.id,role:p.role,side:p.side,x:p.x,z:p.z,heading:p.heading,speed:p.speed,state:p.state,fallen:p.fallen,number:p.number,name:p.name,ovr:p.ovr,look:p.look,engaged:p.engaged})),liveTime:this.liveTime,playNumber:this.playNumber}; }
 }

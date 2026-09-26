@@ -621,10 +621,11 @@ function developDrivers(){
     d.stats = d.stats.map(v => Math.max(.5, Math.min(.99, v + trend + (Math.random()-.5)*.02)));
     const retire = d.age >= 39 || (d.age >= 35 && Math.random() < (d.age - 34) * .18);
     if (retire){
-      let name; do { name = rnd(ROOKIE_FIRST) + ' ' + rnd(ROOKIE_LAST); } while (used.has(name));
+      let name; const usedSur = new Set(Career.driversPool.map(x => x.short)); let tries = 0;
+      do { name = rnd(ROOKIE_FIRST) + ' ' + rnd(ROOKIE_LAST); } while ((used.has(name) || usedSur.has(name.split(' ')[1].toUpperCase())) && tries++ < 200);   // apellido único: al piloto se lo identifica por el apellido
       used.add(name);
       const old = d.name, oldTeam = d.teamId;
-      d.name = name; d.short = name.split(' ')[1].toUpperCase(); d.age = 18 + Math.floor(Math.random()*3);
+      d.name = name; d.short = name.split(' ')[1].toUpperCase(); d.photo = (window.LRO_ROSTER && LRO_ROSTER.placeholder) || null; d.rosterId = null; d.age = 18 + Math.floor(Math.random()*3);
       d.stats = d.stats.map(() => .55 + Math.random()*.22); d.personality = rnd(['CONSISTENT','RISK TAKER','AGGRESSIVE','QUALIFYING SPECIALIST']);
       d.contractRounds = 6;
       if (oldTeam !== null && (oldTeam === 0 || Math.random() < .35)) pushNews('RETIRO', old + ' cuelga el casco. ' + name + ' (' + d.age + ') asume su butaca' + (oldTeam === 0 ? ' en tu equipo.' : '.'));

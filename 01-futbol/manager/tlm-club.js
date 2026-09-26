@@ -31,6 +31,24 @@
 
   function fillSquad(state, club, cfg, used) {
     const r = R(state);
+    // Roster fijo (tlm-roster.js): si el club tiene jugadores asignados, se usan ésos; los puestos que falten se generan con foto gris.
+    const rb = TLM.rosterByClub && TLM.rosterByClub(), rows = rb && rb[club.name];
+    if (rows && rows.length) {
+      rows.forEach((e) => {
+        const p = TLM.makeFromRoster(state, e, used);
+        TLM.moveToClub(state, p.id, club.id, { salary: TLM.salaryOf(p), endSeason: state.season + r.int(1, 4) });
+        p.morale = clamp(round(60 + r.gauss() * 6), 30, 90);
+      });
+      const cnt = (pos) => club.squad.filter((id) => state.players[id].primaryPosition === pos).length;
+      const need = []; for (let k = cnt('POR'); k < 2; k++) need.push('POR');            // el roster ya trae ~24; sólo se completa si falta gente o un portero
+      const missing = Math.max(0, 22 - club.squad.length - need.length); const tmpl = SQUAD_TEMPLATE.filter((q) => q !== 'POR'); for (let k = 0; k < missing; k++) need.push(tmpl[k % tmpl.length]);
+      const baseOvr = 40 + club.reputation * (club.foreign ? 0.59 : 0.4);
+      need.forEach((pos) => {
+        const p = TLM.makePlayer(state, { pos, ovr: baseOvr + r.gauss() * 3.6, age: clamp(round(26 + r.gauss() * 4), 18, 36), _used: used, nationHome: club.nation });
+        TLM.moveToClub(state, p.id, club.id, { salary: TLM.salaryOf(p), endSeason: state.season + r.int(1, 4) });
+      });
+      return;
+    }
     const baseOvr = 40 + club.reputation * 0.42;
     const seed = cfg.seedNames || [];
     const template = SQUAD_TEMPLATE.slice();
@@ -58,7 +76,7 @@
     opts = opts || {};
     const cfg = opts.worldConfig || TLM.WORLD_CONFIG;
     const state = {
-      version: 1, id: 'career_' + (opts.seed || Date.now()), seed: (opts.seed || Date.now()) >>> 0, rngState: (opts.seed || Date.now()) >>> 0,
+      version: 1, rosterV: (TLM.ROSTER && TLM.ROSTER.version) || 0, id: 'career_' + (opts.seed || Date.now()), seed: (opts.seed || Date.now()) >>> 0, rngState: (opts.seed || Date.now()) >>> 0,
       settings: { rounds: cfg.format.rounds, name: cfg.name }, currentClubId: null, season: cfg.startYear, currentMatchday: 1,
       counters: {}, clubs: {}, players: {}, competitions: {}, fixtures: {},
       market: { listings: {}, offers: {}, freeAgents: [] }, transfers: [], news: [], history: { seasons: [], records: {} },
@@ -91,7 +109,19 @@
     }
     // agentes libres + jugadores en venta
     const fa = TLM.DEFAULTS.freeAgents;
-    for (let i = 0; i < fa; i++) {
+    let made = 0;
+    const rbf = TLM.rosterByClub && TLM.rosterByClub(), free = (rbf && rbf['']) || [];
+    free.forEach((e) => {                                              // agentes libres del roster fijo (con retrato)
+      const p = TLM.makeFromRoster(state, e, used);
+      p.contract = { clubId: null, salary: 0, endSeason: 0, status: 'free' };
+      state.market.freeAgents.push(p.id); made++;
+    });
+    for (let k = free.filter((e) => e.p === 'POR').length; k < 6; k++, made++) {              // siempre hay porteros libres para armar el once
+      const p = TLM.makePlayer(state, { pos: 'POR', ovr: clamp(56 + r.gauss() * 5, 44, 70), age: clamp(round(27 + r.gauss() * 5), 19, 37), _used: used });
+      p.contract = { clubId: null, salary: 0, endSeason: 0, status: 'free' };
+      state.market.freeAgents.push(p.id);
+    }
+    for (let i = made; i < fa; i++) {
       const pos = i < 6 ? 'POR' : r.pick(TLM.POSITIONS.filter((p) => p !== 'POR')); // siempre hay porteros libres para armar el once
       const p = TLM.makePlayer(state, { pos, ovr: clamp(58 + r.gauss() * 6.5, 44, 74), age: clamp(round(27 + r.gauss() * 5), 18, 37), _used: used });
       p.contract = { clubId: null, salary: 0, endSeason: 0, status: 'free' };

@@ -15,7 +15,7 @@ function block(begin, end, code, anchorFn) {
 // 1) bloque del motor: justo después de la capa TLB (mismo scope que la clase wc)
 block("// <<TLM_ENGINE_BEGIN>>", "// <<TLM_ENGINE_END>>", rd("engine.js"), () => { const i = h.indexOf("// <<TLB_ENGINE_END>>"); if (i < 0) throw new Error("Falta TLB_ENGINE_END"); return h.indexOf("\n", i) + 1; });
 // 1b) assets del manager (CSS + scripts) justo después de collection.js
-const FILES = ["tlm-util", "tlm-dates", "tlm-data", "tlm-players", "tlm-competition", "tlm-club", "tlm-tactics", "tlm-market", "tlm-ai", "tlm-sim", "tlm-news", "tlm-cup", "tlm-career", "tlm-bridge", "tlm-ui-core", "tlm-ui-team", "tlm-ui-market", "tlm-ui-match", "tlm-ui-cup", "tlm-ui-wardrobe"];
+const FILES = ["tlm-util", "tlm-dates", "tlm-data", "tlm-roster", "tlm-players", "tlm-competition", "tlm-club", "tlm-tactics", "tlm-market", "tlm-ai", "tlm-sim", "tlm-news", "tlm-cup", "tlm-career", "tlm-bridge", "tlm-ui-core", "tlm-ui-team", "tlm-ui-market", "tlm-ui-match", "tlm-ui-cup", "tlm-ui-wardrobe"];
 {
   const begin = "<!-- <<TLM_ASSETS_BEGIN>> -->", end = "<!-- <<TLM_ASSETS_END>> -->", NL = String.fromCharCode(10);
   const text = [begin, '<link rel="stylesheet" href="manager/tlm.css">', '<script src="../assets/nations/nations.js"></script>', ...FILES.map((f) => `<script src="manager/${f}.js"></script>`), '<script>window.TLM_UI && TLM_UI.init();</script>', end].join(NL);

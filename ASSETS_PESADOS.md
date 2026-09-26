@@ -5,7 +5,8 @@ sin ellas el juego carga pero le faltan imágenes/modelos. Para usar el proyecto
 
 | Carpeta | Tamaño aprox. |
 |---|---|
-| `assets/roster/` | 2,6 GB |
+| `assets/roster/` | 2,6 GB (+ carpetas `*_alpha` con los recortes) |
+| `assets/players/` | ~100 MB (retratos WebP que usa el juego; ver `_INFO/ROSTER_JUGADORES.md`) |
 | `01-futbol/roster/` | 2,2 GB |
 | `assets/carengines/` | 755 MB |
 

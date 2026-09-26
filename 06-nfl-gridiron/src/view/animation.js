@@ -2,9 +2,10 @@ import * as THREE from 'three';
 
 const material = color => new THREE.MeshStandardMaterial({ color, roughness:.72 });
 const geometries = { body:new THREE.BoxGeometry(.82,.65,.48), helmet:new THREE.SphereGeometry(.29,12,9), limb:new THREE.CylinderGeometry(.11,.095,.52,7), boot:new THREE.BoxGeometry(.2,.16,.38) };
-const skin=material('#ae7f62'), pants=material('#e3e6e4'), boots=material('#13202a'), mask=material('#c5d0d6');
-export function createPlayer(team,role,number) {
+const defaultSkin=material('#ae7f62'), pants=material('#e3e6e4'), boots=material('#13202a'), mask=material('#c5d0d6');
+export function createPlayer(team,role,number,look=null) {
   const root=new THREE.Group(), rig=new THREE.Group(); root.add(rig);
+  const skin=look?.skin?material(look.skin):defaultSkin;
   const shirt=material(team.color), helmetMat=material(team.dark);
   const mesh=(geo,mat,x,y,z,parent=rig)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.castShadow=true;parent.add(m);return m;};
   const body=mesh(geometries.body,shirt,0,1.12,0);

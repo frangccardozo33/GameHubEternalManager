@@ -3,6 +3,7 @@ import '../../../../assets/nations/nations.js';
 import '../../../../assets/tribuna/tribuna.js';
 import { KEY_ATTRS, LABELS, POS_NAMES } from '../../manager/constants.js';
 import { esc } from '../kit.js';
+import { PLACEHOLDER } from '../../manager/generator.js';
 
 let registered = false;
 function register(app) {
@@ -22,8 +23,9 @@ function register(app) {
         const t = p.teamId != null ? d.teams[p.teamId] : null, keys = (KEY_ATTRS[p.pos] || []).slice(0, 6), stats = {};
         Object.keys(p.ratings || {}).forEach(k => { stats[LABELS[k] || k] = Math.round(p.ratings[k]); });
         return { id: 'lgo-' + p.id, name: p.name, number: p.number || null, pos: p.pos, posName: POS_NAMES[p.pos], ovr: p.ovr, age: p.age, skin: (String(p.id).length * 3 + p.age) % 5,
-          team: t ? { id: t.id, name: t.name, short: t.short, primary: t.color, secondary: t.dark } : { id: 'libre', name: 'Agente libre', short: 'LIB', primary: '#5b6673', secondary: '#e8edf2' },
-          nation: window.LFONations.forPerson(p.id, t ? t.short : 'libre'), statLabels: keys.map(k => [LABELS[k] || k, (LABELS[k] || k).replace(/[^A-Za-zÁÉÍÓÚáéíóú ]/g, '').slice(0, 4).toUpperCase()]), stats,
+          portrait: '../../' + (p.photo || PLACEHOLDER),
+          team: t ? { id: t.id, name: t.name, short: t.short, primary: t.color, secondary: t.dark, crest: t.crest } : { id: 'libre', name: 'Agente libre', short: 'LIB', primary: '#5b6673', secondary: '#e8edf2' },
+          nation: p.nat || window.LFONations.forPerson(p.id, t ? t.short : 'libre'), statLabels: keys.map(k => [LABELS[k] || k, (LABELS[k] || k).replace(/[^A-Za-zÁÉÍÓÚáéíóú ]/g, '').slice(0, 4).toUpperCase()]), stats,
           info: [['Edad', p.age + ' años'], ['Potencial', p.potential], ['Contrato', p.contract ? `${p.contract.salary ?? p.contract.amount ?? '?'} M · ${p.contract.years ?? '?'} años` : 'sin contrato']] };
       });
     },

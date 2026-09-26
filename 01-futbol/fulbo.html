@@ -10111,7 +10111,7 @@ Object.assign(wc.prototype, {
     p.heightM = x.heightM; p.scale = x.heightM / BASE_MODEL_HEIGHT; p.stamina = x.stamina == null ? 100 : x.stamina; p.cards = { yellow: 0, red: false };
     p.cardData = x.card; p.tlmOvr = x.overall; p.primaryPosition = x.primaryPosition; p.tlmMorale = x.morale;
     const k = x.card || {};
-    p.appearance = { skin: k.skin, hair: k.hair, cut: k.hairStyle === "largo" ? "long" : k.hairStyle === "rapado" ? "bald" : undefined, kit: p.role === "GK" ? this.teams[t].gkColor || this.teams[t].color : this.teams[t].color, trim: p.role === "GK" ? "#ffffff" : this.teams[t].colorAlt, pattern: p.role === "GK" ? "plain" : this.teams[t].kitPattern || "stripes" };
+    p.appearance = { skin: k.skin, hair: k.hair, cut: /^(largo|melena|media|trenzas|rastas|colita|mediacola|mullet|manbun|mono|rodete|twists|trencitas|taza)$/.test(k.hairStyle) ? "long" : /^(rapado|corona)$/.test(k.hairStyle) ? "bald" : undefined, kit: p.role === "GK" ? this.teams[t].gkColor || this.teams[t].color : this.teams[t].color, trim: p.role === "GK" ? "#ffffff" : this.teams[t].colorAlt, pattern: p.role === "GK" ? "plain" : this.teams[t].kitPattern || "stripes" };
     delete p.collectibleId; delete p.collectionZones; delete p.preferredFoot;
     p.memory = { confidence: 50, recentMistakes: 0, recentSuccesses: 0, recentDuelResults: 0, lastOpponent: null, lastPassTarget: null, pressureMemory: 0, recentFatigue: 0 };
     this.deriveIdentity(p);
@@ -39699,6 +39699,7 @@ dialog{overflow:hidden}
 <script src="manager/tlm-util.js"></script>
 <script src="manager/tlm-dates.js"></script>
 <script src="manager/tlm-data.js"></script>
+<script src="manager/tlm-roster.js"></script>
 <script src="manager/tlm-players.js"></script>
 <script src="manager/tlm-competition.js"></script>
 <script src="manager/tlm-club.js"></script>

@@ -32,14 +32,14 @@ export class AnimationController {
   constructor(player, color, referee = false) {
     this.player = player; this.root = new THREE.Group(); this.body = new THREE.Group(); this.root.add(this.body);
     this.phase = player.index * 0.7; this.blend = 0; this.jump = 0;
-    const skin = material(['#b98257', '#65422f', '#d4a47d', '#986144', '#52382c'][(player.skin ?? player.index) % 5]);
+    const skin = material(player.look?.skin ?? ['#b98257', '#65422f', '#d4a47d', '#986144', '#52382c'][(player.skin ?? player.index) % 5]);
     const jersey = material(referee ? '#d7e0dd' : color);
     const trim = material(referee ? '#17282f' : player.team ? '#e9e7d8' : '#22313a');
     const shoes = material(player.team ? '#e4e5df' : '#27333a');
     this.torso = mesh(this.body, new THREE.CylinderGeometry(0.245, 0.19, 0.57, 10), jersey, [1, 1, 0.68], [0, 1.27, 0]);
     mesh(this.body, cylinder, skin, [0.082, 0.13, 0.082], [0, 1.61, 0]);
     this.head = mesh(this.body, sphere, skin, [0.145, 0.185, 0.145], [0, 1.8, 0]);
-    mesh(this.body, new THREE.SphereGeometry(1, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.51), material('#231d1b'), [0.15, player.index % 3 === 0 ? 0.205 : 0.18, 0.15], [0, 1.84, -0.008]);
+    if (!player.look?.bald) mesh(this.body, new THREE.SphereGeometry(1, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.51), material(player.look?.hair ?? '#231d1b'), [0.15, (player.look ? (/^(afro|rulos|rastas|trenzas|twists)$/.test(player.look.hs) ? 0.215 : /^(largo|media)$/.test(player.look.hs) ? 0.2 : 0.18) : player.index % 3 === 0 ? 0.205 : 0.18), 0.15], [0, 1.84, -0.008]);
     mesh(this.body, sphere, skin, [0.04, 0.045, 0.05], [0, 1.79, 0.14]);
     for (const side of [-1, 1]) mesh(this.body, sphere, material('#211c1b'), [0.013, 0.011, 0.009], [side * 0.052, 1.84, 0.133]);
     this.arms = []; this.legs = [];

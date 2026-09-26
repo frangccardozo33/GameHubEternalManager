@@ -32,7 +32,7 @@ export class PlayerStats {
 }
 export class Player {
   constructor(id, role, side, x, z, rng, number, profile = null) {
-    Object.assign(this, { id, role, side, x, z, start: { x, z }, vx: 0, vz: 0, speed: 0, heading: side === 'O' ? 0 : Math.PI, number: profile?.number ?? number, state: 'stance', assignment: {}, routeIndex: 0, cooldown: 0, engaged: null, fallen: 0, pid: profile?.pid ?? null, name: profile?.name ?? null, ovr: profile?.ovr ?? null });
+    Object.assign(this, { id, role, side, x, z, start: { x, z }, vx: 0, vz: 0, speed: 0, heading: side === 'O' ? 0 : Math.PI, number: profile?.number ?? number, state: 'stance', assignment: {}, routeIndex: 0, cooldown: 0, engaged: null, fallen: 0, pid: profile?.pid ?? null, name: profile?.name ?? null, ovr: profile?.ovr ?? null, look: profile?.look ?? null });
     this.stats = new PlayerStats(role, rng, profile?.stats ?? null);
   }
 }

@@ -84,7 +84,7 @@ export class StadiumView {
     const key=snapshot.players.map(p=>`${p.id}:${p.role}:${p.number}`).join(',')+snapshot.offense;
     if(key===this.rosterKey)return;
     for(const root of this.meshes.values()) {this.scene.remove(root);this.animation.dispose(root);}this.meshes.clear();
-    for(const p of snapshot.players) {const team=this.teams[p.side==='O'?snapshot.offense:1-snapshot.offense];const root=createPlayer(team,p.role,p.number);root.userData.id=p.id;this.meshes.set(p.id,root);this.scene.add(root);}
+    for(const p of snapshot.players) {const team=this.teams[p.side==='O'?snapshot.offense:1-snapshot.offense];const root=createPlayer(team,p.role,p.number,p.look);if(p.look?.h){const k=Math.max(.9,Math.min(1.1,p.look.h/188)),w=Math.max(.88,Math.min(1.25,Math.pow(p.look.w/225,.32)));root.scale.set(w,k,w);}root.userData.id=p.id;this.meshes.set(p.id,root);this.scene.add(root);}
     this.rosterKey=key;
   }
   debug(sim,enabled) {

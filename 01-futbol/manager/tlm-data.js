@@ -161,6 +161,7 @@
 
   // ---- CLUBES INVITADOS (Continente Viejo): no juegan la liga LFO, sólo La Cupidité (como una Champions o una Libertadores) ----
   // rep = reputación 1-100 (define la calidad de la plantilla). Los escudos están en equiposfut/continente2.
+  // Los clubes del Continente Viejo están MUY por encima de los de la liga (Kostanay y Tel Shava: +15/20 de reputación y de media sobre el mejor local).
   // Nombres propios de cada nación del Continente Viejo (los jugadores de los clubes invitados los usan al generarse).
   const NAMES_VIEJO = {
     baikal: { first: ['Dmitri', 'Ivan', 'Nikolai', 'Sergei', 'Mikhail', 'Andrei', 'Pavel', 'Yuri', 'Oleg', 'Anton', 'Vasili', 'Kirill'], last: ['Volkov', 'Petrov', 'Smirnov', 'Kuznetsov', 'Sokolov', 'Morozov', 'Orlov', 'Lebedev', 'Zhukov', 'Baranov', 'Antonov', 'Fedorov'] },
@@ -170,15 +171,15 @@
     overmark: { first: ['Henrik', 'Magnus', 'Sander', 'Anders', 'Erik', 'Torstein', 'Jonas', 'Kristian', 'Espen', 'Tobias'], last: ['Hansen', 'Berg', 'Lunde', 'Solberg', 'Nilsen', 'Dahl', 'Strand', 'Halvorsen', 'Moen', 'Haugen'] },
   };
   const GUEST_CLUBS = [
-    { name: 'Red Gull Club Tellin', shortName: 'RGT', nation: 'estovackia', crest: 'equiposfut/continente2/redgullclubtellin.png', primaryColor: '#f2c500', secondaryColor: '#0a2a6b', kitPattern: 'hoops', stadium: 'Tellin Arena', capacity: 34000, rep: 78, profile: 'starBuyer' },
-    { name: 'Maccabi Tel Shava', shortName: 'MTS', nation: 'netanya', crest: 'equiposfut/continente2/maccabitelshava.png', primaryColor: '#0a2a6b', secondaryColor: '#ffc400', kitPattern: 'vband', stadium: 'Estadio Estrella Dorada', capacity: 31000, rep: 74, profile: 'balanced' },
-    { name: 'Sporting Lake Baikal', shortName: 'SLB', nation: 'baikal', crest: 'equiposfut/continente2/sportinglakebaikal.png', primaryColor: '#4f8fd0', secondaryColor: '#1f4e8c', kitPattern: 'gradient', stadium: 'Estadio Lago Profundo', capacity: 30000, rep: 72, profile: 'defensive' },
-    { name: 'Sporty VV Klub Estovackia', shortName: 'SKE', nation: 'estovackia', crest: 'equiposfut/continente2/sportyvvklubestovackia.png', primaryColor: '#b3001b', secondaryColor: '#111111', kitPattern: 'halves', stadium: 'Estadio del Pato Volador', capacity: 28000, rep: 70, profile: 'aggressive' },
-    { name: 'Sporty VV Klub Kostanay', shortName: 'SKK', nation: 'kostanay', crest: 'equiposfut/continente2/sportyvvklubkostanay.png', primaryColor: '#151515', secondaryColor: '#ffffff', kitPattern: 'checks', stadium: 'Estadio Águila Doble', capacity: 26000, rep: 68, profile: 'conservative' },
-    { name: 'Groz Sport Kulübü', shortName: 'GRZ', nation: 'baikal', crest: 'equiposfut/continente2/grozsportkulubu.png', primaryColor: '#46a7dc', secondaryColor: '#0b2a63', kitPattern: 'pinstripes', stadium: 'Arena de la Fortaleza', capacity: 24000, rep: 66, profile: 'offensive' },
-    { name: 'Klaipeda United', shortName: 'KLU', nation: 'kostanay', crest: 'equiposfut/continente2/Klaipedaunited.png', primaryColor: '#a4142b', secondaryColor: '#1b1b1b', kitPattern: 'quarters', stadium: 'Estadio del Puerto de Klaipeda', capacity: 21000, rep: 61, profile: 'pragmaticSeller' },
-    { name: 'Inter Focuri', shortName: 'IFO', nation: 'overmark', crest: 'equiposfut/continente2/interfocuri.png', primaryColor: '#0fa958', secondaryColor: '#111111', kitPattern: 'stripes', stadium: 'Estadio de las Hogueras', capacity: 20000, rep: 58, profile: 'youthDeveloper' },
-    { name: 'ØRK FC', shortName: 'ORK', nation: 'overmark', crest: 'equiposfut/continente2/orkfc.png', primaryColor: '#1c5b2a', secondaryColor: '#ffffff', kitPattern: 'chevron', stadium: 'Estadio Banderín Verde', capacity: 17000, rep: 55, profile: 'lowBudget' },
+    { name: 'Red Gull Club Tellin', shortName: 'RGT', nation: 'estovackia', crest: 'equiposfut/continente2/redgullclubtellin.png', primaryColor: '#f2c500', secondaryColor: '#0a2a6b', kitPattern: 'hoops', stadium: 'Tellin Arena', capacity: 34000, rep: 91, profile: 'starBuyer' },
+    { name: 'Maccabi Tel Shava', shortName: 'MTS', nation: 'netanya', crest: 'equiposfut/continente2/maccabitelshava.png', primaryColor: '#0a2a6b', secondaryColor: '#ffc400', kitPattern: 'vband', stadium: 'Estadio Estrella Dorada', capacity: 31000, rep: 97, profile: 'balanced' },
+    { name: 'Sporting Lake Baikal', shortName: 'SLB', nation: 'baikal', crest: 'equiposfut/continente2/sportinglakebaikal.png', primaryColor: '#4f8fd0', secondaryColor: '#1f4e8c', kitPattern: 'gradient', stadium: 'Estadio Lago Profundo', capacity: 30000, rep: 89, profile: 'defensive' },
+    { name: 'Sporty VV Klub Estovackia', shortName: 'SKE', nation: 'estovackia', crest: 'equiposfut/continente2/sportyvvklubestovackia.png', primaryColor: '#b3001b', secondaryColor: '#111111', kitPattern: 'halves', stadium: 'Estadio del Pato Volador', capacity: 28000, rep: 87, profile: 'aggressive' },
+    { name: 'Sporty VV Klub Kostanay', shortName: 'SKK', nation: 'kostanay', crest: 'equiposfut/continente2/sportyvvklubkostanay.png', primaryColor: '#151515', secondaryColor: '#ffffff', kitPattern: 'checks', stadium: 'Estadio Águila Doble', capacity: 26000, rep: 98, profile: 'conservative' },
+    { name: 'Groz Sport Kulübü', shortName: 'GRZ', nation: 'baikal', crest: 'equiposfut/continente2/grozsportkulubu.png', primaryColor: '#46a7dc', secondaryColor: '#0b2a63', kitPattern: 'pinstripes', stadium: 'Arena de la Fortaleza', capacity: 24000, rep: 85, profile: 'offensive' },
+    { name: 'Klaipeda United', shortName: 'KLU', nation: 'kostanay', crest: 'equiposfut/continente2/Klaipedaunited.png', primaryColor: '#a4142b', secondaryColor: '#1b1b1b', kitPattern: 'quarters', stadium: 'Estadio del Puerto de Klaipeda', capacity: 21000, rep: 82, profile: 'pragmaticSeller' },
+    { name: 'Inter Focuri', shortName: 'IFO', nation: 'overmark', crest: 'equiposfut/continente2/interfocuri.png', primaryColor: '#0fa958', secondaryColor: '#111111', kitPattern: 'stripes', stadium: 'Estadio de las Hogueras', capacity: 20000, rep: 79, profile: 'youthDeveloper' },
+    { name: 'ØRK FC', shortName: 'ORK', nation: 'overmark', crest: 'equiposfut/continente2/orkfc.png', primaryColor: '#1c5b2a', secondaryColor: '#ffffff', kitPattern: 'chevron', stadium: 'Estadio Banderín Verde', capacity: 17000, rep: 77, profile: 'lowBudget' },
   ];
 
   const DEFAULTS = {

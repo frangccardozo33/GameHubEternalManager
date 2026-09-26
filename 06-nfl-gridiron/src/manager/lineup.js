@@ -102,7 +102,7 @@ export class LineupProvider {
       mods.passRush = (mods.passRush || 0) + k; mods.pursuit = (mods.pursuit || 0) + a; mods.reaction = (mods.reaction || 0) + a;
       mods.zoneCoverage = (mods.zoneCoverage || 0) - a; mods.awareness = (mods.awareness || 0) - a * .6;
     }
-    return { pid: p.id, name: p.name, number: p.number, ovr: p.ovr, pos: p.pos, stats: engineStats(p, { fatigue: this.fatigueOf(p), mods }) };
+    return { pid: p.id, name: p.name, number: p.number, ovr: p.ovr, pos: p.pos, look: p.look ?? null, stats: engineStats(p, { fatigue: this.fatigueOf(p), mods }) };
   }
   pick(pos, index) {
     const sim = this.sim, special = sim && SPECIAL.has(sim.play?.type), side = sim && sim.playOffense === this.idx ? 'O' : 'D';

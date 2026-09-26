@@ -54,7 +54,7 @@ export class Player {
     this.role = data?.role ?? ['PG', 'SG', 'SF', 'PF', 'C'][index % 5]; this.name = data?.name ?? NAMES[team][index];
     this.number = data?.number ?? [3, 11, 7, 23, 34, 2, 18, 9][index];
     this.height = data?.height ?? [1.86, 1.94, 2.01, 2.08, 2.16][index % 5];
-    this.skin = data?.skin ?? null; this.teamLabel = null; this.numberColor = null;
+    this.skin = data?.skin ?? null; this.look = data?.look ?? null; this.teamLabel = null; this.numberColor = null;
     this.ratings = data ? { ...data.ratings } : Object.fromEntries(ATTRIBUTES.map((key, i) => [key, clamp(BASE_RATINGS[index % 5][i] + random.range(-7, 7) - (index > 4 ? 4 : 0), 35, 97)]));
     this.ovr = data?.ovr ?? Object.values(this.ratings).reduce((a, b) => a + b, 0) / ATTRIBUTES.length;
     this.x = 0; this.z = 0; this.vx = 0; this.vz = 0; this.facing = 0;

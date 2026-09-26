@@ -10,6 +10,7 @@ import { matchupGameplan } from './scouting.js';
 import { clone, shuffle, sum } from './util.js';
 import { makeGameplan } from '../sim/gameplan.js';
 import { insertCup, advanceCup } from './cup.js';
+import { ROSTER } from './roster-data.js';
 
 const hash = str => { let h = 2166136261; for (const c of String(str)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 const NUM_KEYS = Object.keys(emptySeasonLine());
@@ -28,7 +29,7 @@ export class League {
   get rng() { return this.data.rng; }
   uid(prefix) { return prefix + (++this.data.counters[prefix]); }
   static create({ userTeam = 'NTH', seasonLength = 14, seed = (Date.now() % 900000) + 1, quarterSeconds = 300 } = {}) {
-    const data = { v: 1, seed, rng: new Random(seed), counters: { p: 0, s: 0, g: 0, o: 0, n: 0 }, usedNames: {}, year: 2026, phase: 'regular', week: 0, seasonLength, userTeam, settings: { quarterSeconds },
+    const data = { v: 1, rosterV: ROSTER.version, seed, rng: new Random(seed), counters: { p: 0, s: 0, g: 0, o: 0, n: 0 }, usedNames: {}, year: 2026, phase: 'regular', week: 0, seasonLength, userTeam, settings: { quarterSeconds },
       teams: {}, players: {}, staff: {}, freeAgents: [], staffPool: [], teamOrder: [], calendar: [], results: {}, offers: [], newsLog: [], champions: [], userGames: [], weekStartRanks: {}, history: [] };
     const lg = new League(data);
     seedTeams(lg.world); lg._neutralizeStaff(); lg._fixTicket();
@@ -39,7 +40,7 @@ export class League {
     return lg;
   }
   serialize() { this.data.rngState = this.data.rng.state; return JSON.stringify({ ...this.data, rng: undefined }); }
-  static load(json) { const data = JSON.parse(json); if (!data || data.v !== 1) throw new Error('Guardado incompatible'); return new League(data); }
+  static load(json) { const data = JSON.parse(json); if (!data || data.v !== 1) throw new Error('Guardado incompatible'); if (data.rosterV !== ROSTER.version) throw new Error('Guardado de una versión anterior (otra base de jugadores)'); return new League(data); }
 
   // ---------- accessors
   get user() { return this.data.teams[this.data.userTeam]; }

@@ -8,7 +8,7 @@ import * as S from './screens.js';
 import { esc, signed, cls, money } from './widgets.js';
 import { prefYears, LIM } from '../manager/market.js';
 import { ATTRIBUTES } from '../manager/data.js';
-import { autoRole } from '../manager/players.js';
+import { autoRole, PLACEHOLDER } from '../manager/players.js';
 import { TEAM_ROLES, ATTR_LABELS, POS_NAMES } from '../manager/data.js';
 import '../../../assets/nations/nations.js';
 import '../../../assets/tribuna/tribuna.js';
@@ -207,9 +207,9 @@ try {
       return Object.values(s.players).map(p => {
         const t = p.teamId != null ? s.teams[p.teamId] : null, stats = {};
         Object.keys(ATTR_LABELS).forEach(k => { if (p.a[k] != null) stats[ATTR_LABELS[k]] = Math.round(p.a[k]); });
-        return { id: 'lbo-' + p.id, name: p.first && p.last ? `${p.first} ${p.last}` : p.name, number: p.num, pos: p.role, posName: POS_NAMES[p.role], ovr: p.ovr, age: p.age, skin: p.skin,
+        return { id: 'lbo-' + p.id, name: p.first && p.last ? `${p.first} ${p.last}` : p.name, number: p.num, pos: p.role, posName: POS_NAMES[p.role], ovr: p.ovr, age: p.age, skin: p.skin, portrait: '../' + (p.photo || PLACEHOLDER),
           team: t ? { id: t.id, name: t.name, short: t.short, primary: t.color, secondary: t.alt, crest: t.crest } : { id: 'libre', name: 'Agente libre', short: 'LIB', primary: '#5b6673', secondary: '#e8edf2' },
-          nation: window.LFONations.forPerson(p.id, t ? t.short : 'libre'), stats,
+          nation: p.nat || window.LFONations.forPerson(p.id, t ? t.short : 'libre'), stats,
           info: [['Altura', p.h.toFixed(2) + ' m'], ['Edad', p.age + ' años'], ['Potencial', p.pot], ['Contrato', p.contract ? p.contract.salary + ' M€ · ' + p.contract.years + ' años' : 'sin contrato']] };
       });
     },

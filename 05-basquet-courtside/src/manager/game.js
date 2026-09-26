@@ -1,7 +1,8 @@
 import { Random, clamp, defaultTactics, DEFAULT_RULES } from '../simulation/model.js';
 import { MatchSimulator } from '../simulation/match.js';
 import { ROLES, TEAM_POOL, TEAM_ROLES, USAGE } from './data.js';
-import { makePlayer, newContract, valueOf, progress, NEW_STATS, autoRole } from './players.js';
+import { makePlayer, makeFromRoster, reserveNames, RBYID, newContract, valueOf, progress, NEW_STATS, autoRole } from './players.js';
+import { ROSTER } from './roster-data.js';
 import { eff } from './stats.js';
 import { install, LIM } from './market.js';
 import { install as installClub } from './club.js';
@@ -17,7 +18,7 @@ const tick = () => new Promise(r => setTimeout(r, 0));
 
 export class Game {
   constructor(s) {
-    this.s = s; this.rng = new Random(1); this.rng.state = s.rng >>> 0;
+    this.s = s; this.rng = new Random(1); this.rng.state = s.rng >>> 0; s.pool ??= []; reserveNames(s.players);
     s.cfg.salaryCap = 1e6; // sin tope salarial (igual que en fútbol)
     this.initClub(); if (s.cup === undefined && s.phase === 'regular' && s.schedule?.length) { this.initCup(); if (s.cup && s.day >= s.cup.slots[0]) { s.cup.done = true; s.cup.skipped = true; } } s.prospects ??= []; s.scoutPts ??= 6; s.off ??= null; for (const t of s.teams) t.dead ??= [];
     if (!s.prospects.length && s.phase !== 'offseason') this.generateProspects();
@@ -36,8 +37,9 @@ export class Game {
   // ---------- creación ----------
   static create(cfgIn = {}, userId = 0, seed = Date.now() % 1e9) {
     const cfg = { ...DEFAULT_CFG, ...cfgIn }; cfg.teams = clamp(cfg.teams - (cfg.teams % 2), 4, TEAM_POOL.length);
-    const g = new Game({ v: 1, cfg, season: 1, phase: 'regular', day: 0, userId, teams: [], players: {}, fa: [], schedule: [], po: null, matches: {}, inbox: [], history: [], rng: seed, nid: { p: 1, e: 1, m: 1, n: 1 }, lastReport: null, prospects: [], scoutPts: 6, off: null });
+    const g = new Game({ v: 1, rosterV: ROSTER.version, cfg, season: 1, phase: 'regular', day: 0, userId, teams: [], players: {}, fa: [], schedule: [], po: null, matches: {}, inbox: [], history: [], rng: seed, nid: { p: 1, e: 1, m: 1, n: 1 }, lastReport: null, prospects: [], scoutPts: 6, off: null });
     for (let i = 0; i < cfg.teams; i++) g.createTeam(i);
+    g.s.pool = ROSTER.players.filter(e => !(e.t >= 0 && e.t < cfg.teams)).map(e => e.id);   // reserva: el resto del roster (agentes libres, draft y reposición)
     g.s.teams.forEach((t, i) => { t.isUser = i === userId; });
     for (let i = 0; i < 14; i++) g.addFreeAgent(-8 - Math.floor(g.rng.range(0, 10)), Math.floor(g.rng.range(22, 35)));
     for (let i = 0; i < 6; i++) g.addFreeAgent(-20, Math.floor(g.rng.range(19, 21)));
@@ -51,7 +53,15 @@ export class Game {
     const t = { id: i, name: `${city} ${nick}`.toUpperCase(), city, nick, short, label: nick.toUpperCase(), color, alt, crest: '../' + logo, roster: [], lineup: { starters: [], bench: [] },
       dead: [], tactics: this.aiTactics(), plan: { minutes: {}, closer: null, foulPolicy: 'normal', staminaPolicy: 'normal' }, assign: {}, usage: {}, chem: 60, streak: 0, lastStarters: '', popularity: Math.round(rng.range(40, 80)), isUser: false };
     const roles = [...ROLES].sort(() => rng.next() - 0.5).concat(['PG', 'SG', 'SF', 'PF', 'C', 'SF', 'PF', 'C'].sort(() => rng.next() - 0.5));
-    const nums = new Set();
+    const nums = new Set(), entries = ROSTER.players.filter(e => e.t === i);
+    if (entries.length >= 10) {                                    // roster fijo: reales + ficticios con retrato
+      entries.sort((a, b) => b.o - a.o).forEach(e => {
+        const p = makeFromRoster(rng, `P${this.s.nid.p++}`, e, { teamId: i });
+        let n = p.num; if (!n || nums.has(n)) { do { n = Math.floor(rng.range(0, 45)); } while (nums.has(n)); } nums.add(n); p.num = n; p.contract = newContract(rng, p); p.morale = 65;
+        this.s.players[p.id] = p; t.roster.push(p.id);
+      });
+      this.s.teams[i] = t; return t;
+    }
     roles.slice(0, 13).forEach((role, k) => {
       const age = k < 2 ? Math.floor(rng.range(24, 32)) : Math.floor(rng.range(20, 35)), p = makePlayer(rng, `P${this.s.nid.p++}`, { role, tier: TIERS[k] + boost + rng.range(-2, 2), age, teamId: i });
       let n; do { n = Math.floor(rng.range(0, 45)); } while (nums.has(n)); nums.add(n); p.num = n; p.contract = newContract(rng, p); p.morale = 65;
@@ -60,7 +70,15 @@ export class Game {
     this.s.teams[i] = t; return t;
   }
   aiTactics() { const r = () => Math.round(clamp(50 + this.rng.range(-18, 18), 15, 85)); return { ...defaultTactics(), tempo: r(), inside: r(), pickRoll: r(), transition: r(), ballMovement: 50, shotThree: r(), shotRim: r(), aggression: r(), pressure: r(), defense: this.rng.next() < 0.15 ? 'zone23' : 'man' }; }
+  // Saca del pool del roster un jugador de edad y nivel parecidos (o null si no hay): las reposiciones también tienen retrato.
+  poolTake(age, ovrTarget, maxAge = age + 3, minAge = age - 3) {
+    const pool = this.s.pool; let bi = -1, bd = 1e9;
+    for (let i = 0; i < pool.length; i++) { const e = RBYID.get(pool[i]); if (!e || e.a < minAge || e.a > maxAge) continue; const d = Math.abs(e.o - ovrTarget) + this.rng.next() * 2; if (d < bd) { bd = d; bi = i; } }
+    if (bi < 0) return null; const e = RBYID.get(pool[bi]); pool.splice(bi, 1); return e;
+  }
   addFreeAgent(tier, age) {
+    const e = this.poolTake(age, 80 + tier);
+    if (e) { const p = makeFromRoster(this.rng, `P${this.s.nid.p++}`, e); p.contract = null; p.teamId = null; p.num = p.num || Math.floor(this.rng.range(0, 45)); this.s.players[p.id] = p; this.s.fa.push(p.id); return p; }
     const p = makePlayer(this.rng, `P${this.s.nid.p++}`, { role: this.rng.pick(ROLES), tier, age }); p.contract = null; p.teamId = null; p.num = Math.floor(this.rng.range(0, 45));
     this.s.players[p.id] = p; this.s.fa.push(p.id); return p;
   }
@@ -138,7 +156,7 @@ export class Game {
     const players = dressed.map((p, i) => {
       const f = 1 + (p.form - 60) * 0.0007 + (p.morale - 60) * 0.0004, ratings = {};
       for (const k of Object.keys(p.a)) ratings[k] = clamp(p.a[k] * f + (['passing', 'vision', 'decisions', 'defense'].includes(k) ? bonus : 0), 30, 99);
-      return { pid: p.id, name: p.name, number: p.num, height: p.h, role: p.role, ratings, ovr: p.ovr, energy: 0.7 + 0.3 * p.cond / 100, skin: p.skin, active: i < 5, slot: i, targetMin: (team.plan.minutes[p.id] ?? 0.3) * gm, usage: USAGE[team.usage[p.id] ?? 'normal'][1] };
+      return { pid: p.id, name: p.name, number: p.num, height: p.h, role: p.role, ratings, ovr: p.ovr, energy: 0.7 + 0.3 * p.cond / 100, skin: p.skin, look: p.look ?? null, active: i < 5, slot: i, targetMin: (team.plan.minutes[p.id] ?? 0.3) * gm, usage: USAGE[team.usage[p.id] ?? 'normal'][1] };
     });
     const idOf = pid => { const i = dressed.findIndex(p => p.id === pid); return i < 0 ? null : `${side}-${i}`; };
     const assignments = {}; for (const [defPid, slot] of Object.entries(team.assign)) { const id = idOf(defPid); if (id != null && slot !== '' && slot != null) assignments[id] = Number(slot); }

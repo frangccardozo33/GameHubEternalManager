@@ -1,6 +1,23 @@
 import { PROFILE, ATTRIBUTES, POSITIONS, ROSTER_TARGET, STARTERS, KEY_ATTRS, FIRST, LAST, TEAM_TEMPLATES, ovrAt, refreshOvr, marketValue } from './constants.js';
 import { normal, rint, ci, clone } from './util.js';
 import { makeGameplan } from '../sim/gameplan.js';
+import { ROSTER } from './roster-data.js';
+
+// ---- Roster fijo (roster-data.js): reales + ficticios con retrato. Apellidos únicos: al jugador se lo identifica por el apellido. ----
+export const PLACEHOLDER = ROSTER.placeholder;
+export const RBYID = new Map(ROSTER.players.map(e => [e.id, e]));
+const surOf = n => String(n).replace(/-/g, ' ').trim().split(/\s+/).filter(x => !/^(jr|sr|ii|iii|iv)\.?$/i.test(x)).pop().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const POOL_KEYS = ['lat', 'kai', 'kai', 'kai', 'mar', 'ria', 'ria', 'mel', 'ove', 'ibe', 'sko', 'tam', 'lat'];
+function pickName(world) {
+  const rng = world.rng, used = world.data.usedNames;
+  for (let i = 0; i < 120; i++) {
+    const key = rng.pick(POOL_KEYS), [F, L] = ROSTER.pools[key], last = rng.pick(L), s = 's:' + surOf(last);
+    if (used[s]) continue;
+    const n = `${rng.pick(F)} ${last}`; if (used[n]) continue;
+    used[n] = 1; used[s] = 1; const nats = ROSTER.poolNats[key]; return { name: n, nat: nats[Math.floor(rng.next() * nats.length)] };
+  }
+  const n = `${rng.pick(FIRST)} ${rng.pick(LAST)} ${rint(rng, 2, 9)}`; used[n] = 1; return { name: n, nat: 'Kaigam' };
+}
 
 export const emptySeasonLine = () => ({ gp: 0, passAtt: 0, passComp: 0, passYds: 0, passTD: 0, int: 0, sacksTaken: 0, rushAtt: 0, rushYds: 0, rushTD: 0, fumbles: 0, tgt: 0, rec: 0, recYds: 0, recTD: 0, drops: 0, tackles: 0, sacks: 0, ints: 0, ff: 0, missed: 0, fgm: 0, fga: 0, xpm: 0, xpa: 0, punts: 0, puntYds: 0 });
 export const emptyTeamSeason = () => ({ gp: 0, plays: 0, yards: 0, passYds: 0, rushYds: 0, passAtt: 0, passComp: 0, rushAtt: 0, sacksTaken: 0, sackYds: 0, turnovers: 0, takeaways: 0, thirdAtt: 0, thirdConv: 0, fourthAtt: 0, fourthConv: 0, rzTrips: 0, rzTD: 0, penalties: 0, penYds: 0, top: 0, firstDowns: 0, pf: 0, pa: 0,
@@ -13,6 +30,7 @@ export class World {
 }
 
 function makeName(world) {
+  if (ROSTER.pools) return pickName(world).name;
   const rng = world.rng, used = world.data.usedNames;
   for (let i = 0; i < 40; i++) { const n = `${rng.pick(FIRST)} ${rng.pick(LAST)}`; if (!used[n]) { used[n] = 1; return n; } }
   const n = `${rng.pick(FIRST)} ${rng.pick(LAST)} ${rint(rng, 2, 9)}`; used[n] = 1; return n;
@@ -37,7 +55,8 @@ export function makePlayer(world, pos, level, { age = null, forceAge = false } =
   age = age ?? ageFor(rng, pos, level);
   const ratings = {};
   for (const k of ATTRIBUTES) ratings[k] = ci((PROFILE[pos][k] ?? .62) * 100 * (level / 78) + rng.range(-6, 6));
-  const p = { id: world.nextId('p'), name: makeName(world), pos, age, number: 0, ratings, ovr: 0, potential: 0, stamina: ci(normal(rng, 72, 9) - Math.max(0, age - 30) * 1.5, 40, 98), durability: ci(normal(rng, 76, 10), 40, 98),
+  const nm = pickName(world);
+  const p = { id: world.nextId('p'), name: nm.name, nat: nm.nat, photo: PLACEHOLDER, pos, age, number: 0, ratings, ovr: 0, potential: 0, stamina: ci(normal(rng, 72, 9) - Math.max(0, age - 30) * 1.5, 40, 98), durability: ci(normal(rng, 76, 10), 40, 98),
     contract: null, teamId: null, ovr0: 0, form: 50, fatigue: 0, morale: 60, greed: Math.round(rng.range(.92, 1.12) * 100) / 100, injury: null, season: emptySeasonLine(), history: [], log: [], acc: {}, joined: world.data.year };
   refreshOvr(p);
   const diff = level - p.ovr; if (diff) for (const k of KEY_ATTRS[pos]) ratings[k] = ci(ratings[k] + diff);
@@ -45,10 +64,29 @@ export function makePlayer(world, pos, level, { age = null, forceAge = false } =
   p.potential = potentialFor(rng, p.ovr, age);
   return p;
 }
+export function makePlayerFromRoster(world, e) {
+  const rng = world.rng, ratings = {}; ROSTER.attrs.forEach((k, i) => { ratings[k] = e.r[i]; });
+  const used = world.data.usedNames; used[e.n] = 1; used['s:' + surOf(e.n)] = 1;
+  const p = { id: world.nextId('p'), name: e.n, nat: e.nat, photo: e.ph, look: { skin: e.sk, hair: e.hr, hs: e.hs, bald: !!e.bald, h: e.h, w: e.w }, rosterId: e.id, note: e.nt || '', pos: e.p, age: e.a, number: e.num || 0, ratings, ovr: 0, potential: 0,
+    stamina: ci(normal(rng, 72, 9) - Math.max(0, e.a - 30) * 1.5, 40, 98), durability: ci(normal(rng, 76, 10), 40, 98), contract: null, teamId: null, ovr0: 0, form: 50, fatigue: 0, morale: 60, greed: Math.round(rng.range(.92, 1.12) * 100) / 100,
+    injury: null, season: emptySeasonLine(), history: [], log: [], acc: {}, joined: world.data.year };
+  refreshOvr(p); p.ovr0 = p.ovr; p.potential = Math.max(e.pt || p.ovr, p.ovr);
+  return p;
+}
+// Saca del pool del roster (jugadores sin equipo inicial) uno del puesto y nivel pedidos.
+export function takeFromPool(world, pos, level, { young = false } = {}) {
+  const d = world.data, pool = d.rosterPool || []; let bi = -1, bd = 1e9;
+  for (let i = 0; i < pool.length; i++) {
+    const e = RBYID.get(pool[i]); if (!e || e.p !== pos) continue; if (young ? e.a > 24 : false) continue;
+    const dd = Math.abs(e.o - level) + world.rng.next() * 3 - (!young && e.fa ? 4 : 0); if (dd < bd) { bd = dd; bi = i; }
+  }
+  if (bi < 0 || bd > 22) return null; const e = RBYID.get(pool[bi]); pool.splice(bi, 1); return e;
+}
 const NUM_RANGES = { QB: [[1, 19]], RB: [[20, 39], [1, 9]], WR: [[10, 19], [80, 89]], TE: [[80, 89], [40, 49]], OL: [[60, 79]], DL: [[90, 99], [70, 79]], LB: [[50, 59], [40, 49]], CB: [[20, 39]], S: [[20, 49]], K: [[1, 19]], P: [[1, 19]] };
 export function assignNumber(world, team, p) {
   const players = world.data.players;
-  const used = new Set(team.roster.map(id => players[id]?.number).filter(Boolean));
+  const used = new Set(team.roster.filter(id => id !== p.id).map(id => players[id]?.number).filter(Boolean));
+  if (p.number && !used.has(p.number)) return p.number;              // dorsal real del roster
   for (const [a, b] of NUM_RANGES[p.pos]) { const opts = []; for (let n = a; n <= b; n++) if (!used.has(n)) opts.push(n); if (opts.length) return p.number = world.rng.pick(opts); }
   for (let n = 1; n < 100; n++) if (!used.has(n)) return p.number = n;
 }
@@ -70,21 +108,22 @@ export function styleGameplan(style, defense) {
 }
 export function defaultTraining() { return { focus: { passing: 15, routeRunning: 15, blocking: 15, passRush: 15, coverage: 15, tackling: 15, conditioning: 10 }, intensity: 'normal' }; }
 
-export function makeTeam(world, tpl, bias = 0) {
+export function makeTeam(world, tpl, bias = 0, idx = -1) {
   const rng = world.rng, d = world.data;
   const team = { id: tpl.id, name: tpl.name, city: tpl.city, mascot: tpl.mascot, short: tpl.code || tpl.id, crest: tpl.crest, color: tpl.color, dark: tpl.dark, style: tpl.style, defense: tpl.defense,
     roster: [], depth: {}, gameplan: styleGameplan(tpl.style, tpl.defense), training: defaultTraining(), staff: { hc: null, oc: null, dc: null, scouts: [], trainers: [] },
     finance: { cash: 45, ticket: 85, hype: 50, log: [], attendance: [] }, record: { w: 0, l: 0, t: 0, pf: 0, pa: 0, streak: '' }, season: emptyTeamSeason(), deadCap: 0, form: [], tips: {} };
   d.teams[team.id] = team;
   const sb = STYLE_BONUS[tpl.style] || {}, db = DEF_BONUS[tpl.defense] || {};
+  const mine = ROSTER.players.filter(e => e.t === idx);
   for (const pos of POSITIONS) {
-    const n = ROSTER_TARGET[pos], starters = STARTERS[pos];
+    const n = ROSTER_TARGET[pos], starters = STARTERS[pos], own = mine.filter(e => e.p === pos).sort((a, b) => b.o - a.o);
     for (let i = 0; i < n; i++) {
       const tier = i < starters ? 0 : i < starters + Math.ceil(starters / 2) ? 1 : 2;
       let level = tier === 0 ? normal(rng, 75.5 + bias, 5) : tier === 1 ? normal(rng, 65 + bias * .5, 5) : normal(rng, 55, 4.5);
       level += (sb[pos] || 0) + (db[pos] || 0);
       if (pos === 'K' || pos === 'P') level = normal(rng, 74 + bias, 7);
-      const p = makePlayer(world, pos, ci(level, 42, 94));
+      const p = own[i] ? makePlayerFromRoster(world, own[i]) : makePlayer(world, pos, ci(level, 42, 94));
       p.teamId = team.id; team.roster.push(p.id); d.players[p.id] = p;
       assignNumber(world, team, p);
       p.contract = contractFor(world, p);
@@ -102,7 +141,9 @@ export function makeFreeAgents(world, count = 45, { young = false } = {}) {
     const position = rng.pick(list);
     const level = ci(normal(rng, young ? 56 : 59, 8) + (i < 4 ? 12 : 0), 42, 84);
     const age = young ? rint(rng, 21, 23) : null;
-    const p = makePlayer(world, position, level, { age });
+    const e = takeFromPool(world, position, level, { young });
+    const p = e ? makePlayerFromRoster(world, e) : makePlayer(world, position, level, { age });
+    if (e && young) p.age = Math.min(p.age, 24);
     p.teamId = null; p.contract = null; d.players[p.id] = p; ids.push(p.id);
   }
   return ids;
@@ -115,7 +156,8 @@ export function normalizePayroll(world, team, target) {
 }
 export function seedTeams(world) {
   const d = world.data; d.teamOrder = [];
-  for (const tpl of TEAM_TEMPLATES) { const t = makeTeam(world, tpl, (tpl.talent - 1) * 2.0 + world.rng.range(-1, 1)); normalizePayroll(world, t, 168 + world.rng.range(-6, 14)); d.teamOrder.push(tpl.id); }
+  d.rosterPool = ROSTER.players.filter(e => e.t < 0 || e.t >= TEAM_TEMPLATES.length).map(e => e.id);
+  for (const [idx, tpl] of TEAM_TEMPLATES.entries()) { const t = makeTeam(world, tpl, (tpl.talent - 1) * 2.0 + world.rng.range(-1, 1), idx); normalizePayroll(world, t, 168 + world.rng.range(-6, 14)); d.teamOrder.push(tpl.id); }
   const pool = []; for (let i = 0; i < 14; i++) { const role = ['HC', 'OC', 'DC', 'SCOUT', 'TRAINER'][i % 5]; const s = makeStaff(world, role, 60 + rint(world.rng, -8, 8)); d.staff[s.id] = s; pool.push(s.id); }
   d.staffPool = pool;
   d.freeAgents = makeFreeAgents(world, 48);

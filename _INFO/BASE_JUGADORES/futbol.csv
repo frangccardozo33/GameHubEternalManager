@@ -1,0 +1,657 @@
+﻿Nombre,Tipo,Club,Pos,Sec,Media,Potencial,Edad,Nacion,Altura_cm,Pie,Ritmo,Aceleracion,Regate,Pase,Remate,Defensa,Fisico,Lectura,Nota,Foto
+Liam Baranov,ficticio,Agente libre,POR,,71,71,29,Baikal,191,A,51,59,47,61,39,74,77,67,,assets/players/football/x_ficticiofinalnight601500001.webp
+Minjun Galiev,ficticio,Agente libre,POR,,64,68,22,Kostanay,190,D,45,54,46,63,29,68,61,65,,assets/players/football/x_futboli08700001.webp
+Camilo Moura,ficticio,Agente libre,POR,,62,64,28,Tamago,194,I,49,49,48,51,25,65,63,64,,assets/players/football/x_futboli11000001.webp
+Ezequiel Viera,ficticio,Agente libre,POR,,62,80,21,Magayanes,188,D,46,37,40,53,30,68,59,68,,assets/players/football/x_ficticiofinalnight600900001.webp
+Liam Stanton,ficticio,Agente libre,POR,,61,69,24,Kaigam,189,D,52,52,40,56,25,63,58,67,,assets/players/football/x_ficticiofinalnight609700001.webp
+Nathan Farrow,ficticio,Agente libre,POR,,58,59,25,Kaigam,193,D,47,38,39,51,32,56,61,67,,assets/players/football/x_ficticiofinalnight202800001.webp
+Jonas Esteves,ficticio,Agente libre,POR,,58,59,25,Grammes,190,D,42,39,34,50,25,63,59,58,,assets/players/football/x_futboli04300001.webp
+Tobias Lie,ficticio,Agente libre,POR,,57,57,29,Overmark,198,D,38,39,44,50,25,63,61,54,,assets/players/football/x_ficticiofinalnight202400001.webp
+Youssef Van der Merwe,ficticio,Agente libre,POR,,57,58,27,Skote,199,D,47,36,37,51,25,59,61,61,,assets/players/football/x_futboli10200001.webp
+Nicolás Castillo,ficticio,Agente libre,POR,,57,58,28,Peronia,196,I,43,42,35,51,25,64,60,51,,assets/players/football/x_futboli08200001.webp
+Gabriel Vieira,ficticio,Agente libre,POR,,56,59,26,Tamago,204,D,44,40,43,52,25,54,65,60,,assets/players/football/x_futbolh00100001.webp
+Dae Lacerda,ficticio,Agente libre,POR,,56,57,27,Tamago,187,A,44,45,34,54,25,57,52,62,,assets/players/football/x_futboli00500001.webp
+Lukas Thorsen,ficticio,Agente libre,POR,,56,63,22,Overmark,196,D,40,42,37,50,25,59,59,55,,assets/players/football/x_futboli04100001.webp
+Liam Novak,ficticio,Agente libre,POR,,56,64,19,Zenet,192,I,36,41,38,51,25,56,56,63,,assets/players/football/x_ficticiofinalnight602600001.webp
+Devin Mora,ficticio,Agente libre,POR,,55,73,17,Sotoa,191,I,45,39,34,43,31,56,58,59,,assets/players/football/x_futboli01300001.webp
+Emeka Saidi,ficticio,Agente libre,POR,,55,55,33,Sahar,194,I,36,40,35,38,25,61,54,56,,assets/players/football/x_futboli02700001.webp
+Emiliano Carrasco,ficticio,Agente libre,POR,,54,57,26,Peronia,187,D,39,35,27,44,25,57,59,54,,assets/players/football/x_futbolh01700001.webp
+Caio Nishimura,ficticio,Agente libre,POR,,54,62,24,Tamago,187,D,43,37,34,46,26,61,48,57,,assets/players/football/x_ficticiofinalnight200700001.webp
+Enzo Hamon,ficticio,Agente libre,POR,,54,54,30,Iberia,187,D,50,37,31,45,25,62,56,47,,assets/players/football/x_ficticiofinalv2test00700001.webp
+Marcos Ueda,ficticio,Agente libre,POR,,54,54,27,Tamago,194,D,37,30,35,42,25,60,56,54,,assets/players/football/x_ficticiofinalnight605900001.webp
+Thiago Ospina,ficticio,Agente libre,POR,,54,64,21,Costas Unidas,192,I,43,39,37,49,25,55,64,50,,assets/players/football/x_ficticiofinalnight607500001.webp
+Pablo Whitlock,ficticio,Agente libre,POR,,53,67,21,Kaigam,193,D,41,37,36,39,25,54,54,58,,assets/players/football/x_ficticiofinalnight501200001.webp
+Andrés Amaral,ficticio,Agente libre,POR,,53,60,23,Tamago,195,D,39,45,31,38,25,54,55,53,,assets/players/football/x_futbolg01300001.webp
+Marcos Kondo,ficticio,Agente libre,POR,,53,53,29,Tamago,189,A,28,38,34,36,25,52,57,58,,assets/players/football/x_ficticiofinalnight603800001.webp
+Tristan Lefèvre,ficticio,Agente libre,POR,,52,53,28,Iberia,192,D,35,38,26,49,25,55,55,51,,assets/players/football/x_ficticiofinalnight204200001.webp
+Finn Rasmussen,ficticio,Agente libre,POR,,52,52,25,Overmark,194,I,50,38,29,40,25,54,54,53,,assets/players/football/x_ficticiofinalnight604500001.webp
+Moussa Chaoui,ficticio,Agente libre,POR,,52,60,24,Sahar,193,D,34,38,25,37,25,59,52,50,,assets/players/football/x_ficticiofinalv3test00600001.webp
+Zacharie Lemaire,ficticio,Agente libre,POR,,52,59,20,Iberia,188,D,33,33,31,41,25,57,56,50,,assets/players/football/x_ficticiofinalnight203900001.webp
+Rohan Amanov,ficticio,Agente libre,POR,,52,54,26,Kostanay,186,A,33,34,28,38,25,60,51,49,,assets/players/football/x_futboli14200001.webp
+Jonas Ashworth,ficticio,Agente libre,POR,,50,53,24,Kaigam,191,I,34,43,32,41,25,49,55,51,,assets/players/football/x_futboli09000001.webp
+Hugo Greco,ficticio,Agente libre,POR,,50,64,17,Melonia,191,D,40,38,27,45,25,50,51,53,,assets/players/football/x_futboli13200001.webp
+Yeison Ogawa,ficticio,Agente libre,POR,,50,56,22,Tamago,185,A,30,32,34,51,25,52,50,56,,assets/players/football/x_futboli04700001.webp
+Callum Ødegård,ficticio,Agente libre,POR,,50,50,34,Overmark,193,I,28,37,27,42,25,50,55,52,,assets/players/football/x_futboli05300001.webp
+Diego Bastos,ficticio,Agente libre,POR,,49,52,28,Tamago,197,D,33,29,25,43,25,50,49,56,,assets/players/football/x_futboli06700001.webp
+Brayan Andrade,ficticio,Agente libre,POR,,49,57,23,Tamago,185,A,30,37,28,45,25,55,44,52,,assets/players/football/x_ficticiofinalnight300800001.webp
+Rodrigo Salvio,ficticio,Agente libre,POR,,48,65,20,Sotoa,183,A,29,33,25,41,25,47,54,52,,assets/players/football/x_ficticiofinalnight302800001.webp
+Lukas Meunier,ficticio,Agente libre,POR,,48,51,27,Iberia,187,A,34,31,25,41,25,49,58,47,,assets/players/football/x_ficticiofinalnight302200001.webp
+Brandon Thomas,ficticio,Agente libre,POR,,48,62,21,Valurria,199,D,37,34,31,42,25,50,50,51,,assets/players/football/x_futboli15000001.webp
+Matteo Bertin,ficticio,Agente libre,POR,,48,56,18,Iberia,188,I,35,34,25,43,25,50,54,46,,assets/players/football/x_futboli07200001.webp
+Brayan Dantas,ficticio,Agente libre,POR,,47,47,33,Tamago,192,I,39,36,30,36,25,54,43,47,,assets/players/football/x_futboli03100001.webp
+Lukas Graf,ficticio,Agente libre,POR,,47,49,27,Margin,198,I,31,31,29,45,25,50,46,50,,assets/players/football/x_ficticiofinalnight300300001.webp
+Lautaro Espeche,ficticio,Agente libre,POR,,47,53,24,Costas Unidas,189,D,37,40,25,37,25,52,45,46,,assets/players/football/x_ficticiofinalnight203500001.webp
+Anh Biton,ficticio,Agente libre,POR,,46,55,18,Netanya,188,I,35,27,25,38,25,51,45,51,,assets/players/football/x_ficticiofinalvartest00300001.webp
+Omar Ouali,ficticio,Agente libre,POR,,46,63,19,Sahar,192,D,34,28,25,40,25,51,43,50,,assets/players/football/x_futbolg01600001.webp
+Luca Baudry,ficticio,Agente libre,POR,,45,45,26,Iberia,188,D,30,36,31,38,25,48,49,42,,assets/players/football/x_futboli05400001.webp
+Devin Figueroa,ficticio,Agente libre,POR,,44,54,19,Peronia,185,I,27,31,25,43,25,42,54,43,,assets/players/football/x_futboli14800001.webp
+Jack Kalinin,ficticio,Agente libre,POR,,44,61,20,Baikal,194,D,37,32,25,39,25,47,44,44,,assets/players/football/x_futbolg01000001.webp
+Caio Bravo,ficticio,Agente libre,POR,,44,53,20,Sotoa,184,D,35,37,27,38,25,49,46,40,,assets/players/football/x_futboli11700001.webp
+Oliver Knudsen,ficticio,Agente libre,POR,,44,55,18,Overmark,192,D,28,30,25,34,25,52,41,40,,assets/players/football/x_ficticiofinalnight604300001.webp
+Ítalo Furtado,ficticio,Agente libre,POR,,44,51,18,Tamago,195,A,27,29,25,43,25,50,44,43,,assets/players/football/x_ficticiofinalnight201100001.webp
+Tomás Chevalier,ficticio,Agente libre,POR,,44,59,17,Iberia,195,D,28,25,25,37,25,43,52,47,,assets/players/football/x_futboli03900001.webp
+Nicolás Rezende,ficticio,Agente libre,POR,,44,61,18,Tamago,181,D,25,33,25,31,25,48,42,47,,assets/players/football/x_futbolg00100001.webp
+Marco Doyle,ficticio,Agente libre,POR,,44,53,21,Kaigam,189,D,29,32,26,33,25,50,45,39,,assets/players/football/x_futboli15100001.webp
+Santiago Endo,ficticio,Agente libre,POR,,44,57,19,Tamago,188,D,28,29,25,43,25,52,38,44,,assets/players/football/x_futboli01200001.webp
+Santiago Arellano,ficticio,Agente libre,POR,,44,56,19,Magayanes,187,D,32,30,26,37,25,53,38,45,,assets/players/football/x_ficticiofinalv3test00200001.webp
+Murilo Vasconcelos,ficticio,Agente libre,POR,,44,58,19,Tamago,187,D,26,30,26,33,25,45,49,43,,assets/players/football/x_ficticiofinalnight201300001.webp
+Javier Salamandro,especial,Al-Sahar,POR,,90,90,29,Sahar,192,D,62,93,52,82,40,93,82,93,El mejor arquero del mundo · reflejos por encima del límite humano,assets/players/football/r_javiersalamandro.webp
+Facundo Herrera,celebridad,Al-Sahar,LD,,81,83,25,Peronia,176,D,69,78,72,73,62,85,82,77,Identidad sin confirmar,assets/players/football/r_herrerafacundo.webp
+José Antonio Cacho,celebridad,Al-Sahar,POR,,80,80,40,Grammes,184,D,60,55,60,65,50,84,75,92,"Cacho01 · leyenda de FIFA, arquero",assets/players/football/r_joseantoniocacho.webp
+Martín Di Salvo,celebridad,Al-Sahar,MC,,78,78,39,Valurria,181,D,64,63,71,86,70,74,75,75,Coscu · pionero del streaming argentino,assets/players/football/r_martindisalvo.webp
+Agustín Pánceta,celebridad,Al-Sahar,DC,,78,80,25,Peronia,178,D,80,69,76,74,81,57,76,77,La Agusneta · streamer (Mar del Tuyú),assets/players/football/r_agustinpanceta.webp
+David Quint,celebridad,Al-Sahar,MP,MC,77,77,27,Peronia,176,D,75,85,76,81,63,77,69,75,Davoo Xeneize · streamer de fútbol,assets/players/football/r_davidquint.webp
+Teo D'Elia,celebridad,Al-Sahar,ED,,77,77,29,Peronia,178,D,83,70,77,77,75,56,71,78,Actor y streamer,assets/players/football/r_teodelia.webp
+Mario Gallardo,celebridad,Al-Sahar,MCD,,76,76,39,Grammes,179,D,66,75,79,74,70,78,73,77,DjMaRiiO · youtuber de fútbol (Móstoles),assets/players/football/r_mariogallardo.webp
+Lautaro Moschini,celebridad,Al-Sahar,MC,,76,76,27,Valurria,180,D,74,80,70,80,68,67,67,81,Moski · streamer,assets/players/football/r_lautaromoschini.webp
+Juan Illo,celebridad,Al-Sahar,DFC,,75,75,36,Grammes,184,D,57,76,61,62,58,81,77,79,IlloJuan · streamer español,assets/players/football/r_illojuan.webp
+Gerónimo Benavídez,celebridad,Al-Sahar,LD,LI,75,75,39,Peronia,180,D,68,75,68,64,52,80,74,74,Momo · streamer y abogado,assets/players/football/r_geronimobenavidez.webp
+Ignacio Rodríguez,celebridad,Al-Sahar,MCD,,75,75,32,Peronia,180,D,71,71,78,76,72,76,73,72,Creador de contenido (identidad sin confirmar),assets/players/football/r_ignaciorodriguez.webp
+Benjamín Barreiro,celebridad,Al-Sahar,EI,,74,74,28,Valurria,177,I,67,76,85,70,71,46,69,80,Creador de contenido (identidad sin confirmar),assets/players/football/r_benjaminbarreiro.webp
+Benito Este,celebridad,Al-Sahar,MC,MD,73,73,34,Peronia,175,I,60,59,62,79,69,66,59,83,Benito SDR · pionero de los streams de fútbol,assets/players/football/r_benitoeste.webp
+Allan Wlk,real,Al-Sahar,DC,,72,72,27,Morvicia,188,D,75,75,68,56,71,25,74,58,,assets/players/football/r_allanwlk.webp
+Joel Canchimbo,real,Al-Sahar,MD,ED,72,75,25,Magayanes,177,D,84,84,77,72,64,28,70,66,,assets/players/football/r_joelcanchimbo.webp
+Jerónimo Domina,real,Al-Sahar,DC,,72,75,25,Valurria,171,D,76,76,73,61,66,42,67,60,,assets/players/football/r_jeronimodomina.webp
+Gustavo Vargas,real,Al-Sahar,DFC,,72,72,29,Morvicia,181,D,67,64,62,49,28,76,77,53,,assets/players/football/r_gustavovargas.webp
+Nico González,real,Al-Sahar,MI,EI,72,72,32,Valurria,180,I,77,77,76,71,72,48,66,72,,assets/players/football/r_nicogonzalez.webp
+Jordi Wild,celebridad,Al-Sahar,DFC,,72,72,46,Grammes,183,D,47,58,60,70,57,81,68,78,Youtuber y podcaster,assets/players/football/r_jordanwild.webp
+Daniel González,real,Al-Sahar,DFC,,71,71,28,Costas Unidas,183,D,75,74,56,50,25,72,77,50,,assets/players/football/r_danielgonzalez.webp
+Ronaldo de Jesús,real,Al-Sahar,DFC,,71,72,26,Morvicia,186,D,67,70,61,62,55,73,72,63,real,assets/players/football/r_ronaldodejesus.webp
+Esteban Matus,real,Al-Sahar,LI,,69,69,28,Costas Unidas,173,I,82,74,70,60,55,67,72,57,,assets/players/football/r_estebanmatus.webp
+Kim Ryun Seong,real,Al-Sahar,LI,,69,69,28,Tamago,179,I,77,74,67,60,38,67,73,58,,assets/players/football/r_kimryunseong.webp
+Kevin Moskowitz,especial,Atlético Margin,MCD,DFC/MC,88,88,30,Margin,187,D,76,74,79,89,70,97,89,94,De los mejores mediocampistas del mundo · pivote defensivo,assets/players/football/r_kevinmoskowitz.webp
+Fabrizio Sartori,real,Atlético Margin,DC,,72,72,28,Valurria,178,D,81,83,64,61,67,30,78,66,,assets/players/football/r_fabriziosartori.webp
+Santiago Núñez,real,Atlético Margin,DFC,,72,72,30,Peronia,186,D,62,60,59,56,27,74,83,62,,assets/players/football/r_santiagonunez.webp
+Fausto Vera,real,Atlético Margin,MCD,DFC,72,72,30,Valurria,180,D,72,71,73,71,72,71,76,72,,assets/players/football/r_gaustovera.webp
+Franco Watson,real,Atlético Margin,MP,MC,71,71,28,Peronia,177,D,73,72,70,75,63,56,58,74,,assets/players/football/r_francowatson.webp
+Lucas Villalba,real,Atlético Margin,ED,,71,71,29,Valurria,183,D,83,80,68,66,61,38,66,64,,assets/players/football/r_lucasvillalba.webp
+Diego Enríquez,real,Atlético Margin,POR,,71,71,28,Sotoa,185,D,25,34,43,64,33,79,71,78,,assets/players/football/r_diegoenriquez.webp
+Franco Zapiola,real,Atlético Margin,MI,,71,71,29,Peronia,176,I,79,75,72,72,62,61,75,68,,assets/players/football/r_francozapiola.webp
+Kevin Jappert,real,Atlético Margin,DFC,,70,72,26,Peronia,189,D,74,73,59,56,44,70,76,56,,assets/players/football/r_kevinjappert.webp
+Santiago González,real,Atlético Margin,MC,,70,70,27,Valurria,183,D,72,70,65,71,55,66,84,68,,assets/players/football/r_santiagogonzalez.webp
+Agustín Palavecino,real,Atlético Margin,MD,,70,70,27,Peronia,184,D,83,78,74,68,66,38,75,66,,assets/players/football/r_agustinpalavecino.webp
+Carlos Faya,real,Atlético Margin,MC,,70,70,28,Magayanes,176,D,68,68,69,72,66,65,65,72,,assets/players/football/r_carlosfaya.webp
+Agustín Álvarez,real,Atlético Margin,DC,,70,71,29,Valurria,177,D,68,72,73,68,70,34,72,67,,assets/players/football/r_agustinalvarez.webp
+Elías Torres,real,Atlético Margin,DC,,69,69,29,Valurria,186,D,77,74,67,58,63,25,79,60,,assets/players/football/r_eliastorres.webp
+Williams Alarcón,real,Atlético Margin,MC,MI,69,69,30,Costas Unidas,183,D,63,64,71,68,64,66,72,66,,assets/players/football/r_williamsalarcon.webp
+Vicente Bernedo,real,Atlético Margin,POR,,68,68,29,Costas Unidas,187,D,25,37,42,60,32,75,70,71,,assets/players/football/r_vicentebernedo.webp
+Valentín Moreno,real,Atlético Margin,LD,,67,67,27,Peronia,172,D,74,72,65,51,46,64,76,57,,assets/players/football/r_valentinmoreno.webp
+Finn Hoffmann,ficticio,Atlético Margin,LI,,51,60,19,Margin,189,D,43,46,50,38,33,54,55,53,,assets/players/football/x_futbolh01000001.webp
+Liam Lehmann,ficticio,Atlético Margin,LD,LI,51,58,19,Margin,185,D,57,51,39,41,35,50,56,51,,assets/players/football/x_futbolg01800001.webp
+Finn Lang,ficticio,Atlético Margin,DFC,,51,68,21,Margin,184,I,33,45,41,44,42,56,52,50,,assets/players/football/x_futboli10900001.webp
+Leon Vetter,ficticio,Atlético Margin,DFC,,50,51,27,Margin,191,D,42,49,43,49,36,52,51,51,,assets/players/football/x_ficticiofinalnight202700001.webp
+Liam Dietrich,ficticio,Atlético Margin,EI,,49,62,18,Margin,178,D,51,49,47,49,49,27,36,55,,assets/players/football/x_ficticiofinalnight605600001.webp
+Jack Jansen,ficticio,Atlético Margin,DFC,,48,50,26,Margin,194,D,45,47,39,36,35,51,51,44,,assets/players/football/x_futboli04200001.webp
+Callum Vogel,ficticio,Atlético Margin,LI,LD,48,57,20,Margin,188,D,44,46,45,46,27,51,43,52,,assets/players/football/x_futboli17000001.webp
+Darius Zubieta,ficticio,Atlético Morvico,MC,MI,57,60,23,Grammes,173,D,49,61,56,56,54,57,49,62,,assets/players/football/x_futboli02800001.webp
+Thiago Cisneros,ficticio,Atlético Morvico,POR,,55,69,21,Peronia,188,D,40,36,40,52,25,62,49,59,,assets/players/football/x_ficticiofinalnight203100001.webp
+Tua Tagoa,ficticio,Atlético Morvico,DFC,,55,55,35,Morvicia,191,D,44,54,44,41,38,58,60,57,,assets/players/football/x_futboli16600001.webp
+Marcos Zamora,ficticio,Atlético Morvico,DFC,,54,59,23,Morvicia,189,D,38,51,50,51,38,58,57,55,,assets/players/football/x_ficticiofinalnight609000001.webp
+Pieter Escribano,ficticio,Atlético Morvico,ED,,54,56,27,Grammes,180,D,49,56,57,52,55,40,50,50,,assets/players/football/x_futboli13000001.webp
+Nicolás Vázquez,ficticio,Atlético Morvico,LI,,53,53,30,Morvicia,182,D,58,59,47,45,30,52,57,53,,assets/players/football/x_ficticiofinalnight609400001.webp
+Kyle Brooks,ficticio,Atlético Morvico,MC,,53,54,27,Grammes,171,D,44,51,50,56,46,52,51,53,,assets/players/football/x_futboli00800001.webp
+Jonas Delaunay,ficticio,Atlético Morvico,MI,EI,53,53,28,Iberia,179,D,55,53,49,55,44,50,50,54,,assets/players/football/x_futboli14900001.webp
+Camilo Tavares,ficticio,Atlético Morvico,MD,ED,53,53,27,Tamago,176,D,54,49,49,58,45,44,54,50,,assets/players/football/x_futboli14000001.webp
+Thiago Lopes,ficticio,Atlético Morvico,MP,MC,52,60,24,Tamago,175,D,60,50,48,58,44,52,47,48,,assets/players/football/x_futboli06000001.webp
+Rafael Quiroga,ficticio,Atlético Morvico,POR,,50,51,27,Valurria,189,D,31,38,30,43,25,51,54,51,,assets/players/football/x_ficticiofinalnight606500001.webp
+Tomás Aubert,ficticio,Atlético Morvico,MCD,DFC,50,50,32,Iberia,184,D,49,46,52,50,49,48,44,52,,assets/players/football/x_futboli06500001.webp
+Tyler Johnson,ficticio,Atlético Morvico,LD,LI,48,61,19,Morvicia,187,I,50,47,33,42,31,51,46,56,,assets/players/football/x_futboli04000001.webp
+Tomás Carvalho,ficticio,Atlético Morvico,EI,MI,48,50,22,Grammes,178,D,37,45,54,48,51,29,43,37,,assets/players/football/x_ficticiofinalnight608100001.webp
+Andrés Correia,ficticio,Atlético Morvico,DC,,48,64,17,Tamago,181,D,44,54,46,43,49,25,51,46,,assets/players/football/x_futboli13800001.webp
+Tomás Gallego,ficticio,Atlético Morvico,DC,,48,48,31,Grammes,179,D,45,46,46,52,53,25,49,51,,assets/players/football/x_futboli06300001.webp
+Malik Jackson,ficticio,Atlético Morvico,DFC,,47,47,30,Morvicia,185,D,45,42,46,34,25,52,45,51,,assets/players/football/x_futboli14400001.webp
+Emiliano Maeda,ficticio,Atlético Morvico,MCD,MC,47,47,29,Tamago,178,I,41,48,46,46,40,38,40,53,,assets/players/football/x_futboli00700001.webp
+Agustín Cantero,ficticio,Atlético Morvico,DFC,,47,47,25,Morvicia,185,D,36,48,33,38,38,50,51,50,,assets/players/placeholder.webp
+Marcus Carter,ficticio,Atlético Morvico,LI,LD,46,46,34,Morvicia,185,D,33,49,38,35,27,52,48,48,,assets/players/football/x_futboli16100001.webp
+Malik Sanders,ficticio,Atlético Morvico,DFC,,44,50,17,Morvicia,186,I,38,41,30,32,31,52,38,39,,assets/players/football/x_futboli01900001.webp
+Facundo Ramos,ficticio,Atlético Morvico,LD,LI,44,59,20,Tamago,188,D,42,49,37,33,25,46,47,41,,assets/players/football/x_futboli01500001.webp
+Tyler Marcos,ficticio,Atlético Morvico,MC,MD,44,48,22,Grammes,173,D,45,48,45,45,40,43,43,43,,assets/players/football/x_futboli08600001.webp
+Andrés Borges,ficticio,Atlético Morvico,DC,,44,55,19,Tamago,178,D,39,44,45,43,47,27,46,40,,assets/players/football/x_futbolh00000001.webp
+Agustín Lagos,real,CD Héroicos de Peronia,LD,LI,70,70,29,Peronia,184,D,83,80,71,66,56,66,75,66,,assets/players/football/r_agustinlagos.webp
+Tomás Ángel,real,CD Héroicos de Peronia,DC,,70,70,27,Magayanes,175,I,77,76,69,59,63,25,67,58,,assets/players/football/r_tomasangel.webp
+Facundo Muñoa,real,CD Héroicos de Peronia,MI,EI,70,72,26,Valurria,171,I,76,76,81,64,60,66,69,70,,assets/players/football/r_facundomunoa.webp
+Felipe Peña Biafore,real,CD Héroicos de Peronia,MCD,MC,70,70,29,Peronia,180,D,68,67,69,70,62,71,73,69,,assets/players/football/r_felipepenabiafore.webp
+Ezequiel Cannavó,real,CD Héroicos de Peronia,LD,,70,71,28,Peronia,183,D,74,76,69,70,53,66,78,66,,assets/players/football/r_ezequielcannavo.webp
+Eduardo Delmás,real,CD Héroicos de Peronia,MP,,70,78,23,Morvicia,172,I,78,80,81,72,67,34,52,65,,assets/players/football/r_eduardodelmas.webp
+Fabricio Iacovich,real,CD Héroicos de Peronia,POR,,69,69,28,Peronia,198,I,45,51,43,64,33,71,76,69,,assets/players/football/r_fabricioiacovich.webp
+Matías Lugo,real,CD Héroicos de Peronia,MC,,68,68,29,Peronia,170,D,67,69,69,69,49,66,70,66,,assets/players/football/r_matiaslugo.webp
+Fernando Cardozo,real,CD Héroicos de Peronia,MD,ED,68,68,29,Morvicia,173,D,77,77,78,64,70,25,69,65,,assets/players/football/r_fernandocardozo.webp
+Óscar Cortés,real,CD Héroicos de Peronia,MI,,68,68,27,Magayanes,178,D,80,80,74,68,67,51,60,65,,assets/players/football/r_oscarcortes.webp
+Yair González,real,CD Héroicos de Peronia,MI,MD,67,67,28,Peronia,173,D,78,82,74,68,62,25,50,66,,assets/players/football/r_yairgonzalez.webp
+Yoshan Valois,real,CD Héroicos de Peronia,DC,,63,65,26,Magayanes,187,D,56,58,59,57,72,25,64,59,,assets/players/football/r_yoshanvolois.webp
+Lautaro Acosta,ficticio,CD Héroicos de Peronia,LI,LD,60,64,22,Peronia,185,A,57,62,42,51,48,64,60,55,,assets/players/football/x_ficticiofinalv3test00300001.webp
+Jalen Williams,ficticio,CD Héroicos de Peronia,DC,,59,59,33,Peronia,188,I,61,61,62,58,55,35,57,59,,assets/players/football/x_futboli10500001.webp
+Caio Cuadrado,ficticio,CD Héroicos de Peronia,ED,,58,59,28,Peronia,172,D,55,61,61,51,58,36,53,56,,assets/players/football/x_ficticiofinalnight606800001.webp
+Matías Vélez,ficticio,CD Héroicos de Peronia,DFC,,57,58,27,Peronia,197,I,53,52,49,57,46,56,61,62,,assets/players/football/x_ficticiofinalnight602100001.webp
+Mason Mitchell,ficticio,CD Héroicos de Peronia,DFC,,56,56,27,Peronia,188,D,45,45,39,48,47,58,60,54,,assets/players/football/x_futboli03400001.webp
+Brandon Solano,ficticio,CD Héroicos de Peronia,MCD,,53,53,29,Peronia,176,A,51,52,55,57,49,46,46,49,,assets/players/football/x_futboli13900001.webp
+Nicolás Lanzini,ficticio,CD Héroicos de Peronia,LI,,52,54,25,Peronia,188,I,43,56,36,37,37,53,61,52,,assets/players/football/x_ficticiofinalnight608000001.webp
+Caio Morán,ficticio,CD Héroicos de Peronia,EI,ED,51,66,18,Peronia,188,A,49,59,49,48,52,31,55,52,,assets/players/football/x_futbolh00600001.webp
+Kyle Fontana,ficticio,CD Héroicos de Peronia,DFC,,51,52,25,Peronia,178,I,41,44,41,42,37,54,55,47,,assets/players/football/x_futboli02400001.webp
+Gonzalo Gamarra,ficticio,CD Héroicos de Peronia,POR,,50,52,28,Costas Unidas,197,D,40,36,28,51,25,50,50,56,,assets/players/football/x_ficticiofinalnight301400001.webp
+Yeison Cabrera,ficticio,CD Héroicos de Peronia,DFC,,49,49,35,Peronia,181,I,39,47,42,38,36,51,56,45,,assets/players/football/x_futboli06100001.webp
+Agustín Cárdenas,ficticio,CD Héroicos de Peronia,DFC,,49,49,29,Peronia,189,D,38,46,41,45,37,52,50,54,,assets/players/football/x_futboli03700001.webp
+Romeo Benítez,real,FC Santa Rosa,MI,,70,70,28,Morvicia,170,D,80,82,76,69,59,31,61,68,,assets/players/football/r_romeobenitez.webp
+Agustín Amado,real,FC Santa Rosa,MC,,69,69,29,Valurria,176,D,68,67,78,71,55,65,47,67,,assets/players/football/r_agustinamado.webp
+Matías Fernández,real,FC Santa Rosa,MP,,69,69,29,Peronia,173,D,71,73,75,70,64,36,62,65,,assets/players/football/r_matiasfernandez.webp
+Gastón Verón,real,FC Santa Rosa,DC,,68,68,29,Peronia,184,D,71,55,72,67,67,40,67,69,,assets/players/football/r_gastonveron.webp
+Kim Ju Chan,real,FC Santa Rosa,EI,MI,67,69,26,Tamago,174,D,79,79,65,57,56,28,64,63,,assets/players/football/r_kimjuchan.webp
+Matías Perelló,real,FC Santa Rosa,MD,,67,67,29,Peronia,170,D,69,75,80,64,66,30,53,64,,assets/players/football/r_matiasperello.webp
+Rodrigo Chagas,real,FC Santa Rosa,MC,MCD,66,66,27,Valurria,176,D,74,74,69,65,63,66,65,63,,assets/players/football/r_rodrigochagas.webp
+Manuel Panaro,real,FC Santa Rosa,MI,MD,66,66,28,Valurria,181,D,84,85,77,61,58,34,66,63,,assets/players/football/r_manuelpanaro.webp
+Milton Scarpa,ficticio,FC Santa Rosa,LI,,61,61,29,Valurria,185,I,54,64,56,48,40,65,62,55,,assets/players/football/x_ficticiofinalnight202600001.webp
+Facundo Zapata,ficticio,FC Santa Rosa,ED,,58,58,27,Valurria,173,D,57,62,56,59,60,34,57,54,,assets/players/football/x_ficticiofinalnight600000001.webp
+Santiago Pereyra,ficticio,FC Santa Rosa,LD,,57,57,30,Valurria,187,D,47,60,47,50,39,60,61,60,,assets/players/football/x_ficticiofinalnight603700001.webp
+Hernán Ríos,ficticio,FC Santa Rosa,MCD,,55,58,26,Valurria,175,D,51,55,51,59,49,54,49,55,,assets/players/football/x_ficticiofinalnight205300001.webp
+Bautista Condori,ficticio,FC Santa Rosa,DC,,55,56,26,Valurria,181,D,49,54,58,52,58,30,58,57,,assets/players/football/x_ficticiofinalnight601800001.webp
+Facundo Ianni,ficticio,FC Santa Rosa,LI,LD,53,60,22,Valurria,179,D,51,52,42,46,33,57,50,49,,assets/players/football/x_futboli01000001.webp
+Facundo Domínguez,ficticio,FC Santa Rosa,LD,LI,53,55,22,Valurria,183,I,41,51,42,39,40,55,61,51,,assets/players/football/x_futbolg00600001.webp
+Andrés Sato,ficticio,FC Santa Rosa,POR,,51,52,28,Tamago,188,A,35,36,29,48,25,57,57,45,,assets/players/football/x_futbolh01600001.webp
+Nicolás Cejas,ficticio,FC Santa Rosa,DFC,,51,69,17,Valurria,185,I,52,44,35,35,30,49,61,48,,assets/players/football/x_futboli18500001.webp
+Jan Ortega,ficticio,FC Santa Rosa,POR,,47,62,18,Kaigam,195,D,38,42,31,39,25,50,44,48,,assets/players/football/x_ficticiofinalnight607600001.webp
+Yeison Ledesma,ficticio,FC Santa Rosa,DFC,,47,56,20,Valurria,185,D,38,43,34,41,31,49,51,54,,assets/players/football/x_ficticiofinalnight608600001.webp
+Bruno Baldivieso,ficticio,FC Santa Rosa,DFC,,47,53,22,Valurria,182,D,33,43,36,38,28,55,43,45,,assets/players/football/x_ficticiofinalnight602800001.webp
+Iván Céspedes,ficticio,FC Santa Rosa,DC,,47,55,23,Valurria,177,D,40,51,48,45,49,25,37,47,,assets/players/football/x_futboli16400001.webp
+Rodrigo Funes,ficticio,FC Santa Rosa,DFC,,46,51,24,Valurria,183,D,42,48,34,42,35,50,43,45,,assets/players/football/x_ficticiofinalvartest00600001.webp
+Maximiliano Sandoval,ficticio,FC Santa Rosa,DFC,,45,55,19,Valurria,180,I,40,45,29,32,25,50,44,45,,assets/players/football/x_ficticiofinalnight606000001.webp
+Bautista Pedraza,ficticio,FC Santa Rosa,MCD,MC,45,53,22,Valurria,168,I,37,44,46,46,43,44,43,43,,assets/players/football/x_futboli15800001.webp
+Bastián Yáñez,real,Fútbol Club de Tamago,MI,,68,68,29,Costas Unidas,175,I,82,81,75,66,61,28,76,61,,assets/players/football/r_bastianyanez.webp
+Auli Oliveros,real,Fútbol Club de Tamago,MP,,68,68,29,Magayanes,170,D,79,81,72,68,68,60,65,65,,assets/players/football/r_aulioliveros.webp
+Lachlan Brook,real,Fútbol Club de Tamago,MD,ED,66,66,29,Kaigam,178,I,81,82,78,60,62,36,67,62,,assets/players/football/r_lachlanbrook.webp
+Agustín Medina,real,Fútbol Club de Tamago,MC,MD,63,63,36,Grammes,176,D,49,50,62,61,62,59,68,63,,assets/players/football/r_agustinmedina.webp
+Camilo Fonseca,ficticio,Fútbol Club de Tamago,DFC,,63,71,22,Tamago,182,D,58,64,52,53,50,69,60,61,,assets/players/football/x_ficticiofinalnight601700001.webp
+Gonzalo Escudero,real,Fútbol Club de Tamago,DFC,,60,68,23,Valurria,180,I,62,61,47,47,32,62,62,48,,assets/players/football/r_gonzaloescudero.webp
+Caio Macedo,ficticio,Fútbol Club de Tamago,EI,ED,58,60,26,Tamago,178,D,56,58,56,53,62,37,58,64,,assets/players/football/x_ficticiofinalnight200200001.webp
+Maximiliano Leite,ficticio,Fútbol Club de Tamago,DC,,57,57,32,Tamago,181,D,54,58,53,54,62,27,56,57,,assets/players/football/x_futboli03500001.webp
+Santiago Kimura,ficticio,Fútbol Club de Tamago,DFC,,56,64,23,Tamago,191,D,48,58,44,47,41,59,60,55,,assets/players/football/x_futboli05000001.webp
+Diego Maciel,ficticio,Fútbol Club de Tamago,LI,LD,55,66,21,Tamago,182,D,59,50,43,38,44,59,54,54,,assets/players/football/x_ficticiofinalnight500500001.webp
+Camilo Hasegawa,ficticio,Fútbol Club de Tamago,MCD,,55,67,21,Tamago,183,I,57,46,49,58,56,44,56,56,,assets/players/football/x_futboli12600001.webp
+Rodrigo Barros,ficticio,Fútbol Club de Tamago,MC,,55,57,23,Tamago,178,D,53,51,46,62,51,43,47,57,,assets/players/football/x_futboli18600001.webp
+Lautaro Peixoto,ficticio,Fútbol Club de Tamago,ED,MD,55,58,24,Tamago,182,I,60,62,50,58,53,33,52,52,,assets/players/football/x_futboli16800001.webp
+Leonardo Matsumoto,ficticio,Fútbol Club de Tamago,LD,LI,54,57,25,Tamago,183,D,57,53,46,44,47,51,62,55,,assets/players/football/x_ficticiofinalnight201700001.webp
+Felipe Shimizu,ficticio,Fútbol Club de Tamago,DC,,53,53,28,Tamago,182,D,48,53,52,48,57,34,49,50,,assets/players/football/x_futboli06600001.webp
+Nicolás Guedes,ficticio,Fútbol Club de Tamago,POR,,50,64,21,Tamago,192,D,32,38,27,38,25,54,45,53,,assets/players/football/x_futboli11900001.webp
+Bautista Valdez,ficticio,Fútbol Club de Tamago,POR,,50,50,33,Costas Unidas,190,D,39,41,25,38,25,52,50,50,,assets/players/football/x_futboli16000001.webp
+Gonzalo Abe,ficticio,Fútbol Club de Tamago,MC,MI,50,53,28,Tamago,176,D,42,50,48,54,41,49,47,49,,assets/players/football/x_ficticiofinalnight608700001.webp
+Agustín Aoki,ficticio,Fútbol Club de Tamago,DFC,,47,50,24,Tamago,180,D,35,45,41,41,29,50,51,48,,assets/players/football/x_futboli05600001.webp
+Ren Siqueira,ficticio,Fútbol Club de Tamago,LI,LD,47,58,21,Tamago,187,D,43,42,32,41,38,45,56,45,,assets/players/football/x_ficticiofinalnight202200001.webp
+Agustín Cavalcanti,ficticio,Fútbol Club de Tamago,DC,,47,55,18,Tamago,173,D,45,51,41,46,52,28,40,48,,assets/players/football/x_ficticiofinalnight605800001.webp
+Ezequiel Barbosa,ficticio,Fútbol Club de Tamago,DFC,,46,51,22,Tamago,187,A,36,50,34,39,27,48,49,41,,assets/players/football/x_futboli00600001.webp
+Ignacio Medeiros,ficticio,Fútbol Club de Tamago,LD,LI,46,46,32,Tamago,184,D,44,51,38,39,32,46,51,47,,assets/players/football/x_futboli18200001.webp
+Rodrigo Pires,ficticio,Fútbol Club de Tamago,MCD,,45,45,29,Tamago,179,D,34,37,43,50,34,46,46,39,,assets/players/football/x_ficticiofinalnight301200001.webp
+Manuel Merlo,celebridad,Grammes FC,MP,MC,75,75,28,Peronia,177,D,79,70,74,80,65,65,62,76,Mernuel · streamer,assets/players/football/r_manuelmerlo.webp
+Johnathan de Jesús,celebridad,Grammes FC,DFC,,75,75,30,Tamago,187,D,63,70,62,68,49,76,83,71,Creador de contenido (identidad sin confirmar),assets/players/football/r_johnathanjesus.webp
+Álvaro Campo,celebridad,Grammes FC,MD,MI,74,74,31,Peronia,178,D,74,70,74,75,59,75,74,73,Creador de contenido (identidad sin confirmar),assets/players/football/r_alvarocampo.webp
+Ramiro Hernández,celebridad,Grammes FC,MI,MD,74,74,30,Peronia,179,D,72,72,74,74,68,65,65,80,Creador de contenido (identidad sin confirmar),assets/players/football/r_ramirohernandez.webp
+Ángelo Valdés,celebridad,Grammes FC,DFC,,73,73,38,Magayanes,183,D,52,65,68,56,53,82,73,74,Will · Los Futbolitos,assets/players/football/r_angelovaldes.webp
+Gonzalo Morales,real,Grammes FC,DC,,72,72,27,Valurria,178,I,85,78,67,60,66,25,75,64,,assets/players/football/r_gonzalomorales.webp
+Iván Leguizamón,real,Grammes FC,EI,ED,72,72,28,Morvicia,173,I,86,84,70,69,59,36,63,63,,assets/players/football/r_ivanleguizamon.webp
+Robson Matheus,real,Grammes FC,MC,MD,72,72,28,Sotoa,174,I,71,71,73,73,71,61,71,71,,assets/players/football/r_robsonmatheus.webp
+Juan Ordóñez,celebridad,Grammes FC,LI,LD,72,73,31,Valurria,176,I,65,74,56,61,57,76,75,69,Creador de contenido (identidad sin confirmar),assets/players/football/r_juanordonez.webp
+Teo Rodríguez Pagano,real,Grammes FC,LI,LD,71,75,25,Peronia,178,I,83,82,71,63,45,71,69,57,,assets/players/football/r_teorodriguezpagano.webp
+Hugo Quintana,real,Grammes FC,MC,MI,71,71,29,Morvicia,172,D,70,69,76,74,60,57,58,69,,assets/players/football/r_hugoquintana.webp
+Baltasar Rodríguez,real,Grammes FC,MC,MI,71,71,27,Peronia,173,D,74,78,77,74,67,57,51,72,,assets/players/football/r_baltasarrodriguez.webp
+Pablo Campos,real,Grammes FC,POR,,70,70,28,Grammes,188,D,25,33,43,62,33,78,73,75,,assets/players/football/r_pablocampos.webp
+Anderson Duarte,real,Grammes FC,ED,MD,70,73,26,Valurria,175,I,81,82,70,60,60,37,66,61,,assets/players/football/r_andersonduarte.webp
+Bruno Barticciotto,real,Grammes FC,DC,,70,70,29,Costas Unidas,176,D,75,76,71,65,64,25,70,64,,assets/players/football/r_brunobarticciotto.webp
+Frankarlos Benítez,real,Grammes FC,POR,,70,73,26,Magayanes,188,D,45,59,45,61,35,75,71,69,,assets/players/football/r_frankarlosbenitez.webp
+Joaquín Mosqueira,real,Grammes FC,MCD,,70,72,26,Valurria,184,D,70,72,71,71,63,66,71,67,,assets/players/football/r_joaquinmosqueira.webp
+Ignacio Ovando,real,Grammes FC,DFC,,70,78,23,Peronia,183,D,68,67,66,54,30,72,75,61,,assets/players/football/r_ovandoignacio.webp
+Giorgi Guliashvili,real,Grammes FC,DC,,68,69,29,Baikal,175,D,68,72,68,63,68,28,64,63,,assets/players/football/r_giorgiguliashvili.webp
+Marcelo Esponda,real,Grammes FC,MCD,DFC,68,68,27,Peronia,176,D,70,70,69,68,68,66,70,68,,assets/players/football/r_marceloesponda.webp
+Ezequiel Herrera,real,Grammes FC,LD,,66,66,27,Valurria,180,D,72,74,66,56,42,64,73,57,,assets/players/football/r_ezequielherrera.webp
+Liam Murphy,ficticio,Grammes FC,DFC,,56,73,18,Grammes,185,A,51,53,44,47,44,57,63,52,,assets/players/football/x_ficticiofinalnight301700001.webp
+Wilmer Cardoso,ficticio,Grammes FC,DFC,,50,67,18,Grammes,179,I,47,49,37,40,25,50,57,49,,assets/players/football/x_ficticiofinalnight607800001.webp
+Tomás Bermejo,ficticio,Grammes FC,LD,LI,44,50,18,Grammes,180,D,40,46,32,38,25,44,48,44,,assets/players/football/x_futboli05900001.webp
+Pablo Iversen,ficticio,Groz Sport Kulübü,MC,,81,81,30,Overmark,187,I,85,75,80,82,78,77,75,85,,assets/players/football/x_futboli14600001.webp
+Alex Luna,real,Groz Sport Kulübü,MP,MC,78,80,26,Valurria,174,D,90,88,82,82,77,51,72,73,,assets/players/football/r_alexluna.webp
+Jack Martin,ficticio,Groz Sport Kulübü,POR,,78,80,26,Kaigam,193,D,65,65,55,69,45,79,78,81,,assets/players/football/x_ficticiofinalnight604600001.webp
+Facundo Farías,real,Groz Sport Kulübü,DC,,77,77,28,Valurria,171,D,82,85,77,64,70,34,68,69,,assets/players/football/r_facundoarias.webp
+Minjun Omarov,ficticio,Groz Sport Kulübü,MC,,77,80,23,Kostanay,180,A,81,71,75,79,61,75,64,84,,assets/players/football/x_futboli17500001.webp
+Matteo Orlov,ficticio,Groz Sport Kulübü,DFC,,76,89,19,Baikal,182,D,73,69,63,60,60,83,71,75,,assets/players/football/x_ficticiofinalnight602300001.webp
+Callum Sokolov,ficticio,Groz Sport Kulübü,DFC,,76,84,23,Baikal,184,D,66,73,67,67,63,79,78,73,,assets/players/football/x_futboli12200001.webp
+Brian Aguirre,real,Groz Sport Kulübü,EI,ED,75,75,27,Peronia,175,D,88,84,75,69,64,32,67,65,,assets/players/football/r_brianaguirre.webp
+Lucas Silva,real,Groz Sport Kulübü,MCD,,75,83,23,Valurria,179,D,73,64,77,76,61,73,71,72,,assets/players/football/r_lucassilva.webp
+Franco Ibarra,real,Groz Sport Kulübü,MCD,MC,75,75,29,Peronia,175,D,67,69,72,74,54,75,87,73,,assets/players/football/r_francoibarra.webp
+Joaquín Tobio Burgos,real,Groz Sport Kulübü,MI,,75,77,26,Valurria,178,I,86,86,84,74,70,50,66,73,,assets/players/football/r_joaquinburgos.webp
+Joaquín García,real,Groz Sport Kulübü,LD,,74,74,29,Valurria,183,D,83,79,73,70,48,72,77,69,,assets/players/football/r_joaquingarcia.webp
+Agustín Sández,real,Groz Sport Kulübü,LI,,74,74,29,Morvicia,181,I,83,76,63,57,46,71,85,60,,assets/players/football/r_agustinsandez.webp
+Agustín Olmos,ficticio,Groz Sport Kulübü,DC,,72,76,23,Grammes,186,D,70,76,77,73,69,53,74,74,,assets/players/football/x_ficticiofinalv3test00500001.webp
+Stanislav Savelev,ficticio,Groz Sport Kulübü,DFC,,70,79,19,Baikal,185,D,73,66,61,64,49,71,71,63,,assets/players/football/x_ficticiofinalnight205200001.webp
+Oliver Kapanadze,ficticio,Groz Sport Kulübü,LI,,69,72,28,Baikal,183,D,63,60,59,61,57,70,73,72,,assets/players/football/x_futboli13500001.webp
+Jan Campbell,ficticio,Groz Sport Kulübü,POR,,68,68,30,Overmark,200,D,50,53,45,55,35,68,72,72,,assets/players/football/x_ficticiofinalnight303100001.webp
+Omar Ben-David,ficticio,Groz Sport Kulübü,MC,,68,75,23,Netanya,178,D,70,67,70,73,64,67,65,61,,assets/players/football/x_ficticiofinalnight303000001.webp
+Gabriel Cornejo,ficticio,Groz Sport Kulübü,DFC,,68,68,26,Peronia,180,D,49,64,48,59,56,76,67,72,,assets/players/football/x_ficticiofinalnight608300001.webp
+Tariq Edri,ficticio,Groz Sport Kulübü,MD,ED,67,85,19,Netanya,179,D,64,72,70,66,58,52,63,66,,assets/players/football/x_ficticiofinalnight605000001.webp
+Luca de Vries,ficticio,Groz Sport Kulübü,DFC,,66,68,27,Baikal,180,D,56,69,51,60,47,69,68,66,,assets/players/football/x_ficticiofinalv2test00600001.webp
+Amadou Zniber,ficticio,Groz Sport Kulübü,ED,MD,65,65,33,Sahar,185,I,67,71,66,65,62,49,66,57,,assets/players/football/x_futboli12000001.webp
+Danilo Inoue,ficticio,Groz Sport Kulübü,DC,,65,65,30,Tamago,181,I,61,61,64,62,69,40,67,64,,assets/players/football/x_ficticiofinalnight203600001.webp
+Marco Hansen,ficticio,Groz Sport Kulübü,LD,LI,64,64,32,Overmark,186,D,62,58,58,48,57,70,61,69,,assets/players/football/x_futboli05100001.webp
+Franco González,real,Independiente de Riada,MP,,70,72,26,Valurria,165,D,82,84,80,69,65,40,63,67,,assets/players/football/r_francogonzalez.webp
+Facundo Lencioni,real,Independiente de Riada,MI,MC,70,70,29,Peronia,179,D,73,75,75,69,58,41,69,68,,assets/players/football/r_facundolencioni.webp
+Gonzalo Alassia,real,Independiente de Riada,MC,,70,72,26,Valurria,183,D,72,74,66,71,69,65,75,71,,assets/players/football/r_gonzaloalassia.webp
+David Zalazar,real,Independiente de Riada,ED,,69,69,28,Valurria,180,D,77,79,69,66,61,37,58,67,,assets/players/football/r_davidzalazar.webp
+Alan Rodríguez,real,Independiente de Riada,MC,,69,69,30,Valurria,171,D,68,72,78,69,62,58,49,69,,assets/players/football/r_rodriguezalan.webp
+Franco Alfonso,real,Independiente de Riada,MD,ED,68,68,28,Peronia,165,D,86,88,82,67,62,42,50,65,,assets/players/football/r_francoalfonso.webp
+Toto Fernández,real,Independiente de Riada,MI,EI,68,68,29,Peronia,183,D,74,73,65,69,62,35,71,66,,assets/players/football/r_totofernandez.webp
+Tomás González,real,Independiente de Riada,DC,,67,67,27,Peronia,168,D,76,78,65,56,59,30,54,56,,assets/players/football/r_tomasgonzalez.webp
+Dylan Gorosito,real,Independiente de Riada,LD,,62,68,24,Peronia,173,D,78,80,69,48,34,65,54,57,,assets/players/football/r_dylangorosito.webp
+Karim Nguema,ficticio,Independiente de Riada,MCD,DFC,59,59,29,Riada,172,D,51,56,59,62,54,55,48,60,,assets/players/football/x_futboli10800001.webp
+Erik Skog,ficticio,Independiente de Riada,POR,,56,61,22,Overmark,196,D,43,40,33,53,25,59,59,56,,assets/players/football/x_ficticiofinalnight203300001.webp
+Kofi Mekongo,ficticio,Independiente de Riada,LI,,56,57,25,Riada,176,A,50,53,48,43,42,62,54,58,,assets/players/football/x_ficticiofinalnight605400001.webp
+Blaise Ndzana,ficticio,Independiente de Riada,MCD,,56,62,20,Riada,174,D,52,60,51,62,54,52,54,53,,assets/players/football/x_ficticiofinal00000006.webp
+Kwame Owona,ficticio,Independiente de Riada,DFC,,55,55,30,Riada,184,D,47,52,44,44,43,59,55,58,,assets/players/football/x_ficticiofinalnight603900001.webp
+Jack MacDonald,ficticio,Independiente de Riada,POR,,54,58,23,Grammes,190,D,42,44,33,42,25,58,56,52,,assets/players/football/x_ficticiofinalnight609200001.webp
+Moussa Okafor,ficticio,Independiente de Riada,DFC,,51,51,29,Riada,189,D,50,52,48,40,41,53,53,50,,assets/players/football/x_ficticiofinalvartest00400001.webp
+Etienne Manga,ficticio,Independiente de Riada,DFC,,50,57,18,Riada,180,D,44,50,45,36,37,53,52,54,,assets/players/football/x_ficticiofinal00400003.webp
+Vinícius Yoshida,ficticio,Independiente de Riada,DC,,50,59,19,Tamago,177,I,51,53,48,49,50,33,46,47,,assets/players/football/x_futbolg01900001.webp
+Clovis Bassong,ficticio,Independiente de Riada,DC,,49,59,18,Riada,188,A,48,46,46,42,52,29,53,47,,assets/players/football/x_ficticiofinal00200005.webp
+Omar Onana,ficticio,Independiente de Riada,LI,LD,48,54,21,Riada,183,D,47,54,34,40,31,50,50,53,,assets/players/football/x_ficticiofinalnight604900001.webp
+Malik Eboué,ficticio,Independiente de Riada,LD,,48,56,22,Riada,183,D,49,44,39,38,33,49,49,45,,assets/players/football/x_ficticiofinalnight301900001.webp
+Nestor Ekambi,ficticio,Independiente de Riada,EI,,48,65,20,Riada,177,I,52,51,48,48,43,28,44,47,,assets/players/football/x_ficticiofinal00100006.webp
+Enzo Sampaio,ficticio,Independiente de Riada,DFC,,48,48,29,Grammes,183,D,43,44,46,36,29,52,49,52,,assets/players/football/x_futboli12700001.webp
+Modeste Bikoro,ficticio,Independiente de Riada,DFC,,46,51,24,Riada,187,D,37,41,37,38,29,51,44,48,,assets/players/football/x_ficticiofinalnight00000001.webp
+Caio Nakamura,ficticio,Inter Focuri,DC,,79,79,30,Tamago,181,I,78,77,72,75,86,61,74,73,,assets/players/football/x_ficticiofinalnight301300001.webp
+Fabricio Pérez,real,Inter Focuri,MI,,74,78,25,Peronia,180,D,86,88,82,69,68,28,79,71,,assets/players/football/r_fabricioperez.webp
+Lautaro Millán,real,Inter Focuri,MC,MI,73,77,25,Costas Unidas,169,D,74,77,76,75,56,68,68,71,,assets/players/football/r_lautaromillan.webp
+Omar Campos,real,Inter Focuri,LI,,73,73,28,Magayanes,174,I,90,87,77,67,61,71,72,63,,assets/players/football/r_omarcampos.webp
+Tomás Berg,ficticio,Inter Focuri,LD,,73,89,21,Overmark,186,D,67,67,51,71,54,77,69,71,,assets/players/football/x_futboli15500001.webp
+Brandon Matos,ficticio,Inter Focuri,EI,MI,72,74,28,Grammes,176,I,74,69,64,75,77,48,71,72,,assets/players/football/x_futboli15300001.webp
+Ezequiel Cabral,ficticio,Inter Focuri,MD,,71,71,32,Tamago,178,D,75,72,68,75,68,70,65,71,,assets/players/football/x_futboli05200001.webp
+Dae Singh,ficticio,Inter Focuri,POR,,70,77,19,Kostanay,201,D,52,58,50,64,33,73,70,70,,assets/players/football/x_futboli10400001.webp
+Hugo Olsen,ficticio,Inter Focuri,MCD,MC,70,87,21,Overmark,183,D,56,72,72,69,65,68,74,67,,assets/players/football/x_ficticiofinalnight609900001.webp
+Jack Eide,ficticio,Inter Focuri,DFC,,69,73,23,Overmark,182,D,64,68,67,63,55,70,71,69,,assets/players/football/x_ficticiofinalnight605100001.webp
+Sander Halvorsen,ficticio,Inter Focuri,DFC,,69,69,30,Overmark,176,D,61,69,59,60,52,76,65,68,,assets/players/football/x_ficticiofinalnight203000001.webp
+Bruno Monteiro,ficticio,Inter Focuri,DC,,69,75,22,Grammes,180,I,62,61,68,58,77,43,68,76,,assets/players/football/x_ficticiofinalnight600300001.webp
+Luca Myhre,ficticio,Inter Focuri,MC,,67,83,17,Overmark,178,A,70,70,62,70,67,69,67,66,,assets/players/football/x_futboli16500001.webp
+Sergio Moen,ficticio,Inter Focuri,LI,LD,66,66,32,Overmark,183,D,65,68,58,50,50,70,66,66,,assets/players/football/x_futboli00100001.webp
+Liam Collet,ficticio,Inter Focuri,DFC,,66,66,28,Iberia,193,D,58,60,54,59,53,67,73,62,,assets/players/football/x_ficticiofinalv2test00200001.webp
+Dani Sanz,ficticio,Inter Focuri,ED,EI,65,80,20,Grammes,184,I,64,69,64,60,65,44,68,62,,assets/players/football/x_ficticiofinalnight200100001.webp
+Espen Lunde,ficticio,Inter Focuri,MC,MP,64,66,28,Overmark,178,I,61,60,71,63,64,60,58,63,,assets/players/football/x_ficticiofinalnight200500001.webp
+Liam Costa,ficticio,Inter Focuri,POR,,63,63,29,Overmark,185,D,46,50,42,60,25,69,62,62,,assets/players/football/x_ficticiofinalnight609600001.webp
+Jonas Ulvestad,ficticio,Inter Focuri,MCD,MC,63,63,30,Overmark,184,D,51,54,63,66,53,67,65,58,,assets/players/football/x_ficticiofinalnight608200001.webp
+Facundo Albuquerque,ficticio,Inter Focuri,MP,MC,63,70,19,Tamago,179,D,64,63,61,64,56,60,57,66,,assets/players/football/x_futboli15900001.webp
+Matteo O'Connor,ficticio,Inter Focuri,DFC,,60,61,26,Overmark,191,D,45,54,50,50,49,66,61,63,,assets/players/football/x_ficticiofinalnight603300001.webp
+Liam Aasen,ficticio,Inter Focuri,LD,,60,68,21,Overmark,182,D,48,56,53,50,48,66,61,66,,assets/players/football/x_futboli09800001.webp
+Oliver Hagen,ficticio,Inter Focuri,DFC,,54,54,35,Overmark,187,I,49,49,48,38,30,58,57,46,,assets/players/football/x_futboli15700001.webp
+Camilo Kobayashi,ficticio,Inter Focuri,DC,,53,60,19,Tamago,178,A,56,55,49,47,54,34,52,47,,assets/players/football/x_futbolh00700001.webp
+Finn Gaillard,ficticio,Klaipeda United,DC,,82,82,30,Iberia,178,D,82,77,74,72,88,56,70,83,,assets/players/football/x_futboli07000001.webp
+Ian Subiabre,real,Klaipeda United,MI,MD,75,83,23,Valurria,171,I,94,94,85,69,70,38,75,74,,assets/players/football/r_iansubiabre.webp
+Santiago Simón,real,Klaipeda United,LD,,74,74,28,Peronia,181,D,87,84,79,73,61,69,79,72,,assets/players/football/r_santiagosimon.webp
+Simon Eriksson,real,Klaipeda United,POR,,74,80,24,Overmark,195,D,30,39,47,68,37,79,83,76,,assets/players/football/r_simoneriksson.webp
+Rubén Lezcano,real,Klaipeda United,MD,MI,74,76,26,Morvicia,176,I,78,76,77,76,67,63,69,71,,assets/players/football/r_rubenlezcano.webp
+Josen Escobar,real,Klaipeda United,MCD,DFC,74,76,26,Magayanes,175,D,77,78,77,75,32,72,75,70,,assets/players/football/r_josenescobar.webp
+Takumi Suleimenov,ficticio,Klaipeda United,DFC,,73,73,25,Kostanay,188,D,64,62,65,67,55,79,70,75,,assets/players/football/x_futboli02200001.webp
+Jan Lucumí,real,Klaipeda United,ED,,72,75,26,Magayanes,180,D,82,80,72,72,64,32,69,64,,assets/players/football/r_janlucumi.webp
+Arjun Patel,ficticio,Klaipeda United,DFC,,72,72,30,Kostanay,189,I,68,65,71,69,61,73,75,74,,assets/players/football/x_ficticiofinalv2test00000001.webp
+Isaiah Reig,ficticio,Klaipeda United,EI,,71,89,21,Grammes,181,A,67,74,72,69,72,49,76,70,,assets/players/football/x_futboli18700001.webp
+Jan Marsh,ficticio,Klaipeda United,MC,,69,72,27,Kaigam,170,D,70,64,71,66,60,64,66,74,,assets/players/football/x_ficticiofinalnight605200001.webp
+Jun Utepov,ficticio,Klaipeda United,MCD,MC,68,68,30,Kostanay,178,D,71,66,69,67,62,67,59,74,,assets/players/football/x_futboli02600001.webp
+Jonas Rebelo,ficticio,Klaipeda United,DC,,68,69,30,Grammes,183,I,67,73,70,70,67,46,72,65,,assets/players/football/x_futbolh00800001.webp
+Yeison Tanaka,ficticio,Klaipeda United,DC,,67,70,25,Tamago,170,D,62,72,66,68,70,49,61,70,,assets/players/football/x_ficticiofinalv3test00700001.webp
+Matías Souza,ficticio,Klaipeda United,POR,,66,68,26,Tamago,194,A,52,49,43,64,27,72,69,63,,assets/players/football/x_ficticiofinalnight607100001.webp
+Wei Kasenov,ficticio,Klaipeda United,LI,,66,69,26,Kostanay,185,D,72,65,55,55,48,65,71,65,,assets/players/football/x_ficticiofinalnight600700001.webp
+Takumi Abdrakhmanov,ficticio,Klaipeda United,LI,,66,68,24,Kostanay,182,D,61,66,53,57,52,70,64,60,,assets/players/football/x_ficticiofinalnight303200001.webp
+Hiro Nazarbekov,ficticio,Klaipeda United,LD,,66,68,25,Kostanay,181,I,63,63,50,57,47,68,66,72,,assets/players/football/x_ficticiofinalnight607700001.webp
+Wei Mukhamedov,ficticio,Klaipeda United,MC,MP,66,73,23,Kostanay,169,D,69,70,61,71,59,66,64,63,,assets/players/football/x_futboli06200001.webp
+Aidos Rakhimov,ficticio,Klaipeda United,DFC,,65,71,22,Kostanay,180,D,62,60,52,55,50,69,65,58,,assets/players/football/x_ficticiofinal00300003.webp
+Youssef Mensah,ficticio,Klaipeda United,MC,MD,58,70,20,Netanya,176,I,53,56,50,61,56,59,51,63,,assets/players/football/x_ficticiofinalnight603600001.webp
+Karim Bennani,ficticio,Klaipeda United,MP,DC,58,71,18,Sahar,171,A,63,54,57,63,53,53,58,52,,assets/players/football/x_ficticiofinalnight302000001.webp
+Wei Beisenov,ficticio,Klaipeda United,DFC,,57,74,19,Kostanay,186,D,49,50,45,51,36,63,51,53,,assets/players/football/x_ficticiofinalnight600500001.webp
+Hugo Goikoetxea,ficticio,Klaipeda United,DFC,,56,63,18,Grammes,179,I,48,45,42,50,37,57,59,57,,assets/players/football/x_ficticiofinalnight301000001.webp
+Nuno Mendes,real,Maccabi Tel Shava,LI,,85,85,28,Grammes,180,I,94,90,83,78,74,85,83,77,,assets/players/football/r_nunomendes.webp
+Désiré Doué,real,Maccabi Tel Shava,ED,EI,85,89,25,Iberia,181,D,83,84,89,79,83,56,82,84,,assets/players/football/r_desiredoue.webp
+Giuliano Simeone,real,Maccabi Tel Shava,MD,,85,85,28,Valurria,174,D,96,98,86,83,81,62,90,85,,assets/players/football/r_giulianos.webp
+Khvicha Kvaratskhelia,real,Maccabi Tel Shava,EI,ED,84,84,29,Baikal,183,D,82,81,86,81,84,54,78,84,,assets/players/football/r_khvichakvaratskhelia.webp
+Jamal Musiala,real,Maccabi Tel Shava,MP,,84,84,27,Margin,186,D,74,78,90,83,78,60,70,85,,assets/players/football/r_jamalmusiala.webp
+Matías Soulé,real,Maccabi Tel Shava,MP,,84,84,27,Peronia,176,I,87,90,89,85,83,54,79,80,,assets/players/football/r_soule.webp
+Emeka Kaplan,ficticio,Maccabi Tel Shava,LD,LI,84,85,29,Netanya,189,D,80,91,81,78,72,89,81,78,,assets/players/football/x_ficticiofinalvartest00500001.webp
+William Saliba,real,Maccabi Tel Shava,DFC,,83,83,29,Iberia,192,D,75,70,63,69,37,89,82,74,,assets/players/football/r_williamsaliba.webp
+Santiago Beltrán,real,Maccabi Tel Shava,POR,,82,84,26,Peronia,190,I,64,69,56,76,46,86,80,85,,assets/players/football/r_beltransantiago.webp
+Moisés Caicedo,real,Maccabi Tel Shava,MCD,MC,81,81,29,Sotoa,178,D,61,65,81,80,67,80,82,83,,assets/players/football/r_moisescaicedo.webp
+Amadou Mizrahi,ficticio,Maccabi Tel Shava,DFC,,81,84,26,Netanya,192,D,66,73,70,65,61,88,82,80,,assets/players/football/x_futboli13400001.webp
+Orlando Gill,real,Maccabi Tel Shava,POR,,80,80,30,Morvicia,198,I,33,37,56,80,46,86,90,84,,assets/players/football/r_orlandogil.webp
+Karim Friedman,ficticio,Maccabi Tel Shava,MC,MCD,80,80,29,Netanya,174,D,79,80,78,86,70,78,71,79,,assets/players/football/x_futboli11200001.webp
+Amadou Cohen,ficticio,Maccabi Tel Shava,DC,,79,79,35,Netanya,178,D,81,81,75,74,80,57,76,83,,assets/players/football/x_futboli17400001.webp
+Leonel Flores,real,Maccabi Tel Shava,DC,,78,86,23,Valurria,175,D,80,83,80,69,74,26,73,64,,assets/players/football/r_leonelflores.webp
+Youssef Zohar,ficticio,Maccabi Tel Shava,MI,,76,93,18,Netanya,178,D,78,74,72,78,66,74,71,80,,assets/players/football/x_ficticiofinalnight602400001.webp
+Moussa Jerbi,ficticio,Maccabi Tel Shava,LI,,74,76,28,Netanya,186,D,65,72,68,67,63,76,80,76,,assets/players/football/x_futboli00200001.webp
+Ori Ilan,ficticio,Maccabi Tel Shava,MCD,DFC,74,81,23,Netanya,175,D,72,71,69,83,65,65,71,66,,assets/players/football/x_ficticiofinalnight200000001.webp
+Youssef Vaknin,ficticio,Maccabi Tel Shava,DFC,,73,73,30,Netanya,183,D,59,77,59,62,54,80,70,72,,assets/players/football/x_futboli09600001.webp
+Amadou Bakari,ficticio,Maccabi Tel Shava,DFC,,72,72,35,Netanya,187,D,62,69,60,63,52,77,72,75,,assets/players/football/x_futboli07700001.webp
+Moussa Al-Farsi,ficticio,Maccabi Tel Shava,DFC,,70,73,22,Netanya,182,I,64,71,55,58,47,72,75,68,,assets/players/football/x_futboli00400001.webp
+Samuel Yosef,ficticio,Maccabi Tel Shava,LD,LI,70,85,21,Netanya,191,D,64,73,63,61,53,72,73,72,,assets/players/football/x_futboli07900001.webp
+Hassan Dahan,ficticio,Maccabi Tel Shava,MC,,70,76,21,Netanya,178,D,74,67,60,77,67,64,61,73,,assets/players/football/x_futbolh00200001.webp
+Moussa Shapiro,ficticio,Maccabi Tel Shava,DC,,70,72,23,Netanya,179,D,70,76,67,67,71,48,73,66,,assets/players/football/x_futboli04900001.webp
+Gastón González,real,Melonia City FC,MI,MD,69,69,29,Peronia,183,I,82,78,72,65,68,38,82,66,,assets/players/football/r_gastongonzalez.webp
+Jordan Barrera,real,Melonia City FC,MP,DC,68,74,24,Magayanes,180,D,81,79,77,68,54,35,61,62,,assets/players/football/r_jordanbarrera.webp
+Edwin Mosquera,real,Melonia City FC,MD,,67,67,29,Magayanes,172,D,85,84,73,65,58,25,70,62,,assets/players/football/r_edwinmosquera.webp
+Jeyson Chura,real,Melonia City FC,MI,MC,66,66,28,Sotoa,176,D,84,82,71,66,59,37,64,62,,assets/players/football/r_jeysonchura.webp
+Juan Martín Velázquez,real,Melonia City FC,MI,,66,68,26,Peronia,181,I,78,77,69,66,64,30,64,63,,assets/players/football/r_juanvelazquez.webp
+Manuel Duarte,real,Melonia City FC,MC,,65,65,29,Peronia,171,D,73,73,72,66,64,48,58,60,,assets/players/football/r_manuelduarte.webp
+Kevin Coronel,real,Melonia City FC,LD,,61,63,26,Peronia,168,D,73,73,71,69,50,61,52,65,,assets/players/football/r_kevincoronel.webp
+Hugo Tomé,ficticio,Melonia City FC,DC,,61,61,34,Grammes,192,D,58,56,60,58,65,40,63,58,,assets/players/football/x_futboli18000001.webp
+Agustín Okada,ficticio,Melonia City FC,ED,,60,64,24,Tamago,191,D,57,62,56,61,64,38,56,54,,assets/players/football/x_futbolg00500001.webp
+Callum Riva,ficticio,Melonia City FC,LI,LD,57,57,30,Melonia,181,D,51,56,41,44,40,62,55,52,,assets/players/football/x_ficticiofinalnight605300001.webp
+Ezequiel Sakamoto,ficticio,Melonia City FC,MCD,,57,57,34,Tamago,174,A,59,54,55,57,51,50,57,58,,assets/players/football/x_futboli10600001.webp
+Declan Neri,ficticio,Melonia City FC,DFC,,54,54,29,Melonia,180,D,52,59,42,44,33,54,58,55,,assets/players/football/x_futboli17700001.webp
+Nicolás Muñoz,ficticio,Melonia City FC,POR,,53,61,23,Magayanes,183,D,35,39,31,41,25,58,54,52,,assets/players/football/x_ficticiofinalnight602900001.webp
+Julián Hayashi,ficticio,Melonia City FC,DC,,53,53,29,Tamago,181,D,54,45,50,49,58,27,45,54,,assets/players/football/x_ficticiofinalnight607000001.webp
+Luca Grasso,ficticio,Melonia City FC,DFC,,50,50,29,Melonia,189,A,40,45,30,35,34,54,54,53,,assets/players/football/x_futboli05700001.webp
+Luca Colin,ficticio,Melonia City FC,EI,,49,55,20,Iberia,182,D,45,50,45,50,53,26,48,52,,assets/players/football/x_futboli13700001.webp
+Declan Colombo,ficticio,Melonia City FC,DFC,,48,50,23,Melonia,193,D,46,46,39,33,31,53,47,48,,assets/players/football/x_futboli09100001.webp
+Emeka Diallo,ficticio,Melonia City FC,POR,,47,49,25,Netanya,186,D,30,35,26,39,25,50,51,44,,assets/players/football/x_ficticiofinalnight604200001.webp
+Yeison Galeano,ficticio,Melonia City FC,DC,,47,49,26,Valurria,180,D,54,44,46,48,43,27,43,45,,assets/players/football/x_ficticiofinalnight606100001.webp
+Oliver Giordano,ficticio,Melonia City FC,LI,,46,46,33,Melonia,181,D,40,43,35,35,32,55,38,46,,assets/players/football/x_futboli02900001.webp
+Declan Ferrari,ficticio,Melonia City FC,DFC,,44,44,34,Melonia,178,D,37,35,33,35,26,46,49,41,,assets/players/football/x_futboli12400001.webp
+Ignacio Saito,ficticio,Melonia City FC,LD,LI,44,62,19,Tamago,182,D,39,56,32,34,25,49,43,46,,assets/players/football/x_futbolh01200001.webp
+Felipe Pereira,ficticio,Melonia City FC,MCD,DFC,44,47,28,Tamago,182,A,38,39,43,42,33,35,47,46,,assets/players/football/x_futboli03000001.webp
+Rodrigo Peralta,ficticio,Melonia City FC,DFC,,44,47,26,Grammes,185,D,32,35,33,35,29,47,47,45,,assets/players/football/x_ficticiofinalnight301800001.webp
+Emiliano Vertis,especial,Olympique de Iberia,DC,MP/EI,90,90,26,Iberia,181,D,84,87,93,88,93,38,80,94,El mejor jugador del mundo · especialista en tiros de larga distancia y regates,assets/players/football/r_vertisemilio.webp
+Gastón Edul,celebridad,Olympique de Iberia,MC,MI,76,76,34,Peronia,155,D,76,74,75,78,67,72,70,75,Periodista deportivo y streamer,assets/players/football/r_gastonedul.webp
+Rodriginho,celebridad,Olympique de Iberia,ED,,76,76,29,Tamago,172,D,74,75,82,74,74,61,77,75,Creador de contenido (identidad sin confirmar),assets/players/football/r_rodriginho.webp
+Lautaro Del Campo,celebridad,Olympique de Iberia,DC,,75,76,32,Peronia,178,D,52,53,82,70,92,59,76,73,"La Cobra · streamer (pesado y lento, pero letal en el área)",assets/players/football/r_lautarodelcampo.webp
+Santiago Baietti,celebridad,Olympique de Iberia,EI,ED,75,75,27,Peronia,176,I,76,74,78,76,73,47,72,71,Bauleti · streamer,assets/players/football/r_santiagobaietti.webp
+Vicent Peréz,celebridad,Olympique de Iberia,MC,,74,74,37,Magayanes,178,I,66,81,69,84,63,76,69,65,Los Futbolitos,assets/players/football/r_vicentperez.webp
+Marcelo Morales,celebridad,Olympique de Iberia,DC,,74,74,33,Peronia,181,D,69,72,74,75,77,49,70,74,Creador de contenido (identidad sin confirmar),assets/players/football/r_marcelomorales.webp
+Gonzalo Corbalán,celebridad,Olympique de Iberia,MP,DC,74,74,31,Peronia,178,D,76,70,73,80,64,71,66,69,Creador de contenido (identidad sin confirmar),assets/players/football/r_gonzalocorbalan.webp
+Juan Carlos Gauto,real,Olympique de Iberia,MD,,72,74,26,Peronia,172,D,84,84,78,70,65,31,67,70,,assets/players/football/r_juancarlosgauto.webp
+Facundo Sanguinetti,real,Olympique de Iberia,POR,,72,72,29,Valurria,185,D,25,37,42,65,32,81,69,78,,assets/players/football/r_facundosanguinetti.webp
+Vicente Pizarro,real,Olympique de Iberia,MCD,DFC,72,72,28,Costas Unidas,172,I,63,65,74,72,59,72,71,70,,assets/players/football/r_pizarrovicente.webp
+Óscar Perea,real,Olympique de Iberia,MI,MC,71,75,25,Magayanes,174,D,84,86,79,67,60,29,72,70,,assets/players/football/r_oscarperea.webp
+Nicolás Bolcato,real,Olympique de Iberia,POR,,71,73,26,Peronia,190,D,25,35,45,63,35,77,75,75,,assets/players/football/r_nicolasbolcato.webp
+Mateo Ponte,real,Olympique de Iberia,LD,LI,71,71,27,Valurria,183,D,87,85,73,62,38,69,72,57,,assets/players/football/r_mateoponte.webp
+Juan Sforza,real,Olympique de Iberia,MC,MI,71,71,28,Peronia,180,I,70,74,70,72,64,66,72,70,,assets/players/football/r_juansforza.webp
+Gastón Ávila,real,Olympique de Iberia,DFC,,71,71,29,Valurria,183,I,73,68,72,65,52,72,72,67,,assets/players/football/r_gastonavila.webp
+Ignacio Miramón,real,Olympique de Iberia,MCD,,70,70,27,Valurria,175,D,70,66,74,68,60,68,80,66,,assets/players/football/r_ignaciomiramon.webp
+Thiago Santamaría,real,Olympique de Iberia,LD,LI,70,70,27,Valurria,179,D,77,79,70,66,48,67,73,66,,assets/players/football/r_thiagosantamaria.webp
+Marco Pellegrino,real,Olympique de Iberia,DFC,,70,70,28,Peronia,184,I,66,65,58,53,42,73,74,57,,assets/players/football/r_marcopellegrino.webp
+Marcos Victor,real,Olympique de Iberia,DFC,,70,70,29,Tamago,184,D,69,65,55,46,36,73,78,53,,assets/players/football/r_marcosvictor.webp
+Renzo Orihuela,real,Olympique de Iberia,DFC,,69,69,29,Valurria,183,D,72,71,68,62,41,68,74,64,,assets/players/football/r_renzoorihuela.webp
+Ulises Giménez,real,Olympique de Iberia,DFC,,68,74,24,Peronia,178,D,84,84,69,59,36,64,72,65,,assets/players/football/r_ulisesgimenez.webp
+Mathías De Ritis,real,Olympique de Iberia,LI,,68,68,27,Valurria,183,I,62,66,66,61,47,70,69,58,,assets/players/football/r_mathiasderitis.webp
+Martín Luciano,real,Olympique de Iberia,LI,LD,65,65,27,Valurria,170,I,84,86,72,55,37,62,68,55,,assets/players/football/r_martinluciano.webp
+Wilmer Azevedo,ficticio,ØRK FC,MC,MI,75,78,28,Tamago,166,I,71,75,72,78,70,72,69,78,,assets/players/football/x_ficticiofinalnight603200001.webp
+Marcelo Flores,real,ØRK FC,EI,MI,73,73,27,Kaigam,163,D,80,83,79,69,61,35,62,67,,assets/players/football/r_marceloflores.webp
+Alan Velasco,real,ØRK FC,MI,,73,73,28,Peronia,167,D,74,80,77,71,71,53,66,74,,assets/players/football/r_alanvelasco.webp
+Ragnar Solberg,ficticio,ØRK FC,LI,LD,69,69,29,Overmark,183,I,65,60,66,57,55,74,67,78,,assets/players/football/x_ficticiofinalnight201500001.webp
+Quentin Perrin,ficticio,ØRK FC,MD,,69,69,30,Iberia,185,I,63,74,71,64,59,73,65,78,,assets/players/football/x_ficticiofinalnight203800001.webp
+Vinícius Pasquini,ficticio,ØRK FC,POR,,68,73,22,Valurria,192,D,48,56,50,60,27,72,69,69,,assets/players/football/x_ficticiofinalnight600800001.webp
+Luca Ibáñez,ficticio,ØRK FC,MC,MCD,68,70,26,Grammes,169,D,69,57,67,64,59,65,76,69,,assets/players/football/x_ficticiofinalnight601900001.webp
+Yeison Espinoza,ficticio,ØRK FC,DC,,68,71,27,Peronia,178,I,69,67,59,72,75,44,68,65,,assets/players/football/x_ficticiofinalnight605500001.webp
+Brayan Almeida,ficticio,ØRK FC,ED,EI,67,67,27,Tamago,181,D,65,63,68,65,69,41,59,67,,assets/players/football/x_futboli04800001.webp
+Brayan Oliveira,ficticio,ØRK FC,POR,,66,66,33,Sotoa,199,D,49,45,48,57,39,73,66,64,,assets/players/football/x_futboli14300001.webp
+Liam Pedersen,ficticio,ØRK FC,DFC,,66,66,32,Overmark,192,D,56,69,53,55,43,68,71,73,,assets/players/football/x_futboli08500001.webp
+Jack Nilsen,ficticio,ØRK FC,LI,LD,66,66,29,Overmark,183,D,60,68,54,55,53,72,61,65,,assets/players/football/x_futboli10700001.webp
+Oliver Christiansen,ficticio,ØRK FC,LD,LI,66,66,35,Overmark,184,D,64,72,56,59,52,70,63,63,,assets/players/football/x_futboli06900001.webp
+Thiago Yamada,ficticio,ØRK FC,DC,,66,66,26,Tamago,179,D,68,69,55,63,70,42,59,62,,assets/players/football/x_ficticiofinalnight500900001.webp
+Pieter Aamodt,ficticio,ØRK FC,DFC,,65,65,27,Overmark,185,D,54,59,56,60,55,68,67,70,,assets/players/football/x_ficticiofinalnight302900001.webp
+Facundo Goto,ficticio,ØRK FC,MP,,65,65,35,Tamago,175,D,68,63,65,68,54,64,61,64,,assets/players/football/x_futboli04400001.webp
+Lukas Brekke,ficticio,ØRK FC,DFC,,64,75,20,Overmark,191,D,53,62,56,57,50,64,72,62,,assets/players/football/x_ficticiofinalnight602500001.webp
+Lucas Teixeira,ficticio,ØRK FC,MC,MP,64,70,19,Tamago,174,D,68,67,66,68,54,57,51,64,,assets/players/football/x_ficticiofinalnight600600001.webp
+Adrián Dalen,ficticio,ØRK FC,MCD,MC,63,77,21,Overmark,182,A,52,59,55,67,57,58,65,64,,assets/players/football/x_ficticiofinalnight500100001.webp
+Oliver Jensen,ficticio,ØRK FC,LD,,61,61,29,Overmark,187,D,55,64,58,48,44,65,62,59,,assets/players/football/x_futboli03800001.webp
+Lukas Nogueira,ficticio,ØRK FC,DFC,,61,75,21,Grammes,185,I,59,57,48,56,49,62,61,63,,assets/players/football/x_futboli09400001.webp
+Pablo Næss,ficticio,ØRK FC,MCD,MC,59,73,20,Overmark,178,I,60,57,50,68,49,55,56,57,,assets/players/football/x_ficticiofinalnight609500001.webp
+Maximiliano Nunes,ficticio,ØRK FC,DC,,59,59,34,Tamago,178,D,66,51,56,61,59,44,57,59,,assets/players/football/x_futboli03200001.webp
+Sergio Dahl,ficticio,ØRK FC,DFC,,58,65,19,Overmark,181,D,46,55,51,51,35,64,55,61,,assets/players/football/x_futboli07500001.webp
+Sergio Vidović,ficticio,Real Zenet,LI,,57,60,27,Zenet,186,A,52,53,50,47,47,61,58,57,,assets/players/football/x_futboli12800001.webp
+Yeison Mendoza,ficticio,Real Zenet,MCD,DFC,53,70,21,Tamago,186,I,49,51,46,51,45,47,57,62,,assets/players/football/x_futboli13100001.webp
+Declan Huet,ficticio,Real Zenet,MC,MD,52,57,23,Iberia,180,D,44,55,51,53,43,48,45,53,,assets/players/football/x_futboli05500001.webp
+Brayan Assis,ficticio,Real Zenet,ED,MD,51,51,30,Tamago,174,D,43,53,47,52,58,32,46,50,,assets/players/football/x_futboli17900001.webp
+Malik Benali,ficticio,Real Zenet,POR,,50,50,35,Netanya,196,D,34,40,25,46,25,53,53,46,,assets/players/football/x_futboli16700001.webp
+Caio Mori,ficticio,Real Zenet,MCD,,50,50,30,Tamago,176,D,49,55,43,55,40,37,47,50,,assets/players/football/x_futboli15200001.webp
+Rafa Moreira,ficticio,Real Zenet,MC,MP,50,50,27,Grammes,172,D,56,52,49,58,38,48,45,43,,assets/players/football/x_ficticiofinalnight200600001.webp
+Iker Cabezas,ficticio,Real Zenet,MP,DC,50,51,25,Grammes,179,A,42,53,47,52,42,43,44,54,,assets/players/football/x_ficticiofinalnight204400001.webp
+Marko Delić,ficticio,Real Zenet,DFC,,50,53,27,Zenet,183,D,46,45,34,35,36,54,50,44,,assets/players/placeholder.webp
+Sergio Grgić,ficticio,Real Zenet,DFC,,49,56,24,Zenet,179,D,41,44,31,41,32,50,55,46,,assets/players/football/x_futboli04500001.webp
+Hugo Šarić,ficticio,Real Zenet,DFC,,49,54,23,Zenet,188,I,46,47,42,33,29,51,54,48,,assets/players/football/x_futboli01600001.webp
+Bautista Egea,ficticio,Real Zenet,MI,,49,49,30,Grammes,172,I,48,51,47,52,46,47,49,48,,assets/players/football/x_ficticiofinalnight600400001.webp
+Declan Valente,ficticio,Real Zenet,MD,MC,49,63,21,Grammes,179,D,52,52,43,44,43,41,49,61,,assets/players/football/x_futboli08800001.webp
+Gustavo Bustillo,ficticio,Real Zenet,EI,MI,48,50,27,Grammes,180,D,43,54,48,46,49,26,43,44,,assets/players/football/x_ficticiofinalnight604000001.webp
+Sergio Cerqueira,ficticio,Real Zenet,DC,,48,48,34,Grammes,182,D,46,46,48,42,50,30,55,48,,assets/players/football/x_futboli01100001.webp
+Jalen Cordero,ficticio,Real Zenet,DC,,48,61,20,Peronia,180,D,50,46,45,51,48,28,50,47,,assets/players/football/x_futbolg01400001.webp
+Gabriel Grimaldi,ficticio,Real Zenet,POR,,47,47,27,Sotoa,191,I,38,25,28,37,25,55,46,47,,assets/players/football/x_ficticiofinalnight604400001.webp
+Lautaro Ito,ficticio,Real Zenet,LD,LI,47,49,22,Tamago,188,A,40,52,39,40,30,47,53,47,,assets/players/football/x_futbolg01700001.webp
+Jan Tadić,ficticio,Real Zenet,DFC,,46,63,19,Zenet,189,D,37,40,36,46,26,49,46,46,,assets/players/football/x_ficticiofinalnight608400001.webp
+Bautista Fujita,ficticio,Real Zenet,LD,,45,45,34,Tamago,188,D,48,45,38,33,31,45,51,48,,assets/players/football/x_futboli13600001.webp
+Liam Perić,ficticio,Real Zenet,DFC,,44,51,23,Zenet,184,D,46,44,36,34,31,46,44,44,,assets/players/football/x_futboli18100001.webp
+Neven Matić,ficticio,Real Zenet,LI,LD,44,52,19,Zenet,181,D,42,42,29,29,34,50,40,44,,assets/players/football/x_ficticiofinal00100005.webp
+Igor Camargo,ficticio,Real Zenet,MC,MD,44,51,18,Tamago,177,A,37,45,42,45,45,44,31,50,,assets/players/football/x_ficticiofinalnight202300001.webp
+Agustín Dinas,ficticio,Real Zenet,DC,,44,47,25,Valurria,185,D,38,39,43,34,49,25,37,45,,assets/players/football/x_ficticiofinalnight203400001.webp
+Florian Wirtz,real,Red Gull Club Tellin,MP,,83,83,27,Margin,177,D,74,74,87,86,76,52,64,85,,assets/players/football/r_florianwirtz.webp
+Rayan Cherki,real,Red Gull Club Tellin,ED,,83,83,27,Iberia,177,I,76,78,93,83,82,39,64,84,,assets/players/football/r_rayancherki.webp
+Rafael Leão,real,Red Gull Club Tellin,EI,MI,83,83,31,Grammes,188,D,89,88,83,78,78,25,75,79,,assets/players/football/r_rafaelleao.webp
+Emeka Alaoui,ficticio,Red Gull Club Tellin,DC,,82,96,21,Sahar,175,D,82,76,81,84,85,65,79,80,,assets/players/football/x_futboli16200001.webp
+Kevin Lomónaco,real,Red Gull Club Tellin,DFC,,80,80,28,Valurria,192,D,78,78,77,77,56,80,82,80,,assets/players/football/r_kevinlomonaco.webp
+Joaquín Panichelli,real,Red Gull Club Tellin,DC,,80,80,28,Peronia,190,D,77,72,77,73,86,28,91,80,,assets/players/football/r_panichelli.webp
+Marco Walsh,ficticio,Red Gull Club Tellin,LI,LD,80,80,32,Estovackia,183,I,76,76,73,75,62,82,81,80,,assets/players/football/x_futboli17200001.webp
+Finn Dalton,ficticio,Red Gull Club Tellin,MCD,MC,80,81,25,Kaigam,180,I,78,80,80,87,75,73,76,72,,assets/players/football/x_ficticiofinalnight501400001.webp
+Marco Di Cesare,real,Red Gull Club Tellin,DFC,,79,79,28,Peronia,186,D,70,65,60,60,38,80,90,63,,assets/players/football/r_marcodicesare.webp
+Álvaro Montoro,real,Red Gull Club Tellin,MI,MD,78,86,23,Peronia,170,D,83,87,87,80,65,36,59,75,,assets/players/football/r_alvaromontoro.webp
+Lautaro Rivero,real,Red Gull Club Tellin,DFC,,78,78,27,Valurria,185,I,78,73,70,71,59,76,84,75,,assets/players/football/r_lautarorivero.webp
+Youssef Lavi,ficticio,Red Gull Club Tellin,MC,MCD,78,78,26,Netanya,178,I,82,79,73,78,69,73,82,79,,assets/players/football/x_ficticiofinalnight606700001.webp
+Juan Cruz Meza,real,Red Gull Club Tellin,MC,,77,87,22,Peronia,183,D,76,75,78,77,70,72,80,75,,assets/players/football/r_juancruzmeza.webp
+Minjun Park,ficticio,Red Gull Club Tellin,POR,,77,83,24,Tamago,190,D,63,61,55,76,43,81,73,83,,assets/players/football/x_futbolg01500001.webp
+Patrik Mercado,real,Red Gull Club Tellin,MC,MCD,76,76,27,Sotoa,175,D,76,78,78,79,68,67,66,73,,assets/players/football/r_patrikmercado.webp
+Ezequiel Gómez,ficticio,Red Gull Club Tellin,POR,,76,78,22,Tamago,198,D,62,59,47,61,48,74,83,82,,assets/players/football/x_futbolg00400001.webp
+Callum Valach,ficticio,Red Gull Club Tellin,LI,LD,75,75,33,Estovackia,185,I,72,79,67,68,53,79,71,79,,assets/players/football/x_futboli13300001.webp
+Luca Tamm,ficticio,Red Gull Club Tellin,LD,LI,75,78,27,Estovackia,190,D,68,77,65,73,58,73,82,75,,assets/players/football/x_futboli16300001.webp
+Ibrahim Sasson,ficticio,Red Gull Club Tellin,DC,,74,75,34,Netanya,181,A,72,77,72,68,77,55,71,70,,assets/players/football/x_futboli12500001.webp
+Driss Lamrani,ficticio,Red Gull Club Tellin,MD,MI,72,81,18,Sahar,181,D,76,71,68,76,62,75,62,74,,assets/players/football/x_ficticiofinalnight202900001.webp
+Marek Parn,ficticio,Red Gull Club Tellin,LD,LI,71,79,18,Estovackia,185,D,58,72,59,64,58,75,73,64,,assets/players/football/x_ficticiofinalnight204600001.webp
+Youssef Lahlou,ficticio,Red Gull Club Tellin,MCD,,68,84,18,Sahar,172,D,65,65,68,68,62,61,65,70,,assets/players/football/x_futbolh01100001.webp
+Gabriel Coelho,ficticio,Red Gull Club Tellin,DFC,,65,78,21,Tamago,190,D,49,61,64,56,52,68,72,61,,assets/players/football/x_futboli08300001.webp
+Pieter Müller,ficticio,Red Gull Club Tellin,DFC,,59,77,19,Estovackia,186,D,51,52,51,55,44,61,60,55,,assets/players/football/x_ficticiofinalvartest00200001.webp
+Yerlin Quiñónez,real,Sköte FC,MI,EI,67,67,29,Sotoa,177,D,82,81,72,63,64,34,70,67,,assets/players/football/r_yerlinquinonez.webp
+Lautaro Gutiérrez,real,Sköte FC,MP,,66,72,24,Valurria,185,D,70,64,64,69,62,45,65,65,,assets/players/football/r_lautarogutierrez.webp
+Bautista Brandão,ficticio,Sköte FC,DC,,64,71,22,Tamago,181,D,66,57,65,72,63,49,62,54,,assets/players/football/x_futboli11100001.webp
+Amadou Camara,ficticio,Sköte FC,DFC,,56,57,31,Skote,177,A,47,54,49,51,37,64,49,52,,assets/players/football/x_futboli14100001.webp
+Emiliano Araújo,ficticio,Sköte FC,MC,MCD,56,57,27,Tamago,177,D,54,62,57,61,49,49,51,51,,assets/players/football/x_ficticiofinalnight606200001.webp
+Brandon Gouveia,ficticio,Sköte FC,EI,ED,55,58,26,Grammes,176,D,53,53,48,53,62,29,54,56,,assets/players/football/x_futboli17300001.webp
+Matteo Cordón,ficticio,Sköte FC,MC,MP,54,61,22,Grammes,171,I,51,58,54,59,45,53,48,48,,assets/players/football/x_ficticiofinalnight609100001.webp
+Omar Molefe,ficticio,Sköte FC,DFC,,53,70,21,Skote,186,A,44,50,41,49,45,53,59,53,,assets/players/football/x_ficticiofinalnight604700001.webp
+Hugo Servais,ficticio,Sköte FC,DC,,53,69,21,Iberia,179,D,46,48,53,49,60,35,51,51,,assets/players/football/x_ficticiofinalnight302400001.webp
+Darius Foster,ficticio,Sköte FC,POR,,51,52,25,Peronia,189,D,35,35,25,50,25,56,51,52,,assets/players/football/x_futbolh00400001.webp
+Sami Ferreira,ficticio,Sköte FC,LI,,51,51,29,Skote,182,D,48,56,41,41,30,55,50,42,,assets/players/football/x_futboli09900001.webp
+Innocent Steyn,ficticio,Sköte FC,LI,LD,51,51,28,Skote,185,D,51,55,40,48,25,52,50,55,,assets/players/football/x_ficticiofinalnight201800001.webp
+Sami Zulu,ficticio,Sköte FC,MCD,,51,52,27,Skote,184,D,45,53,46,54,44,54,54,51,,assets/players/football/x_futbolg00700001.webp
+Lucas Gomes,ficticio,Sköte FC,ED,EI,51,64,21,Tamago,180,D,48,53,50,53,54,32,43,55,,assets/players/football/x_ficticiofinalnight301100001.webp
+Youssef Osei,ficticio,Sköte FC,DFC,,50,52,27,Skote,185,D,47,50,45,45,34,50,53,48,,assets/players/football/x_futbolh00500001.webp
+Brayan Sosa,ficticio,Sköte FC,POR,,48,55,24,Sotoa,188,I,29,36,30,39,25,52,47,47,,assets/players/football/x_futboli07800001.webp
+Amadou Khalil,ficticio,Sköte FC,DFC,,48,65,21,Skote,191,D,34,48,42,33,32,57,44,49,,assets/players/football/x_futboli17800001.webp
+Jonas Larrañaga,ficticio,Sköte FC,DC,,48,48,26,Grammes,179,A,45,41,45,50,54,25,45,46,,assets/players/football/x_futboli01700001.webp
+Pieter Mahlangu,ficticio,Sköte FC,LD,LI,44,50,20,Skote,188,I,39,47,36,33,30,47,46,47,,assets/players/football/x_ficticiofinalnight205100001.webp
+Tariq Haddad,ficticio,Sköte FC,LD,,44,62,17,Skote,183,A,43,50,31,37,25,45,47,39,,assets/players/football/x_futboli00000001.webp
+Youssef Khumalo,ficticio,Sköte FC,MCD,MC,44,59,18,Skote,179,D,37,43,40,46,41,42,38,47,,assets/players/football/x_futboli07300001.webp
+Marcus Ocaña,ficticio,Sköte FC,MC,,44,44,34,Grammes,169,D,39,44,44,49,45,41,34,43,,assets/players/football/x_futboli08900001.webp
+Hugo Mateos,ficticio,Sköte FC,MD,,44,50,18,Grammes,178,I,49,50,49,43,38,40,39,45,,assets/players/football/x_ficticiofinalnight607200001.webp
+Enzo Roux,ficticio,Sköte FC,DFC,,44,55,18,Iberia,177,D,42,38,27,34,35,50,36,36,,assets/players/football/x_ficticiofinalvartest00700001.webp
+Bukayo Saka,real,Sporting Lake Baikal,ED,,82,82,29,Kaigam,178,I,77,79,87,81,82,56,70,81,,assets/players/football/r_bukayosaka.webp
+Thiago Almada,real,Sporting Lake Baikal,MP,DC,81,81,29,Valurria,171,D,79,85,88,83,79,58,61,82,,assets/players/football/r_almada.webp
+Bruninho,real,Sporting Lake Baikal,ED,EI,81,91,22,Tamago,175,I,98,98,76,68,68,32,58,65,,assets/players/football/r_bruninho.webp
+Kendry Páez,real,Sporting Lake Baikal,MP,MC,78,85,23,Sotoa,178,I,83,80,86,77,73,50,65,76,,assets/players/football/r_kendrypaez.webp
+Cristian Medina,real,Sporting Lake Baikal,MC,MCD,78,78,28,Valurria,178,D,76,77,82,77,64,72,74,76,,assets/players/football/r_cristianmedina.webp
+Kevin Zenón,real,Sporting Lake Baikal,MI,,77,77,29,Peronia,181,I,78,79,82,77,71,65,72,73,,assets/players/football/r_kevinzenon.webp
+Santiago Montiel,real,Sporting Lake Baikal,MD,,77,77,30,Peronia,166,I,80,83,83,75,74,71,74,77,,assets/players/football/r_santiagomontiel.webp
+Yuri Alberto,real,Sporting Lake Baikal,DC,,77,77,29,Tamago,180,D,71,76,80,72,79,57,70,76,real,assets/players/football/r_yurialberto.webp
+Matías Galarza,real,Sporting Lake Baikal,MCD,MC,76,76,28,Valurria,180,D,67,67,80,74,59,72,74,74,,assets/players/football/r_matiasgalarza.webp
+Jano Gordon,real,Sporting Lake Baikal,LD,,75,77,26,Peronia,183,D,81,78,67,70,41,73,78,67,,assets/players/football/r_janogordon.webp
+Lautaro Vargas,real,Sporting Lake Baikal,LD,LI,75,79,25,Peronia,173,D,89,88,76,65,48,71,80,60,,assets/players/football/r_lautarovargas.webp
+Luca Ivanchenko,ficticio,Sporting Lake Baikal,DFC,,73,80,24,Baikal,188,D,66,67,59,63,54,72,82,70,,assets/players/football/x_ficticiofinalnight300100001.webp
+Hugo Kiselev,ficticio,Sporting Lake Baikal,DFC,,73,73,34,Baikal,189,D,63,70,66,65,57,76,75,75,,assets/players/football/x_futboli07100001.webp
+Omar Rahmani,ficticio,Sporting Lake Baikal,MCD,DFC,72,79,22,Sahar,172,A,59,68,77,67,73,67,63,77,,assets/players/football/x_ficticiofinalnight301600001.webp
+Omar Carmi,ficticio,Sporting Lake Baikal,DC,,72,74,22,Netanya,177,D,66,71,67,72,79,46,66,69,,assets/players/football/x_ficticiofinalnight303300001.webp
+Vasili Lazarev,ficticio,Sporting Lake Baikal,DFC,,70,71,28,Baikal,180,D,65,61,60,61,52,73,73,67,,assets/players/football/x_ficticiofinalnight204500001.webp
+Boris Tsereteli,ficticio,Sporting Lake Baikal,LI,,70,70,28,Baikal,184,D,69,73,56,59,57,72,71,69,,assets/players/football/x_ficticiofinalnight204000001.webp
+Liam Strand,ficticio,Sporting Lake Baikal,LI,LD,70,71,26,Overmark,179,A,61,65,61,65,53,73,72,71,,assets/players/football/x_ficticiofinalnight300200001.webp
+Bruno Ishikawa,ficticio,Sporting Lake Baikal,DFC,,70,70,32,Tamago,181,D,59,69,57,50,53,75,76,65,,assets/players/football/x_futboli12100001.webp
+Liam Ingram,ficticio,Sporting Lake Baikal,POR,,69,76,21,Kaigam,189,I,52,61,48,61,37,73,65,71,,assets/players/football/x_ficticiofinalnight205400001.webp
+Pavel Gusev,ficticio,Sporting Lake Baikal,DFC,,69,75,21,Baikal,178,D,74,66,64,55,50,71,70,70,,assets/players/football/x_ficticiofinalnight202100001.webp
+Youssef Tazi,ficticio,Sporting Lake Baikal,DC,,65,75,20,Sahar,187,D,58,64,67,66,69,45,65,60,,assets/players/football/x_futboli12900001.webp
+Kwame Dayan,ficticio,Sporting Lake Baikal,MC,,64,73,17,Netanya,176,D,62,65,65,63,61,56,63,66,,assets/players/football/x_futboli02100001.webp
+Matteo Navarro,ficticio,Sporting Lake Baikal,POR,,63,80,19,Grammes,184,D,55,52,48,48,25,69,64,60,,assets/players/football/x_futboli10000001.webp
+Gonzalo Zelarayán,real,Sporting Magayanes,MP,,61,63,26,Valurria,179,I,69,68,68,60,58,33,59,58,,assets/players/football/r_gonzalozelarayan.webp
+Natanael Guzmán,real,Sporting Magayanes,MI,,60,60,31,Valurria,171,D,72,73,62,63,49,42,44,60,,assets/players/football/r_natanael.webp
+Felipe Villagra,ficticio,Sporting Magayanes,MC,MP,59,73,21,Magayanes,187,D,57,50,58,64,59,54,48,59,,assets/players/football/x_ficticiofinalnight601200001.webp
+Walter Choque,ficticio,Sporting Magayanes,DFC,,58,60,23,Magayanes,196,D,46,60,45,52,37,64,54,60,,assets/players/football/x_ficticiofinalnight201200001.webp
+Jack Pinto,ficticio,Sporting Magayanes,EI,,56,64,21,Grammes,184,D,56,56,56,53,56,34,55,53,,assets/players/football/x_futboli00900001.webp
+Andrés Bedoya,ficticio,Sporting Magayanes,LD,LI,55,58,25,Magayanes,175,I,44,51,41,43,36,59,58,52,,assets/players/football/x_ficticiofinalnight606900001.webp
+Brayan Mendieta,ficticio,Sporting Magayanes,MC,MP,55,63,23,Magayanes,179,D,55,51,54,58,52,49,60,48,,assets/players/football/x_futboli15600001.webp
+Tomás Martínez,ficticio,Sporting Magayanes,MD,,55,55,27,Grammes,185,D,53,55,47,57,47,50,59,58,,assets/players/football/x_ficticiofinalvartest00000001.webp
+Matheus Nascimento,ficticio,Sporting Magayanes,DFC,,55,55,29,Tamago,171,D,50,54,52,46,33,58,56,55,,assets/players/football/x_ficticiofinalnight205000001.webp
+Sergio Lambert,ficticio,Sporting Magayanes,POR,,54,54,29,Iberia,190,D,42,38,25,45,27,58,53,58,,assets/players/football/x_futboli09700001.webp
+Jan Marchand,ficticio,Sporting Magayanes,DC,,54,61,24,Iberia,187,D,47,52,54,49,60,31,56,50,,assets/players/football/x_futboli11400001.webp
+Claudio Ponce,ficticio,Sporting Magayanes,DC,,54,61,22,Peronia,180,D,50,56,49,47,59,25,49,46,,assets/players/football/x_ficticiofinalnight202500001.webp
+Facundo Escalante,ficticio,Sporting Magayanes,DFC,,53,53,28,Magayanes,183,D,48,45,42,42,38,56,54,52,,assets/players/football/x_ficticiofinalnight201400001.webp
+Thiago Rojas,ficticio,Sporting Magayanes,DFC,,51,51,31,Magayanes,190,D,44,55,42,35,38,55,53,50,,assets/players/football/x_futboli18400001.webp
+Bruno Yupanqui,ficticio,Sporting Magayanes,MCD,,50,56,22,Magayanes,168,D,39,51,53,54,50,44,38,47,,assets/players/football/x_ficticiofinalnight201000001.webp
+Rodrigo Fariña,ficticio,Sporting Magayanes,LI,LD,48,60,19,Magayanes,180,D,41,47,43,40,33,50,51,48,,assets/players/football/x_futboli08000001.webp
+Vinícius Robledo,ficticio,Sporting Magayanes,MCD,DFC,48,51,25,Magayanes,176,D,38,48,48,52,37,42,42,46,,assets/players/football/x_futboli09200001.webp
+Andrés Fretes,ficticio,Sporting Magayanes,ED,MD,48,52,22,Peronia,172,D,48,45,46,47,51,30,46,38,,assets/players/football/x_futbolg00800001.webp
+Walter Salazar,ficticio,Sporting Magayanes,DFC,,46,47,27,Magayanes,181,D,38,43,42,38,25,51,46,50,,assets/players/football/x_ficticiofinalnight204700001.webp
+Agustín Cortez,ficticio,Sporting Magayanes,LD,,46,46,30,Magayanes,187,D,47,47,42,37,31,47,47,41,,assets/players/football/x_ficticiofinalnight606600001.webp
+Wilmer Altamirano,ficticio,Sporting Magayanes,MC,,45,56,19,Magayanes,168,D,46,47,42,48,39,40,45,44,,assets/players/football/x_futboli11800001.webp
+Declan Oakley,ficticio,Sporting Magayanes,POR,,44,44,35,Kaigam,186,D,35,29,25,36,25,45,46,49,,assets/players/football/x_futboli06400001.webp
+Julián Delgado,ficticio,Sporting Magayanes,LI,,44,51,18,Magayanes,180,D,44,44,33,41,25,44,47,45,,assets/players/football/x_ficticiofinalnight608800001.webp
+Joaquín Toledo,ficticio,Sporting Magayanes,DC,,44,62,18,Tamago,171,D,41,44,40,33,49,25,48,44,,assets/players/football/x_ficticiofinalnight601400001.webp
+Bruno Juárez,ficticio,Sporting Santa María de Trinidad,DFC,,61,68,24,Sotoa,188,D,58,57,54,53,42,63,64,53,,assets/players/football/x_futbolg01100001.webp
+Lautaro Balcázar,ficticio,Sporting Santa María de Trinidad,LI,LD,56,61,24,Sotoa,185,I,51,56,40,39,39,61,55,63,,assets/players/football/x_ficticiofinalnight00100001.webp
+Maximiliano Sáenz,ficticio,Sporting Santa María de Trinidad,MC,MP,50,57,22,Sotoa,170,D,51,51,49,54,42,50,44,48,,assets/players/football/x_ficticiofinalnight606400001.webp
+Oliver Jacquet,ficticio,Sporting Santa María de Trinidad,MI,,50,50,26,Iberia,167,D,57,52,46,55,42,49,45,49,,assets/players/football/x_futboli12300001.webp
+Jonas Picard,ficticio,Sporting Santa María de Trinidad,MD,MC,50,50,29,Iberia,176,I,52,49,41,56,54,50,48,52,,assets/players/football/x_futboli02500001.webp
+Camilo Prado,ficticio,Sporting Santa María de Trinidad,DC,,50,50,30,Tamago,193,D,54,46,41,44,54,29,41,49,,assets/players/football/x_futbolh01400001.webp
+Santiago Carrizo,ficticio,Sporting Santa María de Trinidad,DC,,50,56,22,Valurria,180,D,48,49,48,51,54,25,44,49,,assets/players/football/x_ficticiofinalnight604800001.webp
+Agustín Lima,ficticio,Sporting Santa María de Trinidad,POR,,49,50,27,Peronia,191,D,35,30,33,40,25,52,50,53,,assets/players/football/x_ficticiofinalnight302700001.webp
+Luca Fontaine,ficticio,Sporting Santa María de Trinidad,EI,MI,49,55,22,Iberia,178,D,45,50,47,53,52,30,46,46,,assets/players/football/x_ficticiofinalnight609800001.webp
+Devin Antezana,ficticio,Sporting Santa María de Trinidad,LD,LI,48,51,27,Sotoa,188,I,50,53,36,45,43,47,49,48,,assets/players/football/x_futbolh00900001.webp
+Gabriel Pellegrini,ficticio,Sporting Santa María de Trinidad,MC,,48,55,17,Sotoa,177,D,40,46,42,50,42,49,46,50,,assets/players/football/x_futboli03300001.webp
+Bruno Ramírez,ficticio,Sporting Santa María de Trinidad,MP,,48,49,28,Peronia,169,D,41,44,43,52,33,43,48,49,,assets/players/football/x_futboli17600001.webp
+Hernán Ortiz,ficticio,Sporting Santa María de Trinidad,LI,LD,47,65,20,Sotoa,184,A,45,45,43,36,39,54,39,40,,assets/players/football/x_ficticiofinalnight204100001.webp
+Caio Villarreal,ficticio,Sporting Santa María de Trinidad,DFC,,46,63,21,Sotoa,181,I,37,40,40,39,34,50,47,49,,assets/players/football/x_ficticiofinalnight600200001.webp
+Maximiliano Molina,ficticio,Sporting Santa María de Trinidad,MCD,,46,46,27,Sotoa,183,D,43,43,41,53,47,49,43,43,,assets/players/football/x_ficticiofinalnight600100001.webp
+Malik Restrepo,ficticio,Sporting Santa María de Trinidad,ED,MD,46,62,17,Peronia,167,D,45,46,43,44,50,25,42,47,,assets/players/football/x_futboli02300001.webp
+Vitor Bezerra,ficticio,Sporting Santa María de Trinidad,POR,,44,57,19,Tamago,193,I,34,26,26,41,25,47,46,45,,assets/players/football/x_ficticiofinalnight203700001.webp
+Joaquín Sinisterra,ficticio,Sporting Santa María de Trinidad,DFC,,44,57,17,Sotoa,181,I,39,37,34,36,32,44,50,47,,assets/players/football/x_futboli11300001.webp
+Nicolás Jara,ficticio,Sporting Santa María de Trinidad,DFC,,44,55,19,Sotoa,183,D,38,46,36,37,29,46,46,44,,assets/players/football/x_ficticiofinalnight500700001.webp
+Ezequiel Murillo,ficticio,Sporting Santa María de Trinidad,LD,LI,44,58,19,Sotoa,186,D,34,43,31,32,28,48,48,43,,assets/players/football/x_ficticiofinalnight606300001.webp
+Emiliano Bazán,ficticio,Sporting Santa María de Trinidad,MCD,DFC,44,58,18,Sotoa,186,D,45,41,42,47,43,45,36,46,,assets/players/football/x_futboli18300001.webp
+Marcelo Gallo,ficticio,Sporting Santa María de Trinidad,MC,MCD,44,51,22,Sotoa,175,D,35,43,43,44,38,40,40,49,,assets/players/football/x_ficticiofinalnight202000001.webp
+Diego Aguilera,ficticio,Sporting Santa María de Trinidad,DC,,44,52,19,Sotoa,184,D,45,39,37,38,50,25,46,45,,assets/players/placeholder.webp
+Santiago Loyola,ficticio,Sporting Santa María de Trinidad,DFC,,44,46,23,Sotoa,177,D,44,38,30,37,33,45,45,44,,assets/players/placeholder.webp
+Amadeus Wolfdagan,especial,Sportivo Calcio di Kaigam,DC,EI/ED,88,88,25,Kaigam,184,D,95,95,82,72,84,35,84,80,El jugador más rápido del mundo · delantero centro,assets/players/football/r_wolfdagan.webp
+Facundo Colidio,real,Sportivo Calcio di Kaigam,ED,,72,72,30,Peronia,175,D,67,71,76,76,74,54,63,64,real,assets/players/football/r_facundocolidio.webp
+Matko Miljević,real,Sportivo Calcio di Kaigam,MP,,71,71,29,Magayanes,175,D,63,64,75,72,66,54,61,69,,assets/players/football/r_matkomiljevic.webp
+Juan Manuel Gutiérrez,real,Sportivo Calcio di Kaigam,MI,EI,71,71,28,Valurria,173,D,86,88,82,68,71,37,68,67,,assets/players/football/r_juanmanuelgutierrez.webp
+Alcides Benítez,real,Sportivo Calcio di Kaigam,LD,LI,71,71,28,Morvicia,168,D,96,90,79,61,45,70,65,56,,assets/players/football/r_alcidesbenitez.webp
+Gabriel Villamíl,real,Sportivo Calcio di Kaigam,MC,MD,70,70,29,Sotoa,183,D,70,71,71,71,70,60,62,70,,assets/players/football/r_gabrielvillamil.webp
+Facundo Di Biasi,real,Sportivo Calcio di Kaigam,MCD,MC,70,74,25,Valurria,175,D,80,76,71,69,53,64,84,64,,assets/players/football/r_facundodibiasi.webp
+Gabriel Aguayo,real,Sportivo Calcio di Kaigam,MD,ED,70,74,25,Morvicia,169,D,88,88,80,69,64,41,66,63,,assets/players/football/r_gabrielaguayo.webp
+Juan Santos,real,Sportivo Calcio di Kaigam,EI,,70,70,27,Valurria,174,I,76,80,70,60,63,34,68,58,,assets/players/football/r_juancruzdelossantos.webp
+Rodrigo Auzmendi,real,Sportivo Calcio di Kaigam,DC,,70,70,29,Peronia,191,D,74,69,70,62,68,48,71,67,,assets/players/football/r_rodrigoauzmendi.webp
+Franco Nicola,real,Sportivo Calcio di Kaigam,MI,MC,69,69,28,Valurria,178,I,83,78,74,69,66,44,63,66,,assets/players/football/r_franconicola.webp
+José Cavadía,real,Sportivo Calcio di Kaigam,MC,MP,69,73,25,Magayanes,175,D,76,80,72,70,60,54,64,67,,assets/players/football/r_josecavadia.webp
+Gino Santilli,real,Sportivo Calcio di Kaigam,POR,,67,67,29,Peronia,191,D,25,33,42,60,32,72,72,70,,assets/players/football/r_ginosantilli.webp
+José Espínola,real,Sportivo Calcio di Kaigam,MCD,,67,67,29,Morvicia,172,D,74,73,69,63,53,71,80,64,,assets/players/football/r_joseespinola.webp
+Joaquín Blázquez,real,Sportivo Calcio di Kaigam,POR,,65,65,29,Valurria,193,D,25,30,42,60,32,69,74,69,,assets/players/football/r_joaquinblazquez.webp
+Sergio Kerr,ficticio,Sportivo Calcio di Kaigam,LI,,61,61,30,Kaigam,189,D,58,68,60,54,46,63,61,65,,assets/players/football/x_ficticiofinalnight300000001.webp
+Jack Turner,ficticio,Sportivo Calcio di Kaigam,DFC,,57,64,24,Kaigam,187,D,51,53,44,44,46,61,57,53,,assets/players/football/x_ficticiofinalnight300900001.webp
+Preston Barnes,ficticio,Sportivo Calcio di Kaigam,DFC,,55,55,30,Kaigam,178,D,45,52,44,48,30,56,60,60,,assets/players/football/x_ficticiofinalnight204800001.webp
+Jack Langley,ficticio,Sportivo Calcio di Kaigam,LI,,54,54,30,Kaigam,183,D,49,48,42,50,34,56,56,52,,assets/players/football/x_futbolg00900001.webp
+Luca Nolan,ficticio,Sportivo Calcio di Kaigam,DFC,,53,59,23,Kaigam,169,D,49,49,40,47,34,56,51,53,,assets/players/football/x_ficticiofinalnight301500001.webp
+Jan Bagshaw,ficticio,Sportivo Calcio di Kaigam,DFC,,53,53,28,Kaigam,180,D,30,46,40,40,29,63,51,56,,assets/players/football/x_ficticiofinalnight303400001.webp
+Finn Kirkland,ficticio,Sportivo Calcio di Kaigam,DC,,52,52,26,Kaigam,178,D,49,55,55,42,50,33,48,50,,assets/players/football/x_futbolg00000001.webp
+Matteo Jennings,ficticio,Sportivo Calcio di Kaigam,LD,LI,51,56,22,Kaigam,185,D,54,49,39,47,34,49,55,50,,assets/players/football/x_ficticiofinalv3test00000001.webp
+Adrián Whitaker,ficticio,Sportivo Calcio di Kaigam,DFC,,44,56,20,Kaigam,189,D,30,37,39,26,32,55,38,45,,assets/players/football/x_futboli11600001.webp
+Valentín Carboni,real,Sporty VV Klub Estovackia,MP,MC,79,83,25,Peronia,185,I,80,78,81,80,77,52,72,78,,assets/players/football/r_valentincarboni.webp
+Maxloren Castro,real,Sporty VV Klub Estovackia,EI,MI,77,85,23,Sotoa,168,I,88,88,83,67,63,50,63,69,,assets/players/football/r_maxlorencastro.webp
+Leandro Brey,real,Sporty VV Klub Estovackia,POR,,76,76,28,Peronia,193,D,30,41,48,63,38,81,81,80,,assets/players/football/r_leandrobrey.webp
+Matteo Ruiz,ficticio,Sporty VV Klub Estovackia,POR,,76,94,18,Iberia,197,D,62,65,50,73,37,74,79,82,,assets/players/football/x_ficticiofinalnight300700001.webp
+Jamie Ainsley,ficticio,Sporty VV Klub Estovackia,MC,MP,76,76,26,Kaigam,185,D,69,72,83,74,70,73,76,72,,assets/players/football/x_ficticiofinalnight204300001.webp
+Malik El Fassi,ficticio,Sporty VV Klub Estovackia,MD,,76,79,27,Sahar,175,D,77,77,74,79,65,69,72,77,,assets/players/football/x_futbolh01500001.webp
+Lucas Beltrán,real,Sporty VV Klub Estovackia,DC,,75,75,29,Valurria,174,D,69,73,78,74,77,44,75,76,,assets/players/football/r_lucasbeltran.webp
+Arthur Chaves,real,Sporty VV Klub Estovackia,DFC,,75,75,29,Tamago,188,D,82,77,58,54,36,76,79,58,,assets/players/football/r_arthurchaves.webp
+Matías Abaldo,real,Sporty VV Klub Estovackia,MI,EI,75,77,26,Valurria,172,D,84,90,82,76,71,47,60,75,,assets/players/football/r_matiasabaldo.webp
+Aarón Anselmino,real,Sporty VV Klub Estovackia,DFC,,75,79,25,Peronia,186,D,78,74,67,68,52,77,74,70,,assets/players/football/r_aronanselmino.webp
+Matteo Bartos,ficticio,Sporty VV Klub Estovackia,LI,LD,75,81,24,Estovackia,184,I,73,76,65,62,56,82,68,81,,assets/players/football/x_futboli02000001.webp
+Lukas Grønvold,ficticio,Sporty VV Klub Estovackia,MC,,75,78,27,Overmark,181,D,68,74,76,74,66,66,74,77,,assets/players/football/x_futboli08400001.webp
+Cristian Olivera,real,Sporty VV Klub Estovackia,ED,MD,74,74,28,Valurria,175,D,84,85,76,63,63,37,65,61,,assets/players/football/r_cristianolivera.webp
+Tomás Palacios,real,Sporty VV Klub Estovackia,DFC,,74,74,27,Valurria,196,I,73,72,59,59,44,77,75,63,,assets/players/football/r_tomaspalacios.webp
+Alejo Veliz,real,Sporty VV Klub Estovackia,DC,,74,74,27,Peronia,186,D,76,74,71,60,74,27,78,64,,assets/players/football/r_alejoveliz.webp
+Sergio Saar,ficticio,Sporty VV Klub Estovackia,MCD,MC,74,74,26,Estovackia,176,A,71,72,72,77,70,66,66,74,,assets/players/football/x_futbolg00300001.webp
+Kwame Ohana,ficticio,Sporty VV Klub Estovackia,MC,,73,73,29,Netanya,177,D,66,77,68,78,70,66,66,73,,assets/players/football/x_futboli06800001.webp
+Pieter Sedlak,ficticio,Sporty VV Klub Estovackia,LD,LI,71,71,35,Estovackia,186,D,62,68,63,59,59,78,69,76,,assets/players/football/x_futboli09500001.webp
+Hugo Weber,ficticio,Sporty VV Klub Estovackia,DFC,,70,74,22,Iberia,186,D,62,69,55,59,56,72,75,69,,assets/players/football/x_ficticiofinalnight200800001.webp
+Jack Ellingsen,ficticio,Sporty VV Klub Estovackia,DC,,68,71,24,Overmark,173,D,68,66,64,62,70,55,65,66,,assets/players/football/x_ficticiofinalnight601600001.webp
+Callum Schneider,ficticio,Sporty VV Klub Estovackia,LD,LI,66,69,23,Estovackia,177,I,56,63,51,56,47,70,70,68,,assets/players/football/x_futbolg00200001.webp
+Luca Rossi,ficticio,Sporty VV Klub Estovackia,LI,,65,65,28,Estovackia,183,D,63,65,61,57,52,66,68,62,,assets/players/football/x_ficticiofinalnight601000001.webp
+Jan Bianchi,ficticio,Sporty VV Klub Estovackia,DFC,,63,71,20,Estovackia,193,D,59,65,50,48,49,65,70,65,,assets/players/football/x_ficticiofinalv2test00500001.webp
+Minjun Sharma,ficticio,Sporty VV Klub Estovackia,MCD,,57,69,18,Tamago,174,D,58,60,61,58,55,59,49,57,,assets/players/football/x_futboli07400001.webp
+Nico Paz,real,Sporty VV Klub Kostanay,MP,MC,88,90,26,Peronia,186,I,88,90,92,89,87,64,82,87,,assets/players/football/r_nicopaz.webp
+Enzo Fernández,real,Sporty VV Klub Kostanay,MC,MCD,87,87,29,Peronia,178,D,70,69,84,90,81,78,79,89,,assets/players/football/r_enzofernandez.webp
+João Neves,real,Sporty VV Klub Kostanay,MC,,85,87,26,Grammes,174,D,68,70,85,85,72,83,83,85,,assets/players/football/r_joaoneves.webp
+Michael Olise,real,Sporty VV Klub Kostanay,MD,,85,85,29,Iberia,180,I,76,78,88,88,77,44,66,88,,assets/players/football/r_michaelolise.webp
+Valentín Barco,real,Sporty VV Klub Kostanay,MC,MD,85,87,26,Peronia,170,I,83,84,88,89,58,80,69,85,,assets/players/football/r_barco.webp
+Willian Pacho,real,Sporty VV Klub Kostanay,DFC,,84,84,29,Sotoa,188,I,80,71,62,66,30,90,85,73,,assets/players/football/r_willianpacho.webp
+Gabriel Martinelli,real,Sporty VV Klub Kostanay,ED,,84,84,29,Tamago,178,D,87,89,84,78,79,44,73,79,,assets/players/football/r_martinelli.webp
+Rodrygo,real,Sporty VV Klub Kostanay,EI,,83,83,29,Tamago,174,D,85,86,87,80,77,29,68,82,,assets/players/football/r_rodrygo.webp
+Loïs Openda,real,Sporty VV Klub Kostanay,DC,,82,82,30,Margin,175,D,90,90,78,69,76,25,76,71,,assets/players/football/r_openda.webp
+Agustín Giay,real,Sporty VV Klub Kostanay,LD,LI,82,83,26,Peronia,175,D,80,74,74,68,65,83,87,80,real,assets/players/football/r_agustingiay.webp
+Sora Batista,ficticio,Sporty VV Klub Kostanay,POR,,82,88,22,Tamago,188,A,66,66,65,76,55,83,80,89,,assets/players/football/x_ficticiofinalnight204900001.webp
+Máximo Perrone,real,Sporty VV Klub Kostanay,MCD,,81,81,27,Valurria,177,I,75,75,84,83,62,83,70,82,,assets/players/football/r_perrone.webp
+Jun Nguyen,ficticio,Sporty VV Klub Kostanay,MI,EI,78,80,25,Kostanay,176,D,78,76,78,82,70,73,69,77,,assets/players/football/x_ficticiofinalv2test00400001.webp
+Ruslan Tulegenov,ficticio,Sporty VV Klub Kostanay,LI,LD,75,92,21,Kostanay,184,D,74,77,62,71,61,76,74,70,,assets/players/football/x_ficticiofinalnight200400001.webp
+Dae Sagintayev,ficticio,Sporty VV Klub Kostanay,DC,,75,85,21,Kostanay,181,D,73,75,75,67,77,57,70,73,,assets/players/football/x_futboli16900001.webp
+Rohan Sadykov,ficticio,Sporty VV Klub Kostanay,DFC,,73,73,34,Kostanay,190,D,63,74,55,65,61,77,74,73,,assets/players/football/x_futboli17100001.webp
+Hiro Chen,ficticio,Sporty VV Klub Kostanay,LI,,73,73,34,Kostanay,186,D,73,67,60,70,56,74,73,76,,assets/players/football/x_futboli14700001.webp
+Devin Reed,ficticio,Sporty VV Klub Kostanay,POR,,70,72,27,Grammes,194,D,51,53,43,63,43,75,74,69,,assets/players/football/x_futboli00300001.webp
+Jun Kim,ficticio,Sporty VV Klub Kostanay,DFC,,70,70,31,Kostanay,184,D,59,73,62,54,53,73,76,69,,assets/players/football/x_futboli07600001.webp
+Amadou Drissi,ficticio,Sporty VV Klub Kostanay,DC,,70,78,21,Sahar,184,I,71,60,64,69,77,46,65,71,,assets/players/football/x_futboli08100001.webp
+Enzo Haugen,ficticio,Sporty VV Klub Kostanay,DFC,,70,72,27,Overmark,192,D,68,64,60,56,60,71,78,63,,assets/players/football/x_futboli18900001.webp
+Hiro Orazbayev,ficticio,Sporty VV Klub Kostanay,DFC,,69,84,20,Kostanay,182,D,60,57,60,65,52,71,70,78,,assets/players/football/x_ficticiofinalnight601300001.webp
+Wei Kairatov,ficticio,Sporty VV Klub Kostanay,MCD,MC,69,72,26,Kostanay,182,D,68,74,67,70,61,65,69,68,,assets/players/football/x_futboli04600001.webp
+Rohan Lee,ficticio,Sporty VV Klub Kostanay,LD,LI,68,86,20,Kostanay,189,D,66,62,57,57,59,69,73,71,,assets/players/football/x_futboli14500001.webp
+Juan Bisanz,real,Universidad Costas Unidas,MI,EI,68,68,29,Valurria,180,D,75,72,76,68,62,46,63,64,,assets/players/football/r_juanbisanz.webp
+Manuel Fernández,real,Universidad Costas Unidas,MD,MI,67,69,26,Valurria,181,D,88,90,84,64,60,30,56,59,,assets/players/football/r_manuelfernandez.webp
+Lucas Chávez,real,Universidad Costas Unidas,MP,,66,66,27,Sotoa,167,D,82,80,70,66,62,51,69,62,,assets/players/football/r_lucaschavez.webp
+Bruno Bolaños,ficticio,Universidad Costas Unidas,LI,,63,65,25,Costas Unidas,180,D,55,60,58,57,53,64,68,64,,assets/players/football/x_ficticiofinalnight607900001.webp
+Luis Ingolotti,real,Universidad Costas Unidas,POR,,59,59,30,Valurria,184,D,25,31,41,59,31,68,58,62,,assets/players/football/r_luisingolotti.webp
+Darius Bell,ficticio,Universidad Costas Unidas,LD,LI,57,59,26,Costas Unidas,185,D,55,57,48,48,41,59,60,52,,assets/players/football/x_futbolh01300001.webp
+Gabriel Ayala,ficticio,Universidad Costas Unidas,DFC,,55,70,21,Costas Unidas,186,I,48,50,47,53,34,56,57,51,,assets/players/football/x_ficticiofinalnight300600001.webp
+Jack Gauthier,ficticio,Universidad Costas Unidas,ED,EI,55,61,24,Iberia,180,D,51,59,53,51,57,40,53,56,,assets/players/football/x_futboli01400001.webp
+Lisandro Correa,ficticio,Universidad Costas Unidas,DFC,,54,56,25,Costas Unidas,181,D,43,49,40,47,42,58,57,61,,assets/players/football/x_ficticiofinalnight200300001.webp
+Caio Paredes,ficticio,Universidad Costas Unidas,MC,,54,57,26,Costas Unidas,179,I,49,61,53,53,46,59,47,59,,assets/players/football/x_futboli05800001.webp
+Nicolás Bermúdez,ficticio,Universidad Costas Unidas,LI,,53,61,22,Costas Unidas,176,A,44,50,43,50,36,58,50,59,,assets/players/football/x_futboli11500001.webp
+Lautaro Trejo,ficticio,Universidad Costas Unidas,MCD,,53,59,24,Costas Unidas,180,D,60,58,54,57,49,54,54,44,,assets/players/football/x_ficticiofinalnight500200001.webp
+Lukas Girard,ficticio,Universidad Costas Unidas,DC,,52,52,32,Iberia,180,A,51,56,46,49,56,35,48,54,,assets/players/football/x_futboli10300001.webp
+Brandon Seoane,ficticio,Universidad Costas Unidas,DC,,52,57,24,Grammes,175,A,47,45,58,48,53,35,58,52,,assets/players/football/x_futboli09300001.webp
+Diego Rinaldi,ficticio,Universidad Costas Unidas,DFC,,51,51,26,Costas Unidas,180,D,37,47,37,40,35,56,55,52,,assets/players/football/x_ficticiofinalnight603000001.webp
+Devin Hayes,ficticio,Universidad Costas Unidas,MCD,,50,62,19,Costas Unidas,179,I,41,48,53,51,39,43,41,48,,assets/players/football/x_futbolh00300001.webp
+Camilo Vietto,ficticio,Universidad Costas Unidas,MC,,50,52,26,Costas Unidas,170,D,43,56,51,53,40,43,43,50,,assets/players/football/x_ficticiofinalnight602000001.webp
+Santiago Perotti,ficticio,Universidad Costas Unidas,DFC,,49,55,24,Costas Unidas,182,D,43,49,38,41,37,54,47,61,,assets/players/football/x_futbolg01200001.webp
+Liam Rubio,ficticio,Universidad Costas Unidas,DC,,48,49,26,Grammes,178,D,42,42,56,48,48,26,47,44,,assets/players/football/x_futboli10100001.webp
+Lukas Fournier,ficticio,Universidad Costas Unidas,EI,ED,47,56,18,Iberia,174,D,51,51,49,50,42,25,42,41,,assets/players/football/x_ficticiofinalv3test00400001.webp
+Ignacio Copa,ficticio,Universidad Costas Unidas,LD,LI,46,46,30,Costas Unidas,184,A,40,48,32,48,29,46,46,49,,assets/players/football/x_ficticiofinalnight602700001.webp
+Bautista Zampedri,ficticio,Universidad Costas Unidas,MC,,45,45,31,Peronia,171,D,35,42,45,47,42,41,39,46,,assets/players/football/x_futboli03600001.webp
+Omar Nasser,ficticio,Universidad Costas Unidas,POR,,44,44,29,Riada,190,D,36,28,25,26,25,49,44,45,,assets/players/football/x_futboli01800001.webp
+Lucas Freitas,ficticio,Universidad Costas Unidas,DFC,,44,55,18,Tamago,180,D,33,39,34,38,25,45,50,56,,assets/players/football/x_futboli15400001.webp

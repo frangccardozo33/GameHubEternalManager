@@ -68,7 +68,8 @@
       TLM.fillSquad(state, club, c, used);
       // los jugadores de las naciones del Continente Viejo llevan nombres de su región
       for (const pid of club.squad) {
-        const p = state.players[pid], pool = TLM.NAMES_VIEJO[p.nationality && g.LFONations && g.LFONations.get(p.nationality) ? g.LFONations.get(p.nationality).id : ''];
+        const p = state.players[pid]; if (p.rosterId) continue;
+        const pool = TLM.NAMES_VIEJO[p.nationality && g.LFONations && g.LFONations.get(p.nationality) ? g.LFONations.get(p.nationality).id : ''];
         if (!pool) continue;
         for (let k = 0; k < 30; k++) { const n = r.pick(pool.first) + ' ' + r.pick(pool.last); if (!used.has(n)) { used.delete(p.canonicalName); used.add(n); p.canonicalName = n; break; } }
       }

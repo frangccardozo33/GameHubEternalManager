@@ -1,0 +1,101 @@
+﻿Nombre,Apellido,Numero,Tipo,Nacion,Edad,Personalidad,Punta,Aceleracion,Frenada,Curva,Control,Agresividad,Consistencia,Adelantamiento,Media,Foto
+Nicolás Bonelli,BONELLI,76,actc,PER,39,AGGRESSIVE,0.85,0.88,0.91,0.86,0.84,0.92,0.82,0.89,87,assets/players/racing/a_bonellinicolas.webp
+Simon Reicher,REICHER,43,gt,MRG,26,AGGRESSIVE,0.9,0.86,0.84,0.89,0.81,0.92,0.76,0.89,86,assets/players/racing/g_simonreicher.webp
+Facundo Ardusso,ARDUSSO,51,actc,VAL,39,DEFENSIVE,0.85,0.9,0.88,0.91,0.92,0.81,0.92,0.86,88,assets/players/racing/a_ardussofacundo.webp
+Mariano Werner,WERNER,52,actc,VAL,40,AGGRESSIVE,0.88,0.9,0.92,0.9,0.85,0.96,0.9,0.97,91,assets/players/racing/a_wernermariano.webp
+Germán Todino,TODINO,73,actc,VAL,41,TYRE SAVER,0.87,0.86,0.87,0.87,0.85,0.85,0.95,0.84,87,assets/players/racing/a_todinogerman.webp
+Agustín Canapino,A. CANAPINO,01,actc,VAL,36,TYRE SAVER,0.91,0.91,0.91,0.96,0.98,0.85,0.95,0.89,92,assets/players/racing/a_canapinoagustin.webp
+Ben Green,GREEN,12,gt,MRG,39,RISK TAKER,0.89,0.85,0.87,0.9,0.84,0.94,0.83,0.86,87,assets/players/racing/g_bengreen.webp
+Frederik Schandorff,SCHANDORFF,14,gt,OVM,30,RISK TAKER,0.92,0.86,0.82,0.85,0.85,0.96,0.81,0.88,87,assets/players/racing/g_frederikschandorff.webp
+Julián Santero,SANTERO,06,actc,PER,38,AGGRESSIVE,0.9,0.88,0.88,0.88,0.89,0.93,0.82,0.95,89,assets/players/racing/a_santerojulian.webp
+Kobe Pauwels,PAUWELS,42,gt,MEL,22,AGGRESSIVE,0.9,0.8,0.85,0.86,0.83,0.95,0.78,0.91,86,assets/players/racing/g_kobepauwels.webp
+Maxime Robin,ROBIN,91,gt,OVM,26,AGGRESSIVE,0.87,0.88,0.79,0.84,0.82,0.95,0.81,0.93,86,assets/players/racing/g_maximerobin.webp
+Arjun Maini,MAINI,24,gt,GRA,28,AGGRESSIVE,0.84,0.85,0.84,0.84,0.8,0.9,0.77,0.88,84,assets/players/racing/g_arjunmaini.webp
+Chris Froggatt,FROGGATT,03,gt,KAI,33,WET SPECIALIST,0.87,0.83,0.85,0.87,0.88,0.79,0.92,0.86,86,assets/players/racing/g_chrisfroggatt.webp
+Gabriel Rindone,RINDONE,08,gt,MRG,54,TYRE SAVER,0.84,0.8,0.86,0.8,0.82,0.82,0.88,0.88,84,assets/players/racing/g_gabrielrindone.webp
+Tobías Martínez,MARTÍNEZ,95,actc,PER,28,WET SPECIALIST,0.82,0.83,0.85,0.89,0.92,0.8,0.83,0.87,85,assets/players/racing/a_martineztobias.webp
+Jerónimo Teti,TETI,57,actc,PER,34,RISK TAKER,0.88,0.84,0.85,0.85,0.8,0.94,0.78,0.85,85,assets/players/racing/a_tetijeronimo.webp
+Benjamin Goethe,GOETHE,30,gt,OVM,23,RISK TAKER,0.88,0.87,0.82,0.84,0.81,0.94,0.76,0.87,85,assets/players/racing/g_benjamingoethe.webp
+Christian Ledesma,LEDESMA,47,actc,PER,46,RISK TAKER,0.86,0.8,0.85,0.86,0.81,0.9,0.84,0.89,85,assets/players/racing/a_ledesmachristian.webp
+Emiliano Spataro,SPATARO,56,actc,VAL,36,RISK TAKER,0.86,0.85,0.81,0.87,0.83,0.93,0.82,0.91,86,assets/players/racing/a_spataroemiliano.webp
+Mauricio Lambiris,LAMBIRIS,20,actc,PER,41,QUALIFYING SPECIALIST,0.89,0.85,0.85,0.9,0.88,0.78,0.86,0.8,85,assets/players/racing/a_lambirismauricio.webp
+Markus Winkelhock,WINKELHOCK,67,gt,MRG,46,DEFENSIVE,0.83,0.81,0.84,0.81,0.87,0.76,0.85,0.79,82,assets/players/racing/g_markuswinkelhock.webp
+Colin Caresani,CARESANI,64,gt,KAI,38,AGGRESSIVE,0.73,0.78,0.77,0.79,0.76,0.82,0.74,0.85,78,assets/players/racing/g_colincaresani.webp
+Dylan Medler,MEDLER,74,gt,IBE,42,WET SPECIALIST,0.78,0.8,0.83,0.87,0.9,0.81,0.81,0.84,83,assets/players/racing/g_dylanmedler.webp
+Alessio Picariello,PICARIELLO,18,gt,MRG,33,WET SPECIALIST,0.74,0.75,0.79,0.81,0.83,0.76,0.84,0.8,79,assets/players/racing/g_alessiopicariello.webp
+Joseph Loake,LOAKE,45,gt,KAI,41,WET SPECIALIST,0.76,0.73,0.72,0.76,0.78,0.7,0.77,0.78,75,assets/players/racing/g_josephloake.webp
+Ben Doerr,B. DOERR,90,gt,MRG,21,QUALIFYING SPECIALIST,0.8,0.83,0.81,0.76,0.77,0.77,0.73,0.78,78,assets/players/racing/g_bendoerr.webp
+Loris Spinelli,SPINELLI,54,gt,MEL,31,CONSISTENT,0.79,0.74,0.75,0.82,0.81,0.75,0.9,0.75,79,assets/players/racing/g_lorisspinelli.webp
+James Kellett,KELLETT,99,gt,MRG,39,CONSISTENT,0.74,0.76,0.76,0.78,0.77,0.74,0.81,0.73,76,assets/players/racing/g_jameskellett.webp
+Luca Engstler,ENGSTLER,09,gt,OVM,31,AGGRESSIVE,0.8,0.78,0.76,0.81,0.79,0.86,0.77,0.85,80,assets/players/racing/g_lucaengstler.webp
+Christian Hahn,HAHN,02,gt,MRG,38,TYRE SAVER,0.72,0.73,0.78,0.74,0.74,0.74,0.82,0.73,75,assets/players/racing/g_christianhahn.webp
+Oliver Soderstrom,SODERSTROM,25,gt,OVM,28,RISK TAKER,0.84,0.8,0.82,0.8,0.81,0.86,0.77,0.86,82,assets/players/racing/g_oliversoderstrom.webp
+Diego De Carlo,CARLO,62,actc,PER,50,WET SPECIALIST,0.75,0.79,0.8,0.83,0.88,0.73,0.79,0.82,80,assets/players/racing/a_decarlodiego.webp
+Rolf Ineichen,INEICHEN,41,gt,MRG,42,DEFENSIVE,0.85,0.83,0.85,0.84,0.84,0.74,0.87,0.83,83,assets/players/racing/g_rolfineichen.webp
+Nicolás Moscardini,MOSCARDINI,05,actc,VAL,36,AGGRESSIVE,0.79,0.81,0.79,0.83,0.81,0.87,0.79,0.86,82,assets/players/racing/a_moscardininicolas.webp
+Alexey Nesov,NESOV,65,gt,KAI,38,QUALIFYING SPECIALIST,0.81,0.84,0.85,0.84,0.84,0.82,0.77,0.8,82,assets/players/racing/g_alexeynesov.webp
+Arthur Dorison,DORISON,36,gt,IBE,18,DEFENSIVE,0.76,0.79,0.77,0.79,0.76,0.66,0.85,0.77,77,assets/players/racing/g_arthurdorison.webp
+Giacomo Petrobelli,PETROBELLI,40,gt,KAI,51,WET SPECIALIST,0.77,0.79,0.84,0.82,0.85,0.78,0.84,0.71,80,assets/players/racing/g_giacomopetrobelli.webp
+Martín Serrano,SERRANO,61,actc,PER,34,RISK TAKER,0.79,0.81,0.74,0.82,0.74,0.85,0.71,0.79,78,assets/players/racing/a_serranomartin.webp
+Ricardo Risatti,RISATTI,78,actc,VAL,34,CONSISTENT,0.76,0.78,0.82,0.78,0.76,0.78,0.81,0.74,78,assets/players/racing/a_risattiricardo.webp
+Diego Azar,AZAR,80,actc,VAL,34,CONSISTENT,0.76,0.78,0.78,0.81,0.78,0.73,0.87,0.73,78,assets/players/racing/a_azardiego.webp
+Marco Sorensen,SORENSEN,87,gt,OVM,36,AGGRESSIVE,0.79,0.8,0.77,0.79,0.77,0.85,0.74,0.9,80,assets/players/racing/g_marcosorensen.webp
+Alex Fontana,A. FONTANA,98,gt,MRG,34,DEFENSIVE,0.81,0.82,0.82,0.85,0.82,0.73,0.85,0.7,80,assets/players/racing/g_alexfontana.webp
+Calan Williams,WILLIAMS,81,gt,KAI,26,WET SPECIALIST,0.7,0.74,0.76,0.81,0.82,0.68,0.75,0.75,75,assets/players/racing/g_calanwilliams.webp
+Alfredo Hernandez,HERNANDEZ,26,gt,TAM,36,TYRE SAVER,0.76,0.81,0.82,0.83,0.88,0.79,0.79,0.79,81,assets/players/racing/g_alfredohernandez.webp
+Conrad Laursen,LAURSEN,97,gt,GRA,35,DEFENSIVE,0.77,0.82,0.78,0.85,0.86,0.71,0.88,0.8,81,assets/players/racing/g_conradlaursen.webp
+Carrie Schreiner,SCHREINER,49,gt,MRG,28,DEFENSIVE,0.85,0.85,0.86,0.78,0.83,0.77,0.83,0.8,82,assets/players/racing/g_carrieschreiner.webp
+Santiago Mangoni,MANGONI,83,actc,PER,24,DEFENSIVE,0.8,0.74,0.83,0.78,0.75,0.66,0.8,0.73,76,assets/players/racing/a_mangonisantiago.webp
+Gilles Magnus,MAGNUS,29,gt,MRG,27,RISK TAKER,0.67,0.78,0.71,0.77,0.66,0.79,0.7,0.78,73,assets/players/racing/g_gillesmagnus.webp
+Nicolás Impiombato,IMPIOMBATO,96,actc,PER,34,CONSISTENT,0.78,0.76,0.81,0.82,0.82,0.77,0.88,0.76,80,assets/players/racing/a_impiombatonicolas.webp
+Alfred Renauer,RENAUER,85,gt,MRG,29,QUALIFYING SPECIALIST,0.85,0.88,0.81,0.83,0.78,0.82,0.81,0.77,82,assets/players/racing/g_alfredrenauer.webp
+Baptiste Moulin,MOULIN,55,gt,MRG,27,DEFENSIVE,0.85,0.81,0.86,0.83,0.84,0.7,0.88,0.8,82,assets/players/racing/g_baptistemoulin.webp
+Harry George,GEORGE,53,gt,OVM,32,DEFENSIVE,0.69,0.75,0.76,0.75,0.76,0.65,0.79,0.7,73,assets/players/racing/g_harrygeorge.webp
+Tomás Abdala,ABDALA,35,actc,PER,24,QUALIFYING SPECIALIST,0.81,0.79,0.79,0.79,0.8,0.76,0.77,0.74,78,assets/players/racing/a_abdalatomas.webp
+Marcos Landa,LANDA,68,actc,PER,34,AGGRESSIVE,0.8,0.79,0.82,0.87,0.79,0.89,0.75,0.86,82,assets/players/racing/a_landamarcos.webp
+Dustin Blattner,BLATTNER,70,gt,KAI,24,WET SPECIALIST,0.78,0.75,0.75,0.82,0.85,0.75,0.75,0.77,78,assets/players/racing/g_dustinblattner.webp
+Sebastián Abella,ABELLA,11,actc,PER,36,WET SPECIALIST,0.78,0.74,0.77,0.8,0.81,0.74,0.81,0.79,78,assets/players/racing/a_abellasebastian.webp
+Norberto Fontana,N. FONTANA,48,actc,VAL,51,AGGRESSIVE,0.82,0.8,0.83,0.8,0.79,0.87,0.78,0.87,82,assets/players/racing/a_fontananorberto.webp
+Jeremías Olmedo,OLMEDO,22,actc,PER,38,CONSISTENT,0.83,0.79,0.85,0.82,0.81,0.78,0.86,0.81,82,assets/players/racing/a_olmedojeremias.webp
+Dylan Pereira,PEREIRA,66,gt,MRG,29,TYRE SAVER,0.7,0.74,0.74,0.77,0.83,0.71,0.81,0.7,75,assets/players/racing/g_dylanpereira.webp
+Aaron Walker,WALKER,92,gt,MRG,38,CONSISTENT,0.81,0.79,0.86,0.83,0.78,0.77,0.87,0.77,81,assets/players/racing/g_aaronwalker.webp
+Facundo Chapur,CHAPUR,93,actc,PER,35,QUALIFYING SPECIALIST,0.84,0.84,0.81,0.82,0.82,0.82,0.82,0.78,82,assets/players/racing/a_chapurfacundo.webp
+Mirko Bortolotti,BORTOLOTTI,17,gt,IBE,26,AGGRESSIVE,0.77,0.77,0.74,0.75,0.74,0.79,0.71,0.81,76,assets/players/racing/g_mirkobortolotti.webp
+Mattia Drudi,DRUDI,23,gt,MEL,28,DEFENSIVE,0.86,0.81,0.85,0.84,0.88,0.77,0.86,0.77,83,assets/players/racing/g_mattiadrudi.webp
+Lucas Valle,VALLE,07,actc,PER,31,AGGRESSIVE,0.81,0.76,0.75,0.81,0.72,0.83,0.74,0.82,78,assets/players/racing/a_vallelucas.webp
+Patrick Niederhauser,NIEDERHAUSER,16,gt,TAM,30,QUALIFYING SPECIALIST,0.83,0.84,0.86,0.8,0.83,0.84,0.83,0.72,82,assets/players/racing/g_patrickniederhauser.webp
+Simon Balcaen,BALCAEN,04,gt,OVM,31,TYRE SAVER,0.81,0.86,0.83,0.82,0.83,0.82,0.89,0.85,84,assets/players/racing/g_simonbalcaen.webp
+Ugo De Wilde,WILDE,72,gt,KAI,27,WET SPECIALIST,0.78,0.78,0.83,0.86,0.86,0.75,0.86,0.85,82,assets/players/racing/g_ugodewilde.webp
+Luis José Di Palma,PALMA,86,actc,PER,49,DEFENSIVE,0.86,0.83,0.83,0.87,0.86,0.73,0.88,0.86,84,assets/players/racing/a_dipalmaluisjose.webp
+Nicolás Cotignola,COTIGNOLA,77,actc,VAL,33,QUALIFYING SPECIALIST,0.84,0.85,0.8,0.89,0.82,0.74,0.78,0.77,81,assets/players/racing/a_cotignolanicolas.webp
+Gaston Ferrante,FERRANTE,69,actc,VAL,34,RISK TAKER,0.79,0.81,0.73,0.78,0.79,0.82,0.71,0.81,78,assets/players/racing/a_ferrantegaston.webp
+Tom Kalender,KALENDER,46,gt,TAM,33,TYRE SAVER,0.74,0.84,0.81,0.8,0.8,0.74,0.86,0.81,80,assets/players/racing/g_tomkalender.webp
+Jonatan Castellano,CASTELLANO,37,actc,VAL,42,QUALIFYING SPECIALIST,0.82,0.84,0.8,0.83,0.8,0.79,0.8,0.79,81,assets/players/racing/a_castellanojonatan.webp
+Nicki Thiim,THIIM,13,gt,TAM,22,CONSISTENT,0.77,0.75,0.8,0.77,0.77,0.74,0.83,0.73,77,assets/players/racing/g_nickithiim.webp
+Marcelo Agrelo,AGRELO,59,actc,VAL,34,AGGRESSIVE,0.79,0.8,0.76,0.76,0.79,0.83,0.69,0.82,78,assets/players/racing/a_agrelomarcelo.webp
+Kevin Candela,CANDELA,19,actc,PER,27,AGGRESSIVE,0.78,0.81,0.77,0.82,0.76,0.87,0.76,0.9,81,assets/players/racing/a_candelakevin.webp
+Augusto Carinelli,CARINELLI,60,actc,PER,34,TYRE SAVER,0.8,0.8,0.85,0.82,0.82,0.79,0.9,0.79,82,assets/players/racing/a_carinelliaugusto.webp
+Tim Tramnitz,TRAMNITZ,82,gt,MRG,22,QUALIFYING SPECIALIST,0.86,0.86,0.86,0.82,0.84,0.77,0.82,0.81,83,assets/players/racing/g_timtramnitz.webp
+Ignacio Fain,FAIN,33,actc,PER,25,CONSISTENT,0.78,0.76,0.75,0.79,0.74,0.72,0.84,0.69,76,assets/players/racing/a_fainignacio.webp
+Rodrigo Lugon,LUGON,21,actc,PER,34,CONSISTENT,0.81,0.78,0.78,0.79,0.76,0.77,0.77,0.79,78,assets/players/racing/a_lugonrodrigo.webp
+Alex Aka,AKA,34,gt,MRG,26,TYRE SAVER,0.7,0.67,0.75,0.8,0.8,0.7,0.82,0.76,75,assets/players/racing/g_alexaka.webp
+Rocco Mazzola,MAZZOLA,79,gt,MEL,21,TYRE SAVER,0.79,0.79,0.85,0.79,0.82,0.73,0.85,0.77,80,assets/players/racing/g_roccomazzola.webp
+Stephane Tribaudini,TRIBAUDINI,10,gt,IBE,43,RISK TAKER,0.77,0.76,0.77,0.79,0.78,0.78,0.7,0.79,77,assets/players/racing/g_stephanetribaudini.webp
+Juan Tomás Catalán Magni,MAGNI,58,actc,PER,36,AGGRESSIVE,0.79,0.79,0.77,0.79,0.79,0.82,0.76,0.9,80,assets/players/racing/a_catalanmagnijuantomas.webp
+Pierre Louis Chovet,CHOVET,28,gt,TAM,26,CONSISTENT,0.83,0.83,0.85,0.83,0.86,0.82,0.89,0.81,84,assets/players/racing/g_pierrelouischovet.webp
+Robert De Haan,HAAN,88,gt,MEL,24,RISK TAKER,0.75,0.74,0.72,0.76,0.66,0.76,0.66,0.73,72,assets/players/racing/g_robertdehaan.webp
+Elio Craparo,CRAPARO,94,actc,PER,37,CONSISTENT,0.84,0.83,0.8,0.81,0.84,0.81,0.87,0.75,82,assets/players/racing/a_craparoelio.webp
+Martín Trucco Juan,M. JUAN,39,actc,PER,34,RISK TAKER,0.8,0.82,0.76,0.8,0.71,0.82,0.74,0.8,78,assets/players/racing/a_truccojuanmartin.webp
+Joel Sturm,STURM,71,gt,MRG,25,TYRE SAVER,0.79,0.78,0.81,0.82,0.82,0.74,0.85,0.79,80,assets/players/racing/g_joelsturm.webp
+Simon Birch,BIRCH,31,gt,OVM,19,QUALIFYING SPECIALIST,0.81,0.75,0.79,0.78,0.8,0.79,0.75,0.77,78,assets/players/racing/g_simonbirch.webp
+Nicolás Trosset,TROSSET,63,actc,PER,36,WET SPECIALIST,0.79,0.81,0.87,0.88,0.84,0.82,0.87,0.83,84,assets/players/racing/a_trossetnicolas.webp
+Matt Campbell,CAMPBELL,89,gt,MEL,38,DEFENSIVE,0.68,0.74,0.78,0.79,0.76,0.66,0.78,0.72,74,assets/players/racing/g_mattcampbell.webp
+Ben Doerr,B. DOERR,15,gt,MRG,21,QUALIFYING SPECIALIST,0.8,0.83,0.81,0.76,0.77,0.77,0.73,0.78,78,assets/players/racing/g_bendoerr.webp
+Kyle Marcelli,MARCELLI,32,gt,KAI,36,AGGRESSIVE,0.81,0.79,0.75,0.79,0.78,0.85,0.78,0.84,80,assets/players/racing/g_kylemarcelli.webp
+Matías Canapino,M. CANAPINO,75,actc,VAL,30,DEFENSIVE,0.81,0.75,0.85,0.79,0.79,0.71,0.84,0.78,79,assets/players/racing/a_canapinomatias.webp
+Ayhancan Guven,GUVEN,84,gt,NET,28,TYRE SAVER,0.72,0.74,0.78,0.78,0.8,0.71,0.82,0.73,76,assets/players/racing/g_ayhancanguven.webp
+Felix Hirsiger,HIRSIGER,50,gt,MRG,28,AGGRESSIVE,0.76,0.78,0.75,0.81,0.73,0.87,0.72,0.82,78,assets/players/racing/g_felixhirsiger.webp
+Axcil Jefferies,JEFFERIES,44,gt,MRG,42,QUALIFYING SPECIALIST,0.82,0.78,0.75,0.82,0.82,0.78,0.74,0.74,78,assets/players/racing/g_axciljefferies.webp
+Pablo Gianini Juan,P. JUAN,38,actc,VAL,34,CONSISTENT,0.76,0.79,0.79,0.8,0.77,0.71,0.83,0.79,78,assets/players/racing/a_gianinijuanpablo.webp
+Javier Sagrera,SAGRERA,100,gt,GRA,22,DEFENSIVE,0.76,0.78,0.79,0.79,0.76,0.75,0.84,0.75,78,assets/players/racing/g_javiersagrera.webp
+Christopher Haase,HAASE,27,gt,MRG,39,TYRE SAVER,0.65,0.73,0.77,0.77,0.71,0.71,0.71,0.71,72,assets/players/racing/g_christopherhaase.webp

@@ -4,7 +4,7 @@
   if (!window.Tribuna) return;
   const N = window.LFONations;
   const NAMES = { accuracy: 'Precisión', defense: 'Defensa', power: 'Potencia', speed: 'Velocidad', wrestling: 'Wrestling', grappling: 'Grappling', cardio: 'Cardio', initiative: 'Iniciativa', intelligence: 'Inteligencia', chin: 'Resistencia' };
-  const DIV = { feather: 'Pluma', light: 'Ligero', welter: 'Wélter' };
+  const DIV = { fly: 'Mosca', bantam: 'Gallo', feather: 'Pluma', light: 'Ligero', welter: 'Wélter', middle: 'Mediano', lightheavy: 'Semipesado', heavy: 'Pesado' };
   const hue = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h % 360; };
   const hsl = (h, l) => `hsl(${h} 58% ${l}%)`;
   const nationName = (code) => { const n = N && N.list.find((x) => x.code === code); return n ? n.name : code; };

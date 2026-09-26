@@ -281,6 +281,7 @@ const RacingArt = (() => {
   }
   // Original vector portraits: stable facial identity per driver, zero WebGL cost.
   function portrait(d){
+    if(d && d.photo){try{return new URL('../'+d.photo,document.baseURI).href;}catch(e){}}   // retrato real del roster (assets/players/racing)
     const n=Number(d.id)||0,seed=(n*7+Number(d.number))%31;
     const skin=['#edb89a','#c98863','#e0a681','#b87a56','#f1c5a7','#9d654a'][seed%6];
     const shade=['#c88672','#9d5e44','#b3795b','#895039','#c9967d','#774630'][seed%6];

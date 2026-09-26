@@ -56,9 +56,14 @@ class La {
 const te = (i, t = 0, e = 100) => Math.max(t, Math.min(e, i)),
   qi = (i, t) => Math.hypot(i.x - t.x, i.z - t.z),
   Ke = [
+    { id: "fly", name: "Peso mosca", limit: 56.7 },
+    { id: "bantam", name: "Peso gallo", limit: 61.2 },
     { id: "feather", name: "Peso pluma", limit: 65.8 },
     { id: "light", name: "Peso ligero", limit: 70.3 },
     { id: "welter", name: "Peso wélter", limit: 77.1 },
+    { id: "middle", name: "Peso mediano", limit: 83.9 },
+    { id: "lightheavy", name: "Peso semipesado", limit: 93 },
+    { id: "heavy", name: "Peso pesado", limit: 120.2 },
   ],
   Pe = {
     pressure: {
@@ -225,7 +230,29 @@ function Mc(i, t, e = "light", n = "pressure", s = 1) {
 // Países reales de guardados viejos -> naciones del mundo ficticio (assets/nations)
 const LLO_NAT = {ESP: "GRA", BRA: "VAL", CZE: "ZEN", SEN: "RIA", MEX: "MAG", JPN: "TAM", ITA: "MEL", USA: "KAI", TUR: "SAH", SWE: "MRG", MAR: "SAH", IRL: "KAI", BUL: "ZEN", ARG: "PER", KOR: "SOT", POL: "MRG", NGA: "RIA", GER: "MRG", CHI: "CUN"};
 const natFlag = (code) => { const N = window.LFONations, n = N && N.list.find((x) => x.code === code); return n ? `<img class="nat-flag" src="${n.flag}" alt="${n.name}" title="${n.name}">` : ""; };
+// ---- Roster fijo (roster-llo.js): reales del UFC + ficticios con retrato. Los que faltan se generan con retrato gris. ----
+const LLO_NICKS = ["EL LOBO", "VIPER", "COBRA", "RELÁMPAGO", "MARTILLO", "ZORRO", "HALCÓN", "BRUJO", "THE STORM", "IRON", "GHOST", "TITAN", "REAPER", "BLADE", "CONDOR", "TEMPEST", "SPARTAN", "NOMAD", "ROCKET", "SNIPER", "BULL", "PANTHER", "DRAGON", "ECLIPSE", "MAVERICK", "SAMURAI", "TIBURÓN", "FÉNIX", "HURRICANE", "KRAKEN", "GORILA", "TORNADO", "SILENCIO", "COMETA", "LEÓN", "GAVILÁN", "THE ANVIL", "SHADOW", "PIRANHA", "WOLVERINE"];
+const lloHash = (str) => { let h = 2166136261; for (const c of String(str)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+function fighterFromRoster(e, id) {
+  const R = window.LLO_ROSTER, r = new La(lloHash(e.id)), a = {};
+  R.attrs.forEach((k, j) => (a[k] = e.at[j]));
+  const sp = e.n.indexOf(" "), first = sp > 0 ? e.n.slice(0, sp) : e.n, last = sp > 0 ? e.n.slice(sp + 1) : e.n, real = e.k === "real";
+  return {
+    id, firstName: first, lastName: last, nickname: LLO_NICKS[lloHash(e.id + "n") % LLO_NICKS.length], country: e.c, age: e.a, division: e.d, style: e.s, attributes: a,
+    personality: { aggression: r.int(40, 90), patience: r.int(35, 80), courage: r.int(45, 90), conservatism: r.int(25, 75), finish: r.int(40, 92), discipline: r.int(45, 90) },
+    record: real ? { wins: r.int(10, 27), losses: r.int(1, 9), draws: 0 } : { wins: r.int(4, 14), losses: r.int(0, 4), draws: 0 },
+    rating: Math.round(1000 + (e.o - 55) * 18 + r.range(-25, 25)), popularity: real ? r.int(25, 65) : r.int(10, 32), morale: 80, condition: 100, potential: e.pt, history: [], streak: 0, lastFightDay: 0, injuryUntil: 0,
+    retired: !1, defenses: 0, career: real ? "Contendiente" : "Prospecto", skin: e.sk, hair: e.hr, hairStyle: e.hs, photo: e.ph, rosterId: e.id, tactics: { ...xc }, contract: null, sponsor: null, training: [],
+  };
+}
+function takeRosterFighter(division, used) {
+  const R = window.LLO_ROSTER; if (!R) return null;
+  let bi = -1, bd = 1e9;
+  R.pool.forEach((e, j) => { if (used.has(e.id)) return; const d = (e.d === division ? 0 : 60) + (e.a > 27 ? (e.a - 27) * 3 : 0) + Math.random() * 10; if (d < bd) { bd = d; bi = j; } });
+  return bi < 0 || bd > 45 ? null : R.pool[bi];
+}
 function dl() {
+  if (window.LLO_ROSTER && window.LLO_ROSTER.initial) return window.LLO_ROSTER.initial.map((e, t) => fighterFromRoster(e, `f${t}`));
   return ll.map((i, t) =>
     Mc(
       `f${t}`,
@@ -1313,7 +1340,7 @@ function vl() {
         )),
     ),
     {
-      version: 1,
+      version: 2,
       day: 0,
       money: 65e3,
       roster: t,
@@ -1565,9 +1592,16 @@ class xl {
   }
   spawnProspect(t) {
     const e = this.state;
-    if (e.fighters.length >= 60) return null;
+    if (e.fighters.length >= 400) return null;
     const n = e.nextId++,
-      s = Mc(
+      used = new Set(e.fighters.map((f) => f.rosterId).filter(Boolean)),
+      pe = takeRosterFighter(t, used);
+    if (pe) {
+      const f = fighterFromRoster(pe, `p${n}`); f.division = t;
+      if (f.age > 24) { f.age = RND(20, 24); f.career = "Prospecto"; f.record = { wins: RND(0, 4), losses: RND(0, 1), draws: 0 }; f.popularity = 12; }
+      e.fighters.push(f); return f;
+    }
+    const s = Mc(
         `p${n}`,
         [
           PICK(["Tomás", "Darío", "Iván", "Marco", "Leo", "Omar", "Kai", "Nico", "Sami", "André", "Félix", "Rubén"]),
@@ -1579,7 +1613,8 @@ class xl {
         PICK(Object.keys(Pe)),
         n * 31 + 7,
       );
-    ((s.age = RND(19, 22)),
+    ((s.photo = (window.LLO_ROSTER && window.LLO_ROSTER.placeholder) || null),
+      (s.age = RND(19, 22)),
       (s.record = { wins: RND(0, 3), losses: RND(0, 1), draws: 0 }),
       (s.rating = RND(1000, 1090)),
       (s.popularity = 10),
@@ -1939,7 +1974,7 @@ function io(i) {
     },
     e = (s) => typeof s == "number" && Number.isFinite(s);
   ((!i ||
-    i.version !== 1 ||
+    i.version !== 2 ||
     !e(i.money) ||
     i.money < 0 ||
     !Number.isInteger(i.day) ||
@@ -2131,6 +2166,8 @@ const Ml = (i) =>
   Zs = (i, t, e = "") =>
     `<div class="empty">${zt("target")}<h3>${i}</h3><p>${t}</p>${e}</div>`;
 function ts(i, t = "", e = "#bfe75b") {
+  if (i.photo)
+    return `<div class="portrait ${t} portrait-photo" style="--portrait-accent:${e}"><img alt="Retrato de ${xt($t(i))}" src="../${xt(i.photo)}" style="width:100%;height:100%;object-fit:contain;object-position:bottom"></div>`;
   const n = /^#[a-f0-9]{6}$/i.test(i.skin) ? i.skin : "#ad704e";
   return `<div class="portrait ${t}" style="--portrait-accent:${e}"><svg viewBox="0 0 200 220" role="img" aria-label="Retrato de ${xt($t(i))}"><path fill="${e}" opacity=".14" d="M5 210 120 5h55L60 220Z"/><path fill="${n}" d="M83 96v18L48 127c-14 6-22 20-26 47l-9 46h174l-11-48c-5-28-10-39-25-45l-34-13V94Z"/><path fill="#000" opacity=".18" d="m100 112-5 34-34-9 7 53 27 30h24l15-45 11-39-28 8Z"/><path fill="${n}" d="M70 52q3-32 31-32 34 0 33 35l-5 34-13 21H91L76 91Z"/><path fill="#17191b" d="M71 62 68 40q2-23 31-23 35 0 35 28l-4 16-7-16-20-8-24 10Z"/><path fill="#222" opacity=".85" d="m77 77 9 13 16 7 16-9 11-12-6 21-12 13H93L80 96Z"/><path stroke="#352a24" stroke-width="3" d="m80 61 12-1m16 0 13 1m-23 2-3 17h9m-11 7h13" fill="none"/><path stroke="#fff" opacity=".1" stroke-width="2" d="m48 133 36 12m31 0 30-12M102 151v52"/><path fill="#171b20" d="m19 199 31-7 9 28H13Zm133-7 30 7 5 21h-39Z"/><path fill="${e}" d="m19 198 31-7 3 10-36 7Zm133-7 30 7 2 10-36-7Z"/></svg></div>`;
 }
@@ -25719,7 +25756,7 @@ const Zm = [
   Dt = new xl(window.localStorage);
 window.__llo = { get career() { return Dt; },
   // retrato del módulo como imagen (lo usa la Tribuna para que la carta lleve el mismo peleador que se ve en las fichas)
-  portrait(f) { const m = /<svg[\s\S]*<\/svg>/.exec(ts(f)); return m ? "data:image/svg+xml," + encodeURIComponent(m[0].replace("<svg ", '<svg xmlns="http://www.w3.org/2000/svg" ')) : undefined; } };
+  portrait(f) { if (f.photo) return new URL("../" + f.photo, document.baseURI).href; const m = /<svg[\s\S]*<\/svg>/.exec(ts(f)); return m ? "data:image/svg+xml," + encodeURIComponent(m[0].replace("<svg ", '<svg xmlns="http://www.w3.org/2000/svg" ')) : undefined; } };
 let er = "dashboard",
   Ys = {},
   Ue = null,
