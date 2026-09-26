@@ -91,7 +91,7 @@ function renderHome(){
   const damagePct = Math.round((1 - (team.carDamage||0)) * 100);
   $('home-car-cond').textContent = damagePct + '%';
   $('home-body-name').textContent = BODIES[team.bodyType].name;
-  $('home-hero-art').innerHTML = RacingArt.image('car',team.bodyType);
+  $('home-hero-art').innerHTML = RacingArt.image('car',team.bodyType,liveryFor(team));
   $('hero-model').textContent = BODIES[team.bodyType].name;
   $('hero-driver').textContent = driver.name.toUpperCase();
   $('hero-rating').textContent = Math.round(Object.values(computePlayerCarRating(team)).reduce((a,b)=>a+b,0)/5*100);
@@ -115,22 +115,46 @@ function pushNews(title, detail){
 }
 
 // ---- GARAGE ---------------------------------------------------------------
+const BODY_DROP = {bronze:.08, silver:.18, gold:.35, legend:.7};
+function ownedBodies(team){ if(!team.ownedBodies||!team.ownedBodies.length) team.ownedBodies=[team.bodyType]; if(!team.ownedBodies.includes(team.bodyType)) team.ownedBodies.push(team.bodyType); return team.ownedBodies; }
+function rollBodyDrop(packId){
+  const team = playerTeam(Career), owned = ownedBodies(team);
+  if (Math.random() >= (BODY_DROP[packId]||0)) return null;
+  const locked = Object.keys(BODIES).filter(k => !owned.includes(k));
+  if (!locked.length) { team.materials += 40; return {key:null, mats:40}; }
+  const key = locked[Math.floor(Math.random()*locked.length)]; owned.push(key); return {key};
+}
+function renderLivery(team){
+  const box = $('livery-panel'); if (!box) return;
+  const L = Object.assign({}, liveryFor(team));
+  const inp = (k,l) => `<label class="lv-f"><span>${l}</span><input type="color" data-lv="${k}" value="${L[k]||'#ffffff'}"></label>`;
+  const PRE = [['Clásico',null],['Medianoche','#0e1a33','#e8c14a','#ffffff'],['Fuego','#c8261d','#ffffff','#111820'],['Lima','#7ed321','#111820','#ffffff'],['Hielo','#e9f1f7','#2a6ccb','#111820'],['Púrpura','#5b2aa6','#f5c044','#ffffff']];
+  box.innerHTML = `<h3>LIBREA <small>PERSONALIZÁ TU AUTO</small></h3><div class="lv-grid">${inp('primary','Color base')}${inp('secondary','Diseño')}${inp('accent','Detalle')}<label class="lv-f"><span>Techo</span><input type="color" data-lv="roof" value="${L.roof||L.primary}"></label>
+  <label class="lv-f"><span>Patrón</span><select data-lv="pattern">${Object.entries(LIVERY_PATTERNS).map(([k,n])=>`<option value="${k}" ${L.pattern===k?'selected':''}>${n}</option>`).join('')}</select></label></div>
+  <div class="lv-pre">${PRE.map((p,i)=>`<button type="button" data-lvpre="${i}">${p[0]}</button>`).join('')}<button type="button" data-lvreset="1">Restaurar color de escudería</button></div>`;
+  const apply = () => { team.livery = L; saveCareer(Career); if (window.refreshPlayerBody) window.refreshPlayerBody(); const sh=$('garage-showroom'); const art=sh&&sh.querySelector('.showroom-art'); if(art) art.innerHTML=RacingArt.image('car',team.bodyType,L); document.querySelectorAll('.body-art').forEach((el,i)=>{}); };
+  box.querySelectorAll('[data-lv]').forEach(el => el.onchange = () => { L[el.dataset.lv] = el.value; apply(); renderGarage(); });
+  box.querySelectorAll('[data-lvpre]').forEach(b => b.onclick = () => { const p = PRE[+b.dataset.lvpre]; if (p[1]) { L.primary=p[1]; L.secondary=p[2]; L.accent=p[3]; L.roof=null; } else { Object.assign(L,{primary:hexColor(team.color),secondary:'#f2f5f3',accent:'#111820',roof:null}); } apply(); renderGarage(); });
+  box.querySelector('[data-lvreset]').onclick = () => { team.livery = null; saveCareer(Career); if (window.refreshPlayerBody) window.refreshPlayerBody(); renderGarage(); };
+}
 function renderGarage(){
-  const team = playerTeam(Career);
+  const team = playerTeam(Career), owned = ownedBodies(team);
   const axes = computePlayerCarRating(team);
-  $('garage-showroom').innerHTML = `<div class="showroom-title"><span class="eyebrow">LRO · GARAGE</span><h2>${BODIES[team.bodyType].name}</h2><p>${BODIES[team.bodyType].desc}</p><span class="equipped-label">EQUIPADO / GT3</span></div><div class="showroom-art">${RacingArt.image('car',team.bodyType)}</div><div class="showroom-stats">${Object.entries(axes).map(([k,v])=>`<div><span>${AXIS_LABELS[k]}</span><b>${Math.round(v*100)}</b><i style="--value:${Math.min(100,v*100)}%"></i></div>`).join('')}</div>`;
+  $('garage-showroom').innerHTML = `<div class="showroom-title"><span class="eyebrow">LRO · GARAGE</span><h2>${BODIES[team.bodyType].name}</h2><p>${BODIES[team.bodyType].desc}</p><span class="equipped-label">EQUIPADO / GT3</span></div><div class="showroom-art">${RacingArt.image('car',team.bodyType,liveryFor(team))}</div><div class="showroom-stats">${Object.entries(axes).map(([k,v])=>`<div><span>${AXIS_LABELS[k]}</span><b>${Math.round(v*100)}</b><i style="--value:${Math.min(100,v*100)}%"></i></div>`).join('')}</div>`;
   $('body-cards').innerHTML = Object.entries(BODIES).sort((a,b)=>Number(!!b[1].edition)-Number(!!a[1].edition)).map(([key,b],i) => `
-    <button type="button" class="body-card ${team.bodyType===key?'active':''}" data-body="${key}" aria-pressed="${team.bodyType===key}" style="--rc:${RacingArt.specs[key].color}">
+    <button type="button" class="body-card ${team.bodyType===key?'active':''} ${owned.includes(key)?'':'locked'}" data-body="${key}" ${owned.includes(key)?'':'data-locked="1"'} aria-pressed="${team.bodyType===key}" style="--rc:${RacingArt.specs[key].color}">
       <div class="collection-label">${b.edition||'EDICIÓN LRO'}<span>${String(i+1).padStart(2,'0')}</span></div>
-      <div class="body-art">${RacingArt.image('car',key)}</div>
-      <div class="body-info"><h4>${b.name}</h4><small>${b.desc}</small><div class="body-bonuses">${Object.entries(b.axes).map(([a,v])=>`<span class="${v<0?'negative':''}">${AXIS_LABELS[a]} ${v>0?'+':''}${Math.round(v*100)}</span>`).join('')}</div><div class="equip-action">${team.bodyType===key?'EQUIPADO':'EQUIPAR CARROCERÍA'} <span>${team.bodyType===key?'✓':'→'}</span></div></div>
+      <div class="body-art">${RacingArt.image('car',key,liveryFor(team))}</div>
+      <div class="body-info"><h4>${b.name}</h4><small>${b.desc}</small><div class="body-bonuses">${Object.entries(b.axes).map(([a,v])=>`<span class="${v<0?'negative':''}">${AXIS_LABELS[a]} ${v>0?'+':''}${Math.round(v*100)}</span>`).join('')}</div><div class="equip-action">${!owned.includes(key)?'🔒 BLOQUEADA · SALE EN LOS SOBRES':team.bodyType===key?'EQUIPADO':'EQUIPAR CARROCERÍA'} <span>${!owned.includes(key)?'':team.bodyType===key?'✓':'→'}</span></div></div>
     </button>`).join('');
   document.querySelectorAll('[data-body]').forEach(el => el.onclick = () => {
+    if(el.dataset.locked){openModal('<div class="eyebrow">CARROCERÍA</div><h2 id="modal-title">BLOQUEADA</h2><p>Esta carrocería se consigue en los sobres (más chance en Gold y Legend).</p>');return;}
     if(window.isRaceBusy && window.isRaceBusy()){openModal('<h2 id="modal-title">COCHE EN PISTA</h2><p>Finalizá la sesión antes de cambiar la carrocería.</p>');return;}
     team.bodyType = el.dataset.body; saveCareer(Career); renderGarage();
     if(window.refreshPlayerBody)window.refreshPlayerBody();
   });
 
+  renderLivery(team);
   $('parts-cards').innerHTML = PART_TYPES.map(type => {
     const part = team.parts[type];
     const info = RARITY_INFO[part.rarity];
@@ -163,6 +187,7 @@ function openPackFlow(packId){
   const pack = PACKS[packId], team = playerTeam(Career);
   if (!canAfford(team, pack.cost)) { openModal(`<div class="eyebrow">SOBRES</div><h2 id="modal-title">FONDOS INSUFICIENTES</h2><p>Necesitás ${money(pack.cost)} para abrir un ${pack.name}.</p>`); return; }
   const results = openPack(Career, packId);
+  const bodyDrop = rollBodyDrop(packId);
   saveCareer(Career);
   refreshTopBadge();
   packOpening=true;
@@ -176,7 +201,8 @@ function openPackFlow(packId){
       const tag = r.rarityUp ? 'NUEVA PIEZA' : (r.leveledUp ? 'SUBIÓ DE NIVEL' : 'FRAGMENTO AÑADIDO');
       return `<div class="part-card reward-card" style="--rc:${info.color};--delay:${i*.13}s"><span class="rarity-tag">${r.rarity}</span><div class="part-art">${RacingArt.image('part',r.type,info.color)}<span class="reward-count">×1</span></div><h4>${PART_LABELS[r.type]}</h4><div class="reward-status">${tag}</div></div>`;
     }).join('');
-    openModal(`<div class="rewards-heading"><div class="eyebrow">${pack.name} / RECOMPENSAS</div><h2 id="modal-title">¡FELICITACIONES!</h2><p>TUS NUEVOS COMPONENTES YA ESTÁN EN EL GARAGE</p></div><div class="rewards-grid">${rows}</div><button class="primary" style="margin:24px auto 0" id="pack-continue">CONTINUAR →</button>`);
+    const bodyRow = bodyDrop ? (bodyDrop.key ? `<div class="part-card reward-card" style="--rc:#f5c044;--delay:${results.length*.13}s"><span class="rarity-tag">CARROCERÍA NUEVA</span><div class="part-art">${RacingArt.image('car',bodyDrop.key)}</div><h4>${BODIES[bodyDrop.key].name}</h4><div class="reward-status">DESBLOQUEADA</div></div>` : `<div class="part-card reward-card" style="--rc:#9aa08d"><span class="rarity-tag">REPETIDA</span><h4>+${bodyDrop.mats} MATERIALES</h4><div class="reward-status">Ya tenés todas las carrocerías</div></div>`) : '';
+    openModal(`<div class="rewards-heading"><div class="eyebrow">${pack.name} / RECOMPENSAS</div><h2 id="modal-title">¡FELICITACIONES!</h2><p>TUS NUEVOS COMPONENTES YA ESTÁN EN EL GARAGE</p></div><div class="rewards-grid">${rows}${bodyRow}</div><button class="primary" style="margin:24px auto 0" id="pack-continue">CONTINUAR →</button>`);
     $('pack-continue').onclick = () => { closeModal(); refreshAll(); };
     refreshAll();
   }, 900);
@@ -395,13 +421,13 @@ function runPracticeSimulation(){
 function renderSponsors(){
   const team = playerTeam(Career);
   $('active-sponsors').innerHTML = team.sponsors.map((s,i) => s ? `
-    <div class="sponsor-card"><div><h4>${s.name}</h4><small>${money(s.base)} por carrera · ${s.bonus.label} · ${s.roundsLeft} fechas restantes</small></div><button data-drop-sponsor="${i}">TERMINAR CONTRATO</button></div>`
+    <div class="sponsor-card"><div style="display:flex;gap:12px;align-items:center">${window.EM&&EM.sponsorLogo?EM.sponsorLogo(s.id,s.name,54):''}<div><h4>${s.name}</h4><small>${money(s.base)} por carrera · ${s.bonus.label} · ${s.roundsLeft} fechas restantes</small></div></div><button data-drop-sponsor="${i}">TERMINAR CONTRATO</button></div>`
     : `<div class="sponsor-card"><div><h4>Slot ${i+1} vacío</h4><small>Elegí una oferta abajo.</small></div></div>`).join('');
-  document.querySelectorAll('[data-drop-sponsor]').forEach(btn => btn.onclick = () => { team.sponsors[Number(btn.dataset.dropSponsor)] = null; saveCareer(Career); renderSponsors(); });
+  document.querySelectorAll('[data-drop-sponsor]').forEach(btn => btn.onclick = () => { const i = Number(btn.dataset.dropSponsor), sp = team.sponsors[i]; if (!sp) return; if (!confirm('Romper el contrato con ' + sp.name + ' cuesta una penalidad de ' + money(sp.base) + ' y 3 puntos de reputación. ¿Continuar?')) return; if (team.credits < sp.base) { openModal('<h2 id="modal-title">SIN FONDOS</h2><p>No alcanza para pagar la penalidad.</p>'); return; } team.credits -= sp.base; team.reputation = Math.max(0, team.reputation - 3); team.sponsors[i] = null; saveCareer(Career); refreshTopBadge(); renderSponsors(); });
   const activeIds = team.sponsors.filter(Boolean).map(s => s.id);
   const offers = SPONSOR_POOL.filter(s => !activeIds.includes(s.id) && team.reputation >= s.reputationReq);
   $('sponsor-offers').innerHTML = offers.map(s => `
-    <div class="sponsor-card"><div><h4>${s.name}</h4><small>${money(s.base)} por carrera · ${s.bonus.label} · ${s.duration} fechas</small></div><button data-accept-sponsor="${s.id}" ${team.sponsors.every(Boolean)?'disabled title="No hay slots libres"':''}>ACEPTAR</button></div>`).join('') ||
+    <div class="sponsor-card"><div style="display:flex;gap:12px;align-items:center">${window.EM&&EM.sponsorLogo?EM.sponsorLogo(s.id,s.name,54):''}<div><h4>${s.name}</h4><small>${money(s.base)} por carrera · ${s.bonus.label} · ${s.duration} fechas</small></div></div><button data-accept-sponsor="${s.id}" ${team.sponsors.every(Boolean)?'disabled title="No hay slots libres"':''}>ACEPTAR</button></div>`).join('') ||
     '<p style="font-size:12px;color:#7c8272">Sin nuevas ofertas por ahora. Subí tu reputación ganando carreras.</p>';
   document.querySelectorAll('[data-accept-sponsor]').forEach(btn => btn.onclick = () => {
     const slot = team.sponsors.findIndex(s => !s);
@@ -607,7 +633,16 @@ function developDrivers(){
     d.marketValue = Math.round((d.rating*d.rating*30) / 1000) * 1000;
   });
 }
+function payChampionshipBonuses(){
+  const team = playerTeam(Career), champ = [...Career.teams].sort((a,b)=>b.points-a.points)[0];
+  if (champ.id !== team.id) return 0;
+  let total = 0;
+  team.sponsors.forEach(s => { if (s && s.bonus.type === 'championship') total += s.bonus.amount; });
+  if (total) { earn(team, total); pushNews('BONUS DE PATROCINIO', `Campeonato ganado: los patrocinadores pagan ${money(total)}.`); }
+  return total;
+}
 function endSeason(){
+  payChampionshipBonuses();
   recordSeasonHistory();
   pushNews('FIN DE TEMPORADA', `Temporada ${Career.season} completa. Es hora de votar el reglamento.`);
   Career.voteResolved = false;

@@ -179,7 +179,7 @@
   }
   // Aspecto extra de la carta (cortes, barbas, accesorios, poses del módulo cardlook.js). Determinista por jugador: no consume el RNG del mundo.
   const LOOK = {
-    hair: ['mohicano', 'afro', 'rulos', 'trenzas', 'rastas', 'melena', 'colita', 'mono', 'rodete', 'flequillo', 'jopo', 'undercut', 'degradado', 'engominado', 'raya', 'puas', 'media', 'taza', 'trencitas', 'corona'],
+    hair: ['mohicano', 'afro', 'rulos', 'trenzas', 'rastas', 'melena', 'colita', 'mono', 'rodete', 'flequillo', 'jopo', 'undercut', 'degradado', 'engominado', 'raya', 'puas', 'media', 'taza', 'trencitas', 'corona', 'buzz', 'crop', 'librito', 'mullet', 'texturizado', 'cresta', 'edgar', 'rulosfade', 'brocoli', 'twists', 'manbun', 'mediacola', 'disenio', 'hightop', 'crop', 'texturizado', 'buzz', 'degradado'],
     beard: ['completa', 'corta', 'sombra', 'larga', 'vikinga', 'canosa', 'desprolija', 'candado', 'perilla', 'chivera', 'chivo', 'mosca', 'herradura', 'anclada', 'bigote', 'manubrio', 'fumanchu', 'mostacho', 'patillas', 'chuletas'],
     acc: ['vincha', 'vinchaancha', 'bandana', 'gorrolana', 'munequera', 'cadena', 'aros', 'snood', 'mascaranariz', 'pinturaojos', 'rodillera', 'mangalarga'],
     pose: ['cruzado', 'cintura', 'patada', 'cabezazo', 'punos', 'saludo', 'rodilla', 'gambeta', 'escudo'],
@@ -222,7 +222,14 @@
     for (const c of pool) { const sc = Math.min(cdist(c, club.primaryColor), opp ? cdist(c, opp.primaryColor) : 999, cdist(c, club.secondaryColor) * 0.8); if (sc > bs) { bs = sc; best = c; } }
     return best;
   }
-  const kitPattern = (club) => ['stripes', 'band', 'sash', 'plain'][Math.floor(TLM.hash01(club.id, 'kit') * 4) % 4];
+  // Diseño de camiseta: el del club (tlm-data) o, en partidas viejas / clubes creados, uno fijo según el nombre (kits.js).
+  const KIT_BY_NAME = {};
+  [...((TLM.WORLD_CONFIG && TLM.WORLD_CONFIG.clubs) || []), ...(TLM.GUEST_CLUBS || [])].forEach((c) => { if (c.kitPattern) KIT_BY_NAME[c.name] = c.kitPattern; });
+  const kitPattern = (club) => {
+    if (club.kitPattern) return club.kitPattern;
+    const ids = (g.LFOKits && g.LFOKits.ids) || ['stripes', 'band', 'sash', 'plain'];
+    return KIT_BY_NAME[club.name] || ids[Math.floor(TLM.hash01(club.id, 'kit') * ids.length) % ids.length];
+  };
   function sideConfig(state, club, instructions, opp) {
     repairLineup(state, club);
     const f = club.tactics.formation, slots = TLM.FORMATIONS[f];

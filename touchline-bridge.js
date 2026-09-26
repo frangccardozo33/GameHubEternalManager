@@ -34,6 +34,14 @@
   'use strict';
   if (window.top === window) return; // only makes sense inside the hub's iframes
 
+  // Capa común (sonidos, pop-ups, anuncios, transiciones, patrocinios, celebraciones). Música no la usa (ver em-common.js).
+  (function () {
+    const me = document.currentScript && document.currentScript.src; if (!me || /02-musica/.test(location.pathname)) return;
+    const u = new URL('assets/common/em-common.js', me).href;
+    if (document.readyState === 'loading') document.write('<script src="' + u + '"><\/script>');
+    else { const s = document.createElement('script'); s.src = u; document.head.appendChild(s); }
+  })();
+
   const listeners = [];
   const cosmeticsListeners = [];
   const pending = new Map();

@@ -22,7 +22,7 @@ function bcNfl(){
   for(const e of sim.events){if(e.id<=bcLastId)continue;bcLastId=e.id;const t=String(e.text||'');
     if(e.type==='result'){if(/^SACK/.test(t))bc.event('sack',{});else if(/^INTERCEPTION/.test(t))bc.event('interception',{});else{const m=/^FIRST DOWN · (\d+)/.exec(t);if(m&&+m[1]>=20)bc.event('bigplay',{sub:m[1]+' yardas'});}}}
   const T=sim.teams,sc=sim.drive.score;
-  bc.tick({scores:[...sc],names:[T[0].name,T[1].name],colors:[T[0].color,T[1].color],period:sim.clock.quarter,periods:4,phase:sim.state==='FINAL'?'final':sim.started?'live':'pre'});
+  bc.tick({scores:[...sc],names:[T[0].name,T[1].name],colors:[T[0].color,T[1].color],user:managerCtx?userIdx:-1,period:sim.clock.quarter,periods:4,phase:sim.state==='FINAL'?'final':sim.started?'live':'pre'});
   if(sim.state==='HALFTIME'&&!bcHalf){bcHalf=true;const was=paused;paused=true;const lead=sc[0]===sc[1]?null:T[sc[0]>sc[1]?0:1];
     bc.studio({kind:'half',onDone:()=>{paused=was;},lines:[['A',`Medio tiempo: ${T[0].name} ${sc[0]}, ${T[1].name} ${sc[1]}.`],['B',lead?`${lead.name} manda al vestuario, pero la diferencia de ${Math.abs(sc[0]-sc[1])} se puede dar vuelta con un solo drive.`:'Todo igualado: gana el que mejor ajuste en el segundo tiempo.'],['A',`En yardas: ${T[0].short} ${yardsOf(0)} y ${T[1].short} ${yardsOf(1)}.`]]});}
   if(sim.state==='FINAL'&&!bcPost){bcPost=true;const w=T[sc[0]>=sc[1]?0:1],l=w===T[0]?T[1]:T[0];
@@ -94,7 +94,7 @@ function syncTeamLabels(){
   const [home,away]=sim.teams,sb=document.querySelector('.scoreboard');
   sb.style.setProperty('--blue',home.color);sb.style.setProperty('--orange',away.color);
   for(const [sel,t] of [['.team-home',home],['.team-away',away]]){const el=sb.querySelector(sel);el.querySelector('.team-name small').textContent=t.city;el.querySelector('.team-name strong').textContent=t.mascot;
-    el.querySelector('.crest').innerHTML=`<div class="mono-crest" style="--c:${t.color};--d:${t.dark}">${t.short||t.mascot.slice(0,2)}</div>`;}
+    el.querySelector('.crest').innerHTML=t.crest?`<img class="logo-crest" src="${t.crest}" alt="">`:`<div class="mono-crest" style="--c:${t.color};--d:${t.dark}">${t.short||t.mascot.slice(0,2)}</div>`;}
   $('stadium-label').textContent=`${home.city.charAt(0)+home.city.slice(1).toLowerCase()} Field`;
 }
 function loadMatch(ctx,options={}){

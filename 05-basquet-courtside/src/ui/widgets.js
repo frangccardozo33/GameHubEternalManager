@@ -6,6 +6,7 @@ export const cls = v => (v > 0 ? 'pos' : v < 0 ? 'neg' : '');
 export const meter = v => `<span class="meter ${v < 45 ? 'low' : v < 65 ? 'mid' : ''}"><i style="width:${Math.max(3, Math.min(100, v))}%"></i></span>${Math.round(v)}`;
 export const pill = (t, k = '') => `<span class="pill ${k}">${esc(t)}</span>`;
 export const dot = c => `<span class="dot" style="background:${c}"></span>`;
+export const crestDot = t => (t && t.crest ? `<img class="crest-dot" src="${t.crest}" alt="">` : dot(t ? t.color : '#888'));
 export const ovrColor = o => (o >= 85 ? '#86e0a4' : o >= 78 ? '#c8dc8a' : o >= 70 ? '#e9dfc7' : '#c99a8a');
 export const link = (screen, arg, text) => `<a class="lnk" data-go="${screen}" data-arg="${esc(arg)}">${esc(text)}</a>`;
 // Tabla ordenable. cols: {k,label,val(row)->valor ordenable,html(row)->celda,l:izquierda}

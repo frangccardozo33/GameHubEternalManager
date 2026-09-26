@@ -1,3 +1,4 @@
+import { CLUBS } from '../../../assets/common/clubs.mjs';
 // World units are metres; time is seconds. X is court length, Z court width.
 export const COURT = { halfLength: 14, halfWidth: 7.5, hoopX: 12.425, rimY: 3.05, rimRadius: 0.23, ballRadius: 0.12 };
 export const DEFAULT_RULES = {
@@ -70,8 +71,10 @@ export class Player {
 }
 export class Team {
   constructor(id, random, spec = null) {
-    this.id = id; this.name = spec?.name ?? (id ? 'COASTAL WAVES' : 'METRO FOXES'); this.short = spec?.short ?? (id ? 'WAV' : 'FOX');
-    this.color = spec?.color ?? (id ? '#62b9b8' : '#ed743e'); this.style = spec?.style ?? (id ? 'PICK & ROLL' : 'PACE & SPACE');
+    const ex = CLUBS[id ? 1 : 0];
+    this.id = id; this.name = spec?.name ?? `${ex.bkt.city} ${ex.bkt.nick}`.toUpperCase(); this.short = spec?.short ?? ex.bkt.short;
+    this.city = spec?.city ?? ex.bkt.city; this.nick = spec?.nick ?? ex.bkt.nick; this.crest = spec?.crest ?? '../' + ex.logo;
+    this.color = spec?.color ?? ex.color; this.style = spec?.style ?? (id ? 'PICK & ROLL' : 'PACE & SPACE');
     this.roster = spec ? spec.players.map((d, i) => new Player(id, i, random, d)) : Array.from({ length: 8 }, (_, i) => new Player(id, i, random));
     if (spec) for (const p of this.roster) { p.teamLabel = spec.label ?? this.short; p.numberColor = textOn(this.color); }
     this.score = 0; this.fouls = 0; this.timeouts = 2;

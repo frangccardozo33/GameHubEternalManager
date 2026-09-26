@@ -188,13 +188,13 @@ function updatePanels(now) {
 }
 
 // ---------- ciclo de vida ----------
-function crestSvg(team) { return `<svg viewBox="0 0 50 50"><path d="M25 3l19 7v14c0 12-8 20-19 23C14 44 6 36 6 24V10z" fill="${team.color}"/><text x="25" y="31" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="15" font-weight="800" fill="#10171b">${esc(team.short)}</text></svg>`; }
+function crestSvg(team) { return team.crest ? `<img src="${team.crest}" alt="" style="width:100%;height:100%;object-fit:contain">` : `<svg viewBox="0 0 50 50"><path d="M25 3l19 7v14c0 12-8 20-19 23C14 44 6 36 6 24V10z" fill="${team.color}"/><text x="25" y="31" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="15" font-weight="800" fill="#10171b">${esc(team.short)}</text></svg>`; }
 function applyTeamsHud(names) {
   const [h, a] = sim.teams; els.screen.style.setProperty('--home', h.color); els.screen.style.setProperty('--away', a.color);
   document.querySelectorAll('.score-team .team-name').forEach((el, i) => {
-    const [first, second] = names ? names[i] : i ? ['COASTAL', 'WAVES'] : ['METRO', 'FOXES']; el.querySelector('span').textContent = first; el.querySelector('b').textContent = second;
+    const [first, second] = names ? names[i] : [sim.teams[i].city.toUpperCase(), sim.teams[i].nick.toUpperCase()]; el.querySelector('span').textContent = first; el.querySelector('b').textContent = second;
   });
-  crests.forEach((c, i) => { if (mode === 'career') { c.className = 'team-crest'; c.innerHTML = crestSvg(sim.teams[i]); } else { c.className = ORIGINAL_CREST[i].cls; c.innerHTML = ORIGINAL_CREST[i].html; } });
+  crests.forEach((c, i) => { c.className = 'team-crest'; c.innerHTML = crestSvg(sim.teams[i]); });
   document.querySelectorAll('.map-legend span:not(.map-label)')[0].lastChild.textContent = h.short; document.querySelectorAll('.map-legend span:not(.map-label)')[1].lastChild.textContent = a.short;
   document.querySelectorAll('.style-row > span').forEach((el, i) => { el.textContent = sim.teams[i].short; });
   document.querySelectorAll('.settings-teams .home-text').forEach(el => { el.textContent = h.name; }); document.querySelectorAll('.settings-teams .away-text').forEach(el => { el.textContent = a.name; });
@@ -214,7 +214,7 @@ function bcTick() {
   for (const ev of sim.events) { if (ev.id <= lastEvId) break; if (ev.type === 'score' && ev.team != null) { const [n, v] = String(ev.text).split(' · '); scorers[ev.team] = n; pts[n] = (pts[n] || 0) + (parseInt(v, 10) || 0); } }
   lastEvId = sim.events[0]?.id ?? lastEvId;
   const [h, a] = sim.teams;
-  bc.tick({ scores: [h.score, a.score], names: [h.name, a.name], colors: [h.color, a.color], scorer: scorers, period: sim.period, periods: sim.rules.periods, phase: sim.phase === 'finished' ? 'final' : sim.phase === 'ready' ? 'pre' : 'live' });
+  bc.tick({ scores: [h.score, a.score], names: [h.name, a.name], colors: [h.color, a.color], scorer: scorers, user: career ? career.userSide : -1, period: sim.period, periods: sim.rules.periods, phase: sim.phase === 'finished' ? 'final' : sim.phase === 'ready' ? 'pre' : 'live' });
   // estudio en el descanso y al final del partido
   if (sim.phase === 'interval' && sim.period === sim.rules.periods / 2 && !halfShown) {
     halfShown = true; const was = paused; paused = true;
@@ -238,7 +238,7 @@ function showIntro(then) {
   const [h, a] = sim.teams, active = t => sim.players.filter(p => p.team === t && p.active).map(p => ({ n: p.number, name: p.name, pos: p.role }));
   const comp = els.eyebrow.textContent === 'PARTIDO' ? 'Exhibición · Liga de Básquet Online' : els.eyebrow.textContent;
   bc.intro({ competition: comp, date: els.sub.textContent, venue: '',
-    home: { name: h.name, short: h.short, primary: h.color, sub: 'Local' }, away: { name: a.name, short: a.short, primary: a.color, sub: 'Visitante' }, lineups: [active(0), active(1)],
+    home: { name: h.name, short: h.short, primary: h.color, crest: h.crest, sub: 'Local' }, away: { name: a.name, short: a.short, primary: a.color, crest: a.crest, sub: 'Visitante' }, lineups: [active(0), active(1)],
     onDone: () => {
       const bh = bestOf(0), ba = bestOf(1);
       bc.studio({ kind: 'pre', onDone: then, lines: [
@@ -272,8 +272,8 @@ export const Match = {
   get isOpen() { return isOpen; }, get inProgress() { return mode === 'career' && isOpen && sim && sim.phase !== 'finished'; }, get sim() { return sim; },
   openExhibition() {
     if (!ensureView()) return; mode = 'exhibition'; career = null; els.loading.hidden = true;
-    els.settingsButton.hidden = false; els.skip.hidden = true; els.coachTab.hidden = true; els.eyebrow.textContent = 'PARTIDO'; els.title.innerHTML = 'Exhibición<span>.</span>'; els.sub.textContent = 'Metro Foxes contra Coastal Waves.';
-    selectTab('match'); show(true); attach(createExhibition()); setExhibitionChrome();
+    els.settingsButton.hidden = false; els.skip.hidden = true; els.coachTab.hidden = true; els.eyebrow.textContent = 'PARTIDO'; els.title.innerHTML = 'Exhibición<span>.</span>'; const ex = createExhibition(); els.sub.textContent = `${ex.teams[0].city} ${ex.teams[0].nick} contra ${ex.teams[1].city} ${ex.teams[1].nick}.`;
+    selectTab('match'); show(true); attach(ex); setExhibitionChrome();
   },
   openCareer({ sim: s, homeName, awayName, userSide, title, sub, eyebrow, onFinish, onSaveBase }) {
     if (!ensureView()) return false; mode = 'career'; career = { userSide, onFinish, onSaveBase }; els.loading.hidden = true;

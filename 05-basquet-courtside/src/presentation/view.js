@@ -113,6 +113,7 @@ export class MatchView {
     this.halo.visible = !!view.ball.owner;
     if (view.ball.owner) { this.halo.position.set(view.ball.owner.x, 0.01, view.ball.owner.z); this.halo.material.color.set(sim.teams[view.ball.owner.team].color); }
     this.arena.update(view);
+    if (!this.cameraController.__em && window.EM && window.EM.cams) window.EM.cams.wrap(this.cameraController, { THREE: { Vector3: THREE.Vector3 }, dom: this.renderer.domElement, mount: this.container, axis: 'x', half: [14, 7.5], hLow: 1.8, hHigh: 22, r: 22, hOrb: 9, pad: 5, focus: (a) => ({ x: a[0].x, y: 1, z: a[0].z }), speed: 12, defaultMode: 'broadcast' });
     this.cameraController.update(view.ball, Math.min(0.1, dt || 1 / 60), this.camera.aspect, sim.phase === 'ready');
     this.updateDebug(sim); this.renderer.render(this.scene, this.camera);
   }

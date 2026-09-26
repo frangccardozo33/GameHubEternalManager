@@ -104,6 +104,7 @@
     season += cupQual + cupNext + cupAuto;
     if (out.seasonEnded) { const h = out.season, mine = h.table.find((r) => r.clubId === u.id); season += `<div class="tlm-alert info"><b>Fin de la temporada ${h.season}:</b> campeón ${esc(h.championName)}. Terminaste ${mine ? mine.pos + '°' : '—'} con ${mine ? mine.points : 0} puntos. Goleador: ${h.scorers[0] ? esc(h.scorers[0].name) + ' (' + h.scorers[0].goals + ')' : '—'}. Contratos vencidos: revisá tu plantilla. ¡Empieza la nueva temporada!</div>`; }
     UI.modal(`<h2>Jornada ${out.round} cerrada</h2>${season}<div class="tlm-cols"><div><h3>Resultados</h3><ul class="tlm-list">${others || '<li class="muted">—</li>'}</ul></div><div><h3>Tu club</h3><p>Posición: <b>${me ? me.pos : '-'}°</b> · Saldo ${M(u.finances.balance)}</p><h3>Mercado</h3><ul class="tlm-list">${lines.map((l) => `<li>${l}</li>`).join('') || '<li class="muted">Sin novedades de mercado.</li>'}</ul></div></div><div class="tlm-row"><button class="tlm-btn primary" data-act="afterRound">Continuar</button></div>`, 'wide');
+    cupCeremony(s, u);
   };
   function cupClosedModal(out) {
     const c = UI.career, s = c.state, u = c.user, cr = out.cupResult, def = TLM.CUPS[cr.cupId], cup = s.cups[cr.cupId];
@@ -111,6 +112,15 @@
     const next = cup.rounds[cr.idx + 1], alive = cup.status === 'active' && cup.rounds[cr.idx] && cup.rounds[cr.idx].fixtureIds.some((id) => s.fixtures[id].result && s.fixtures[id].result.winnerId === u.id);
     const msg = cup.champion ? `<div class="tlm-alert info"><b>${esc(s.clubs[cup.champion].name)}</b> es el campeón de ${esc(def.name)}${cup.champion === u.id ? ' — ¡es tu club!' : ''}.</div>` : alive && next ? `<div class="tlm-alert info">Seguís en carrera: próxima ronda, <b>${esc(next.name)}</b>${cup.slots[cr.idx + 1] ? ' · ' + esc(TLM.cupDateStr(s, cup, cr.idx + 1)) : ''}.</div>` : '<div class="tlm-alert bad">Tu club quedó afuera de la copa.</div>';
     UI.modal(`<h2>${esc(def.name)} · ${esc(cr.name)} cerrada</h2>${msg}<div class="tlm-cols"><div><h3>Otros partidos</h3><ul class="tlm-list">${rows || '<li class="muted">—</li>'}</ul></div><div><h3>Tu club</h3><p>Saldo ${M(u.finances.balance)}</p><button class="tlm-link" data-act="go" data-screen="cup">Ver el cuadro →</button></div></div><div class="tlm-row"><button class="tlm-btn primary" data-act="afterRound">Continuar</button></div>`, 'wide');
+    cupCeremony(s, u);
+  }
+  // Ceremonia 3D del trofeo (una sola vez por edición) cuando termina la final de La Cupidité.
+  function cupCeremony(s, u) {
+    const cup = s.cups && s.cups.cupidite;
+    if (!cup || !cup.champion || cup.ceremonyShown || !g.LFOCeremony) return;
+    cup.ceremonyShown = true;
+    const w = s.clubs[cup.champion];
+    g.LFOCeremony.show({ name: w.name, color: w.primaryColor, season: cup.season, mine: w.id === u.id });
   }
   A.afterRound = () => { UI.closeModal(); if (B.active && B.ended) B.leave(); UI.go('home'); };
 

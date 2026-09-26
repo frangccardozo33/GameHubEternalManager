@@ -47,8 +47,8 @@ export class Game {
     return g;
   }
   createTeam(i) {
-    const [city, nick, short, color, alt] = TEAM_POOL[i], rng = this.rng, boost = (rng.range(-1, 1) + rng.range(-1, 1)) * 4.5;
-    const t = { id: i, name: `${city} ${nick}`.toUpperCase(), city, nick, short, label: nick.toUpperCase(), color, alt, roster: [], lineup: { starters: [], bench: [] },
+    const [city, nick, short, color, alt, logo] = TEAM_POOL[i], rng = this.rng, boost = (rng.range(-1, 1) + rng.range(-1, 1)) * 4.5;
+    const t = { id: i, name: `${city} ${nick}`.toUpperCase(), city, nick, short, label: nick.toUpperCase(), color, alt, crest: '../' + logo, roster: [], lineup: { starters: [], bench: [] },
       dead: [], tactics: this.aiTactics(), plan: { minutes: {}, closer: null, foulPolicy: 'normal', staminaPolicy: 'normal' }, assign: {}, usage: {}, chem: 60, streak: 0, lastStarters: '', popularity: Math.round(rng.range(40, 80)), isUser: false };
     const roles = [...ROLES].sort(() => rng.next() - 0.5).concat(['PG', 'SG', 'SF', 'PF', 'C', 'SF', 'PF', 'C'].sort(() => rng.next() - 0.5));
     const nums = new Set();
@@ -142,7 +142,7 @@ export class Game {
     });
     const idOf = pid => { const i = dressed.findIndex(p => p.id === pid); return i < 0 ? null : `${side}-${i}`; };
     const assignments = {}; for (const [defPid, slot] of Object.entries(team.assign)) { const id = idOf(defPid); if (id != null && slot !== '' && slot != null) assignments[id] = Number(slot); }
-    return { name: team.name, short: team.short, label: team.label, color: clash ? team.alt : team.color, players, tactics: { ...team.tactics }, plan: { closer: idOf(team.plan.closer), foulPolicy: team.plan.foulPolicy, staminaPolicy: team.plan.staminaPolicy }, assignments, style: 'BALANCED' };
+    return { name: team.name, short: team.short, city: team.city, nick: team.nick, crest: team.crest, label: team.label, color: clash ? team.alt : team.color, players, tactics: { ...team.tactics }, plan: { closer: idOf(team.plan.closer), foulPolicy: team.plan.foulPolicy, staminaPolicy: team.plan.staminaPolicy }, assignments, style: 'BALANCED' };
   }
   colorDistance(a, b) { const c = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)); const [x, y] = [c(a), c(b)]; return Math.hypot(x[0] - y[0], x[1] - y[1], x[2] - y[2]); }
   buildSim(e) {

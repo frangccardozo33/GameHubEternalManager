@@ -166,6 +166,7 @@
       <div class="masthead"><div><div class="eyebrow"><span>GARAGE</span> COCHE Y PIEZAS</div><h1>GARAGE</h1></div></div>
       <div id="garage-showroom" class="garage-showroom"></div>
       <div class="garage-links"><a href="#body-cards">01 / CARROCERÍAS</a><a href="#parts-cards">02 / COMPONENTES</a><a href="#pack-cards">03 / SOBRES</a></div>
+      <div class="panel-block" id="livery-panel"></div>
       <div class="panel-block">
         <h3>COLECCIÓN DE CARROCERÍAS <small>11 MODELOS / 5 NUEVOS</small></h3>
         <div class="cards-grid" id="body-cards"></div>
@@ -257,7 +258,7 @@
         <div class="map-box"><svg id="minimap" viewBox="0 0 200 135" aria-label="Mapa de posiciones en vivo"></svg></div>
         <div class="broadcast-bottom"><div class="view-controls"><span>CÁMARA</span><button data-camera="auto" class="active">◉ AUTO TV</button><button data-camera="track">CIRCUITO</button><button data-camera="chase">PERSECUCIÓN</button><button data-camera="onboard">A BORDO</button></div><div class="director-status"><i class="dot"></i><span id="director-label">DIRECTOR IA ACTIVADO</span></div></div>
       </section>
-      <section class="transport" aria-label="Controles de carrera"><div class="transport-left"><button class="secondary-btn" id="quali-button">SIMULAR CLASIFICACIÓN</button><button class="secondary-btn" id="strategy-button">ESTRATEGIA</button><button class="primary" id="start-button"><span class="play">▶</span><span id="start-label">START RACE</span></button><div class="race-state"><b id="status-label">TODO LISTO EN LA PARRILLA</b><span id="status-detail">Carrera corta</span></div></div><div class="playback"><div class="speed-group" aria-label="Velocidad"><button data-speed="0.5">0.5×</button><button data-speed="1" class="active">1×</button><button data-speed="2">2×</button></div><button class="icon-button" id="restart-button" title="Reiniciar carrera" aria-label="Reiniciar carrera"><svg viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 8M4 4v6h6"/></svg>REINICIAR</button><button class="icon-button" id="sound-button" title="Activar sonido" aria-label="Activar sonido"><svg viewBox="0 0 24 24"><path d="M11 4 5 9H2v6h3l6 5ZM16 9l6 6m0-6-6 6" id="sound-icon"/></svg></button><button class="icon-button" id="fullscreen-button" title="Pantalla completa" aria-label="Pantalla completa"><svg viewBox="0 0 24 24"><path d="M3 9V3h6m6 0h6v6m0 6v6h-6m-6 0H3v-6"/></svg></button></div></section>
+      <section class="transport" aria-label="Controles de carrera"><div class="transport-left"><button class="secondary-btn" id="quali-button">SIMULAR CLASIFICACIÓN</button><button class="secondary-btn" id="strategy-button">ESTRATEGIA</button><button class="primary" id="start-button"><span class="play">▶</span><span id="start-label">START RACE</span></button><div class="race-state"><b id="status-label">TODO LISTO EN LA PARRILLA</b><span id="status-detail">Carrera corta</span></div></div><div class="playback"><div class="speed-group" aria-label="Velocidad"><button data-speed="0.5">0.5×</button><button data-speed="1" class="active">1×</button><button data-speed="2">2×</button><button data-speed="4">4×</button><button data-speed="8">8×</button></div><button class="icon-button" id="restart-button" title="Reiniciar carrera" aria-label="Reiniciar carrera"><svg viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 8M4 4v6h6"/></svg>REINICIAR</button><button class="icon-button" id="sound-button" title="Activar sonido" aria-label="Activar sonido"><svg viewBox="0 0 24 24"><path d="M11 4 5 9H2v6h3l6 5ZM16 9l6 6m0-6-6 6" id="sound-icon"/></svg></button><button class="icon-button" id="fullscreen-button" title="Pantalla completa" aria-label="Pantalla completa"><svg viewBox="0 0 24 24"><path d="M3 9V3h6m6 0h6v6m0 6v6h-6m-6 0H3v-6"/></svg></button></div></section>
       <section class="panel-block" id="commands-panel" style="display:none">
         <h3>DIRECCIÓN DE CARRERA</h3>
         <div class="toggle-driver" id="command-car-toggle"></div>
@@ -317,6 +318,8 @@
   <script src="../assets/broadcast/broadcast.js"></script>
   <script src="broadcast-lro.js"></script>
   <script src="engine.js"></script>
+  <script src="lro-extras.js"></script>
+  <script src="lro-cams.js"></script>
   <script>
   (function(){
     'use strict';

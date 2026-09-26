@@ -83,7 +83,7 @@ export class League {
     const providers = [new LineupProvider(this, home.id), new LineupProvider(this, away.id)];
     const gpFor = (t, o) => t.id === d.userTeam ? clone(userGameplan || t.gameplan) : matchupGameplan(this, t, o);
     const gps = [gpFor(home, away), gpFor(away, home)];
-    const teams = [home, away].map((t, i) => ({ id: t.id, name: t.name, short: t.short, city: t.city, mascot: t.mascot, color: t.color, dark: t.dark, style: t.style, defense: t.defense, gameplan: gps[i], roster: providers[i], discipline: providers[i].discipline }));
+    const teams = [home, away].map((t, i) => ({ id: t.id, name: t.name, short: t.short, crest: t.crest, city: t.city, mascot: t.mascot, color: t.color, dark: t.dark, style: t.style, defense: t.defense, gameplan: gps[i], roster: providers[i], discipline: providers[i].discipline }));
     const rec = new GameRecorder(this, home.id, away.id);
     const sim = new MatchSimulator({ seed: this.seedFor(fx), rules: { quarterSeconds: d.settings.quarterSeconds, penalties: true, overtime: fx.type === 'regular' ? 1 : 6 }, teams, recorder: rec });
     return { sim, rec, providers, fixture: fx };

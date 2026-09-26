@@ -248,3 +248,23 @@ Cambios hechos tras comparar todos los módulos contra el modelo de fútbol:
 - Reacción de arqueros: retardo mínimo 0,14 s (mejores) a 0,26 s (peores) (se revirtió el +0,1 s de los peores).
 
 - Circuitos de carreras: instalados los 20 reales (GT3_20_Circuitos.zip) con decorado; los provisionales están en `07-carreras-apex/_backup_circuits_provisionales/`. Validar: `node 07-carreras-apex/tools/check_circuit.mjs 07-carreras-apex/circuits/circuits.json`.
+
+## Ronda «más bola a los otros módulos» (carreras, capa común, música)
+- **Capa común** `assets/common/em-common.js` (la carga `touchline-bridge.js`; Música queda afuera): sonidos (`EM.sfx`, placeholders sintetizados + `assets/sfx/`), pop-ups informativos de 8 tipos por deporte (`EM.pop`),
+  anuncios pop-up (banner, tercio inferior, esquina) y video-comerciales (`EM.ads`), transiciones (`EM.transition`), patrocinios con 3 espacios, pago por partido y bonus (`EM.sponsors`, botón «PATROCINIOS» en el borde izquierdo),
+  celebraciones con los cosméticos del hub para básquet y NFL (`EM.celebrate`) y cámaras orbital / dron / TV dinámica (`EM.cams.wrap`, LBO/LGO/LLO). Se engancha a `Broadcast` (sin tocar los motores) y a `EM_MATCH`.
+- **Lista de audios a reemplazar**: `assets/sfx/LEEME.md` (se regenera el índice con `node assets/sfx/build-index.mjs`).
+- **Carreras** (`07-carreras-apex`): clasificación simulada vuelta por vuelta (`lro-extras.js`), hora del día y lluvia aleatorias, radio del equipo, podio animado con la canción equipada, calendario con mapas del circuito,
+  cámaras nuevas + cabina 3D con volante y tablero dinámicos + ventanas PiP (`lro-cams.js`), motor con muestras reales de `assets/carengines` (con respaldo sintetizado), carrocerías bloqueadas (salen de los sobres),
+  liverías editables, 10 escuderías nuevas (`assets/racingscuderias`), sponsors corregidos (bonus de campeonato, penalidad por rescindir).
+- **Música**: el módulo de básquet ahora tiene su pista (`basketost.m4a`); carreras/MMA/etc. ya no suenan durante la competencia (carreras avisa `EM_MATCH`).
+- **NFL**: el `<script>` del puente apuntaba a `../touchline-bridge.js` y NFL nunca lo cargaba; ahora `../../touchline-bridge.js` (economía, chat y capa común funcionan).
+- Prompts nuevos: `PROMPTS_IA/08_estadios_basquet_mma_nfl.md` y `09_equipos_compartidos_basquet_nfl.md`.
+- Recompilar tras tocar `src/`: LBO `npm run build` + `PYTHONUTF8=1 python inline.py courtside-single.html`; LGO `npx vite build --config vite.single.config.js`.
+
+## Ronda de correcciones (transmisión, 24 vueltas, boxes, sponsors visibles, equipos compartidos)
+- Pop-ups, anuncios, cintillo inferior, efectos de gol y transiciones viven **dentro del visor del juego** (`em-bhost` se monta en el `mount` de Broadcast), así se ven en pantalla normal y completa. Se quitaron las transiciones de página; ahora hay cortinas dentro de la transmisión (cambio de cuarto, round, largada, safety car…).
+- Carreras: 24 vueltas (`CONFIG.laps`), botones de velocidad 4× y 8×, pit lane de dos carriles (rápido y de boxes) con cola: los autos ya no se atraviesan.
+- Sponsors visibles: autos de LRO (lateral, capó y baúl; los rivales llevan anunciantes ficticios fijos) y camisetas de fútbol (pecho, `LFOKits.paint(..., {sponsor})`, sólo en el partido 3D; cromos y carrera no cambian).
+- Equipos compartidos: `assets/common/clubs.mjs` (25 clubes con escudo, colores y nombres por deporte). LBO = 12 clubes, LGO = 8 (se conservan los ids NTH/ATX/… para guardados y tests; los guardados viejos de LBO se conviene regenerar la liga).
+- UI de partido: cintillo «EN VIVO» con marcador/noticias/consejos/publicidad para LBO, LGO y LLO.

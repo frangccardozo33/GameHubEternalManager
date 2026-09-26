@@ -105,6 +105,7 @@ export class StadiumView {
     this.ball.position.set(snapshot.ball.x,snapshot.ball.y,snapshot.ball.z);this.ball.rotation.x=snapshot.liveTime*16;this.ball.rotation.z=snapshot.ball.mode==='flight'?.3:0;
     this.ballRing.position.set(snapshot.ball.x,.1,snapshot.ball.z);this.ballRing.scale.setScalar(snapshot.ball.mode==='flight'?.8:1);
     this.losLine.position.z=snapshot.los;this.firstLine.position.z=Math.min(100,snapshot.lineToGain);this.marker.position.z=Math.min(100,snapshot.lineToGain);
+    if(!this.cameraController.__em&&window.EM&&window.EM.cams)window.EM.cams.wrap(this.cameraController,{THREE:{Vector3:THREE.Vector3},dom:this.renderer.domElement,axis:'z',half:[55,27],center:[50,0],hLow:3,hHigh:45,r:60,hOrb:32,pad:14,speed:40,defaultMode:'broadcast',focus:a=>({x:a[0].ball.x*.15,y:1,z:a[0].ball.z})});
     this.cameraController.update(snapshot,dt,started);this.renderer.render(this.scene,this.camera);
   }
   pick(event) {

@@ -20,7 +20,18 @@ Los textos usan datos reales del partido; las plantillas están en los propios m
 ## Presentadores
 Diego Ferreyra (crónica) y Lucía Acosta (análisis), los mismos del estudio del fútbol. Nombres y roles: `HOSTS` en `broadcast.js`.
 
-## Arte provisional para reemplazar (todo es CSS en `broadcast.js`, constante `CSS`)
+## Arte (hecho)
+- `art/intro-<liga>.jpg` (1600×900): pabellón (LBO), estadio (LGO), circuito nocturno (LRO) y jaula octogonal (LLO). Se usa como `--ibg`.
+- `art/studio-<liga>.jpg`: set con pared LED facetada del color de la liga; encima van la pantalla con el logo, la mesa y los presentadores (`--sbg`).
+- `art/plate-<liga>.png` (1100×200): chapa de las placas de evento con el motivo del deporte; el color del equipo va en las dos franjas laterales (`--pbg`).
+- Presentadores: ilustraciones SVG dentro de `broadcast.js` (`hostSVG`), con boca que se mueve al hablar y parpadeo. Escudo genérico SVG (`shieldSVG`) cuando el equipo no trae `crest`.
+- Tras tocar `broadcast.js` hay que recompilar LBO (`npm run build` + `python inline.py courtside-single.html`) y LGO (`npx vite build --config vite.single.config.js`).
+
+## Lo que sigue pendiente
+- **Audio**: no hay stingers ni ambiente de estudio.
+- **Voz** de los presentadores (hoy solo texto).
+
+## Arte provisional anterior (referencia)
 - **Estudio** (`.bc-studio`): hoy son dos círculos con iniciales y un escritorio. Falta un set con presentadores ilustrados o 3D, mesa, pantalla de datos y fondo de la liga.
 - **Intro** (`.bc-intro`): fondo degradé, escudos genéricos con las iniciales del equipo, logo de la liga. Falta fondo del estadio/pabellón/circuito/jaula y escudos reales de los equipos (`team.crest`).
 - **Placas** (`.bc-plate`): banda inclinada con el color del equipo. Falta un paquete gráfico por deporte (con la marca de cada liga).

@@ -3,13 +3,13 @@ import { PLAYER_TAGS, valueOf, autoRole } from '../manager/players.js';
 import { LIM, prefYears } from '../manager/market.js';
 import { INTENSITY, facilityCost, capacityOf, REV_KEYS, EXP_KEYS, sumKeys } from '../manager/club.js';
 import { pg, pct, fmt, per36, ts, efg, eff, astTov, usg, teamAdvanced } from '../manager/stats.js';
-import { esc, money, signed, cls, meter, pill, dot, ovrColor, link, table, radar, lineChart, attrBars, cmpRow, tabs } from './widgets.js';
+import { esc, money, signed, cls, meter, pill, dot, crestDot, ovrColor, link, table, radar, lineChart, attrBars, cmpRow, tabs } from './widgets.js';
 import { tacticsHtml, PRESETS, optHtml } from './tacdefs.js';
 import { fmtDay } from '../manager/dates.js';
 
 const tname = (g, id) => g.team(id).name;
-const tag = (g, id) => `${dot(g.team(id).color)}${esc(g.team(id).short)}`;
-const teamLink = (g, id) => `${dot(g.team(id).color)}${esc(g.team(id).name)}`;
+const tag = (g, id) => `${crestDot(g.team(id))}${esc(g.team(id).short)}`;
+const teamLink = (g, id) => `${crestDot(g.team(id))}${esc(g.team(id).name)}`;
 const PRESET_BO = { '1,1,1': 'Todas a 1 partido', '3,3,5': 'Al mejor de 3-3-5', '3,5,7': 'Al mejor de 3-5-7', '5,5,7': 'Al mejor de 5-5-7' };
 const line = (m, side, pid) => m.box[side].find(b => b.pid === pid);
 
@@ -17,8 +17,8 @@ const line = (m, side, pid) => m.box[side].find(b => b.pid === pid);
 export function newgame({ g, ui, hasSave }) {
   const c = ui.cfg, sel = ui.newTeam ?? 0, pv = ui.preview;
   const order = pv ? [...pv.s.teams].sort((a, b) => pv.teamOvr(b) - pv.teamOvr(a)).map(t => t.id) : [];
-  const cards = TEAM_POOL.slice(0, c.teams).map(([city, nick, short, color], i) => { const t = pv?.team(i), rank = order.indexOf(i) + 1;
-    return `<div class="teamcard ${i === sel ? 'sel' : ''}" data-act="pickTeam" data-id="${i}"><b>${dot(color)}${esc(city)} ${esc(nick)}</b><small class="muted">${short}${t ? ` · OVR ${pv.teamOvr(t).toFixed(0)} · ${rank}.º de ${c.teams}` : ''}</small>${t ? `<small class="muted">Masa salarial ${pv.payroll(t).toFixed(0)} M€ · ${rank <= 2 ? '<span class="pos">Favorito</span>' : rank >= c.teams - 1 ? '<span class="neg">Proyecto</span>' : 'Competitivo'}</small>` : ''}</div>`; }).join('');
+  const cards = TEAM_POOL.slice(0, c.teams).map(([city, nick, short, color, , logo], i) => { const t = pv?.team(i), rank = order.indexOf(i) + 1;
+    return `<div class="teamcard ${i === sel ? 'sel' : ''}" data-act="pickTeam" data-id="${i}"><b>${crestDot({ crest: '../' + logo, color })}${esc(city)} ${esc(nick)}</b><small class="muted">${short}${t ? ` · OVR ${pv.teamOvr(t).toFixed(0)} · ${rank}.º de ${c.teams}` : ''}</small>${t ? `<small class="muted">Masa salarial ${pv.payroll(t).toFixed(0)} M€ · ${rank <= 2 ? '<span class="pos">Favorito</span>' : rank >= c.teams - 1 ? '<span class="neg">Proyecto</span>' : 'Competitivo'}</small>` : ''}</div>`; }).join('');
   return `<h1>Basketball Manager<span>.</span></h1><p class="sub">Gestión de plantilla, tácticas y temporada, con partidos en 3D.</p>
   <div class="grid g21"><div class="panel"><h3>1 · Elige tu equipo <button class="btn ghost sm" data-act="regen">Regenerar liga</button></h3><div class="grid g4">${cards}</div>
     <div class="hint">La liga se genera aleatoriamente: hay favoritos y proyectos. Un OVR más alto significa una plantilla mejor; los proyectos son más difíciles pero más agradecidos.</div></div>
@@ -46,7 +46,7 @@ export function dashboard({ g, ui }) {
   } else if (entry) {
     const opp = g.team(entry.home === u.id ? entry.away : entry.home), oRec = st.find(x => x.id === opp.id), home = entry.home === u.id;
     hero = `<div class="hero"><div><div class="eyebrow">${esc(day.label.toUpperCase())}${day.kind === 'playoff' ? ' · PLAYOFFS' : day.kind === 'cup' ? ' · COPA' : ''}</div>
-      <div class="vs"><div class="tm"><b>${dot(u.color)}${esc(u.short)}</b><small>${rec.w}-${rec.l} · OVR ${g.teamOvr(u).toFixed(0)}</small></div><span class="at">${home ? 'vs' : '@'}</span><div class="tm"><b>${dot(opp.color)}${esc(opp.short)}</b><small>${oRec.w}-${oRec.l} · OVR ${g.teamOvr(opp).toFixed(0)}</small></div></div>
+      <div class="vs"><div class="tm"><b>${crestDot(u)}${esc(u.short)}</b><small>${rec.w}-${rec.l} · OVR ${g.teamOvr(u).toFixed(0)}</small></div><span class="at">${home ? 'vs' : '@'}</span><div class="tm"><b>${dot(opp.color)}${esc(opp.short)}</b><small>${oRec.w}-${oRec.l} · OVR ${g.teamOvr(opp).toFixed(0)}</small></div></div>
       <p class="sub" style="margin:8px 0 0">${esc(opp.name)} · ${home ? 'juegas en casa' : 'juegas fuera'} · sus tácticas: ritmo ${opp.tactics.tempo}, ${opp.tactics.defense === 'man' ? 'defensa individual' : 'defensa en zona'}</p></div>
       <div class="row"><button class="btn pri" data-act="play" data-mode="view">▶ Ver partido en 3D</button><button class="btn" data-act="play" data-mode="sim">⏩ Simular partido</button><button class="btn ghost" data-go="tactics">Tácticas</button></div></div>`;
   } else {

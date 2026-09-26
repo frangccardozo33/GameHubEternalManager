@@ -11,3 +11,6 @@ Thumbs.db
 
 # copia del repo original de Carreras (apexracingproj); se renombró para poder subir esos archivos al repo principal
 .git-lro-backup/
+
+# zips de descargas y copias
+*.zip

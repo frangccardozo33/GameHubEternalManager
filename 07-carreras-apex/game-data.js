@@ -100,6 +100,12 @@ function migrateCareer(career){
     (career.driversPool || []).forEach(d => { if (d.nationality in NAT) d.nationality = NAT[d.nationality] || (d.id % 3 ? 'PER' : 'VAL'); });
     career.version = 4;
   }
+  if ((career.version || 2) < 5) {
+    // escuderías nuevas (nombres, colores y logos) y carrocerías bloqueadas: sólo queda la que ya usaba cada equipo
+    career.teams.forEach((t,i) => { const d = TEAM_DEFS[i]; if (d) { t.name = d.name; t.color = d.color; t.logo = d.logo; t.profile = t.isPlayer ? t.profile : d.profile; } });
+    const pt = career.teams[0]; pt.ownedBodies = [pt.bodyType];
+    career.version = 5;
+  }
   return career;
 }
 const WEATHER_STATES = {
@@ -170,16 +176,16 @@ function makeDriverPool(){
   return all;
 }
 const TEAM_DEFS = [
-  {name:'Escudería del Sur',color:0xd96a32,profile:'BALANCED'},
-  {name:'Río Plata Competición',color:0x347f92,profile:'FACTORY'},
-  {name:'Scuderia Austral',color:0xbac89c,profile:'DEVELOPMENT'},
-  {name:'Talleres del Oeste',color:0xd9b752,profile:'BUDGET'},
-  {name:'Cóndor Motorsport',color:0xa74438,profile:'AGGRESSIVE'},
-  {name:'Pampa Racing',color:0xe1ded0,profile:'TYRE SPECIALIST'},
-  {name:'Norte Competición',color:0x343e52,profile:'FACTORY'},
-  {name:'Cruz del Sur',color:0x589580,profile:'BALANCED'},
-  {name:'Litoral Sport',color:0xb688a1,profile:'BUDGET'},
-  {name:'Costa Atlántica',color:0x73a9b2,profile:'AGGRESSIVE'}
+  {name:'Pegasus Racing',color:0x1560b0,profile:'BALANCED',logo:'pegasusracing.jpg'},
+  {name:'Valiant Racing',color:0x3aa6d8,profile:'FACTORY',logo:'valiantracing.jpg'},
+  {name:'Deerson Racing Team',color:0x1f6b35,profile:'DEVELOPMENT',logo:'deersonracingteam.jpg'},
+  {name:'Trax Super Touring Team',color:0x2ee62e,profile:'BUDGET',logo:'traxsupertouringteam.jpg'},
+  {name:'Tyrannos Super Touring Team',color:0xf2c318,profile:'AGGRESSIVE',logo:'tyrannosupertouringteam.jpg'},
+  {name:'Orbital RaceCola Racing',color:0x1d3a6e,profile:'TYRE SPECIALIST',logo:'orbitalracecolaracing.jpg'},
+  {name:'Glance Performance Racing',color:0xe8782a,profile:'FACTORY',logo:'glanceperformanceracing.jpg'},
+  {name:'Hashiru Racing Team',color:0xd42a2a,profile:'BALANCED',logo:'hashiruracingteam.jpg'},
+  {name:'Kaiser Racing Team',color:0xd08ad8,profile:'BUDGET',logo:'kaiserracingteam.jpg'},
+  {name:'EAG Valant Oil Performance',color:0xc76fd0,profile:'AGGRESSIVE',logo:'eagvalantoilperformanceracing.jpg'}
 ];
 function freshParts(){
   const parts = {};
@@ -190,6 +196,7 @@ function makeTeam(index, def, isPlayer){
   return {
     id: index,
     name: def.name,
+    logo: def.logo,
     color: def.color,
     profile: def.profile,
     isPlayer: !!isPlayer,
@@ -202,6 +209,7 @@ function makeTeam(index, def, isPlayer){
     driverIds: [index, 10 + index],
     activeDriverId: index,
     bodyType: Object.keys(BODIES)[index % Object.keys(BODIES).length],
+    ownedBodies: isPlayer ? [Object.keys(BODIES)[index % Object.keys(BODIES).length]] : null,
     parts: isPlayer ? freshParts() : null,
     componentUsage: { engine: 0, gearbox: 0 },
     gridPenaltyNext: 0,
@@ -215,7 +223,7 @@ function newCareer(){
   const shuffledTracks = [...TRACKS];
   const calendar = Array.from({length:TRACKS.length}, (_,i) => ({ round:i+1, trackId: shuffledTracks[i % shuffledTracks.length].id, completed:false, result:null, gridPenalty:false }));
   return {
-    version: 4,
+    version: 5,
     season: 1,
     roundIndex: 0,
     teams,
@@ -243,6 +251,15 @@ function currentTrack(career){ const r = currentRound(career); return TRACKS.fin
 function activeDriver(career, team){ return career.driversPool.find(d => d.id === team.activeDriverId) || career.driversPool.find(d => d.id === team.driverIds[0]); }
 function teamDrivers(career, team){ return team.driverIds.map(id => career.driversPool.find(d => d.id === id)).filter(Boolean); }
 
+const LIVERY_PATTERNS = {none:'Liso',center:'Franja central',twin:'Doble línea',side:'Franjas laterales',nose:'Trompa',dual:'Bandas de capó'};
+const hexColor = n => '#' + (n >>> 0).toString(16).padStart(6,'0').slice(-6);
+function liveryFor(team){
+  const pats = ['center','side','twin','nose','dual'];
+  const base = team.livery || {primary:hexColor(team.color), secondary:'#f2f5f3', accent:'#111820', roof:null, pattern:pats[team.id % pats.length]};
+  // anunciantes: los contratos del jugador; los rivales llevan dos anunciantes ficticios fijos
+  const sp = team.isPlayer ? (team.sponsors||[]).filter(Boolean).map(x => x.name) : [SPONSOR_POOL[(team.id*2)%SPONSOR_POOL.length].name, SPONSOR_POOL[(team.id*2+1)%SPONSOR_POOL.length].name];
+  return Object.assign({}, base, {sponsors: sp});
+}
 function computePlayerCarRating(team){
   const body = BODIES[team.bodyType] || BODIES.classic;
   const axes = { top:.5, accel:.5, brake:.5, corner:.5, control:.5 };

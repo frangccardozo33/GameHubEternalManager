@@ -72,7 +72,7 @@ export function defaultTraining() { return { focus: { passing: 15, routeRunning:
 
 export function makeTeam(world, tpl, bias = 0) {
   const rng = world.rng, d = world.data;
-  const team = { id: tpl.id, name: tpl.name, city: tpl.city, mascot: tpl.mascot, short: tpl.id, color: tpl.color, dark: tpl.dark, style: tpl.style, defense: tpl.defense,
+  const team = { id: tpl.id, name: tpl.name, city: tpl.city, mascot: tpl.mascot, short: tpl.code || tpl.id, crest: tpl.crest, color: tpl.color, dark: tpl.dark, style: tpl.style, defense: tpl.defense,
     roster: [], depth: {}, gameplan: styleGameplan(tpl.style, tpl.defense), training: defaultTraining(), staff: { hc: null, oc: null, dc: null, scouts: [], trainers: [] },
     finance: { cash: 45, ticket: 85, hype: 50, log: [], attendance: [] }, record: { w: 0, l: 0, t: 0, pf: 0, pa: 0, streak: '' }, season: emptyTeamSeason(), deadCap: 0, form: [], tips: {} };
   d.teams[team.id] = team;

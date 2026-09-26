@@ -76,15 +76,19 @@ export const PHYSICAL = new Set(['speed', 'acceleration', 'agility', 'strength',
 export const CATEGORY_LABELS = { off: 'Ataque', def: 'Defensa', st: 'Special teams' };
 export const posSide = pos => ['QB', 'RB', 'WR', 'TE', 'OL'].includes(pos) ? 'off' : ['DL', 'LB', 'CB', 'S'].includes(pos) ? 'def' : 'st';
 
+import { CLUBS } from '../../../assets/common/clubs.mjs';
+// Mismo escudo que el club de fútbol, con nombre propio de LGO (ver assets/common/clubs.mjs).
+const clubTpl = k => { const c = CLUBS[k]; return { name: `${c.nfl.city} ${c.nfl.nick}`, city: c.nfl.city.toUpperCase(), mascot: c.nfl.nick.toUpperCase(), code: c.nfl.short, color: c.color, dark: c.dark, crest: '../../' + c.logo }; };
+export const crestHtml = (t, cls = '') => t.crest ? `<img class="logo-crest ${cls}" src="${t.crest}" alt="">` : `<div class="mono-crest ${cls}" style="--c:${t.color};--d:${t.dark}">${t.short || t.id}</div>`;
 export const TEAM_TEMPLATES = [
-  { id: 'NTH', name: 'North Wolves', city: 'NORTH', mascot: 'WOLVES', color: '#49a6f5', dark: '#14375c', style: 'BALANCED', defense: 'COVERAGE', talent: 1 },
-  { id: 'ATX', name: 'Austin Outlaws', city: 'AUSTIN', mascot: 'OUTLAWS', color: '#ff8552', dark: '#542b20', style: 'RUN HEAVY', defense: 'PRESSURE', talent: 1 },
-  { id: 'HBR', name: 'Harbor Kings', city: 'HARBOR', mascot: 'KINGS', color: '#e6c34a', dark: '#4a3b0b', style: 'PASS HEAVY', defense: 'BALANCED', talent: 2 },
-  { id: 'DSV', name: 'Desert Vipers', city: 'DESERT', mascot: 'VIPERS', color: '#7bd88f', dark: '#12391f', style: 'DEEP PASS', defense: 'PRESSURE', talent: 0 },
-  { id: 'IRN', name: 'Iron Forge', city: 'IRON', mascot: 'FORGE', color: '#c9d1d9', dark: '#2b3540', style: 'RUN HEAVY', defense: 'RUN STOP', talent: 1 },
-  { id: 'BAY', name: 'Bay Comets', city: 'BAY', mascot: 'COMETS', color: '#b27cff', dark: '#2e1b52', style: 'QUICK PASS', defense: 'COVERAGE', talent: 0 },
-  { id: 'SMT', name: 'Summit Rams', city: 'SUMMIT', mascot: 'RAMS', color: '#ff5c73', dark: '#4d1620', style: 'BALANCED', defense: 'RUN STOP', talent: 0 },
-  { id: 'CST', name: 'Coastal Sharks', city: 'COASTAL', mascot: 'SHARKS', color: '#37d4c8', dark: '#0c3a38', style: 'PASS HEAVY', defense: 'PRESSURE', talent: 1 },
+  { id: 'NTH', ...clubTpl(0), style: 'BALANCED', defense: 'COVERAGE', talent: 1 },
+  { id: 'ATX', ...clubTpl(1), style: 'RUN HEAVY', defense: 'PRESSURE', talent: 1 },
+  { id: 'HBR', ...clubTpl(2), style: 'PASS HEAVY', defense: 'BALANCED', talent: 2 },
+  { id: 'DSV', ...clubTpl(3), style: 'DEEP PASS', defense: 'PRESSURE', talent: 0 },
+  { id: 'IRN', ...clubTpl(4), style: 'RUN HEAVY', defense: 'RUN STOP', talent: 1 },
+  { id: 'BAY', ...clubTpl(5), style: 'QUICK PASS', defense: 'COVERAGE', talent: 0 },
+  { id: 'SMT', ...clubTpl(6), style: 'BALANCED', defense: 'RUN STOP', talent: 0 },
+  { id: 'CST', ...clubTpl(7), style: 'PASS HEAVY', defense: 'PRESSURE', talent: 1 },
 ];
 export const FIRST = ['Marcus','Jalen','Devon','Tyrese','Cameron','Andre','Malik','Trevor','Caleb','Isaiah','Darius','Elijah','Jordan','Xavier','Brandon','Tyler','Micah','Nolan','Landon','Omar','Kenji','Rafael','Mateo','Diego','Lucas','Bruno','Emilio','Julian','Theo','Gavin','Colton','Reggie','Terrell','Damon','Chase','Dominic','Everett','Felix','Grant','Hunter','Ivan','Jasper','Kelvin','Leon','Miles','Noel','Owen','Pierce','Quincy','Roman','Sawyer','Tobias','Ulises','Victor','Wade','Zane','Amir','Baron','Cyrus','Donte'];
 export const LAST = ['Reed','Coleman','Brooks','Hayes','Sutton','Ramos','Bennett','Fields','Carver','Delgado','Monroe','Holloway','Vance','Whitaker','Okafor','Navarro','Pruitt','Sinclair','Tanaka','Underwood','Voss','Winslow','Yates','Zimmer','Abbott','Beckett','Crawford','Dawson','Ellis','Foster','Gallo','Hendrix','Ibarra','Jennings','Kessler','Lombardi','Mercer','Nash','Osborne','Pruett','Quinn','Rowland','Stafford','Thorne','Ulrich','Villanueva','Weber','Xiong','Youngblood','Zapata','Alvarez','Blackwell','Cruz','Dunmore','Espinoza','Frazier','Gordon','Harlan','Iglesias','Jamison','Keane','Lockhart','Maddox','Novak','Oyelaran','Pace','Rivas','Salazar','Tate','Vaughn','Walsh','Acosta','Boone','Castillo','Duffy'];

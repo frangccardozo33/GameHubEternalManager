@@ -25672,7 +25672,7 @@ class Km {
         this.sim.result,
       ),
     ),
-      this.cameraController.update(this.sim.fighters, e, this.preview));
+      (!this.cameraController.__em && window.EM && window.EM.cams && window.EM.cams.wrap(this.cameraController, { THREE: { Vector3: F }, dom: this.renderer.domElement, axis: 'x', half: [4.5, 4.5], hLow: 1.3, hHigh: 7, r: 6.5, hOrb: 2.6, pad: 3, speed: 5, defaultMode: 'broadcast', focus: (a) => ({ x: (a[0][0].position.x + a[0][1].position.x) / 2, y: 0.9, z: (a[0][0].position.z + a[0][1].position.z) / 2 }) }), this.cameraController.update(this.sim.fighters, e, this.preview)));
     for (const s of this.arena.panels)
       s.material.opacity =
         s.center.dot(this.camera.position) > 0 ? 0.035 : 0.32;

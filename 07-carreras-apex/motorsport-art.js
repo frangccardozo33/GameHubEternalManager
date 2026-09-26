@@ -36,6 +36,17 @@ const RacingArt = (() => {
     indices.push(0,2,1,0,3,2);let e=(sections.length-1)*4;indices.push(e,e+1,e+2,e,e+2,e+3);
     const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));geo.setIndex(indices);geo.computeVertexNormals();return mesh(g,geo,m);
   }
+  // Cartel de anunciante: fondo de color según el nombre y texto ajustado al ancho (no lleva logo raster para no depender de imágenes).
+  function sponsorDecal(name){
+    let h=0;for(const ch of name)h=(h*31+ch.charCodeAt(0))>>>0;h%=360;
+    const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');
+    const g=x.createLinearGradient(0,0,512,0);g.addColorStop(0,`hsl(${h} 70% 38%)`);g.addColorStop(1,`hsl(${(h+30)%360} 75% 26%)`);x.fillStyle=g;x.fillRect(0,0,512,128);
+    x.strokeStyle='rgba(255,255,255,.7)';x.lineWidth=6;x.strokeRect(3,3,506,122);
+    let fs=76;x.font=`italic 900 ${fs}px Arial`;while(x.measureText(name).width>470&&fs>24){fs-=2;x.font=`italic 900 ${fs}px Arial`;}
+    x.fillStyle='#fff';x.textAlign='center';x.textBaseline='middle';x.fillText(name,256,68);
+    const map=new T.CanvasTexture(c);map.colorSpace=T.SRGBColorSpace;
+    return new T.MeshStandardMaterial({map,roughness:.4,polygonOffset:true,polygonOffsetFactor:-2,side:T.DoubleSide});
+  }
   function decal(text,color='#ffffff',bg=null){
     const c=document.createElement('canvas');c.width=512;c.height=128;const ctx=c.getContext('2d');
     if(bg){ctx.fillStyle=bg;ctx.fillRect(0,0,512,128);}ctx.fillStyle=color;ctx.font='italic 900 82px Arial';ctx.textAlign='center';ctx.fillText(text,256,94);
@@ -47,6 +58,7 @@ const RacingArt = (() => {
     return mesh(g,new T.ShapeGeometry(shape),m,0,0,z);
   }
   function car(key='classic',color,number='07'){
+    const liv=color&&typeof color==='object'?color:null;if(liv)color=liv.primary;
     const s=specs[key]||specs.classic,g=new T.Group(),body=new T.Group();g.add(body);
     g.userData.bodyType=key;g.userData.model=BODIES[key]?.name||key;
     const paint=mat(color||s.color,.48,.28),carbon=mat('#111820',.25,.5),chrome=mat('#adbdca',.8,.25),glass=mat('#122735',.65,.17),white=mat('#f2f5f3',.2,.4);
@@ -163,6 +175,30 @@ const RacingArt = (() => {
       const hub=cyl(w,chrome,.08,.48,0,0,0,12);hub.rotation.z=Math.PI/2;wheels.push(w);
     }
     body.scale.set(s.width,1,s.length);
+    if(liv&&liv.pattern&&liv.pattern!=='none'){
+      const sec=mat(liv.secondary||'#f2f5f3',.4,.35),acc=mat(liv.accent||'#111820',.4,.35),front=s.cabin+s.roofLen/2,back2=s.cabin-s.roofLen/2;
+      const S=(m,w,h,d,x,y,z)=>{const o=block(body,m,w,h,d,x,y,z);o.castShadow=false;return o;};
+      const pat=liv.pattern;
+      if(pat==='center'||pat==='twin'){
+        const xs=pat==='center'?[0]:[-.2,.2],w=pat==='center'?.42:.13;
+        xs.forEach(x=>{S(sec,w,.03,2.3,x,1.415,front+1.15+.3);S(sec,w,.03,s.roofLen,x,s.roof+.05,s.cabin);S(sec,w,.03,1.6,x,1.4,back2-.95);
+          if(pat==='center')S(acc,.1,.032,2.3,x+.3,1.417,front+1.45),S(acc,.1,.032,2.3,x-.3,1.417,front+1.45);});
+      }else if(pat==='side'){
+        [-1,1].forEach(sd=>{S(sec,.04,.16,4.2,sd*1.52,.84,0);S(acc,.045,.05,4.2,sd*1.525,.66,0);});
+      }else if(pat==='nose'){
+        S(sec,2.2,.03,1.3,0,1.36,2.35);S(acc,2.2,.032,.14,0,1.365,1.68);
+      }else if(pat==='dual'){
+        S(sec,1.2,.03,4.3,0,1.41,.2);S(acc,.14,.032,4.3,-.7,1.412,.2);S(acc,.14,.032,4.3,.7,1.412,.2);
+      }
+    }
+    if(liv&&liv.sponsors&&liv.sponsors.length){
+      // huecos libres: lateral alto sobre el nombre del modelo (lejos del número), capó delantero y tapa del baúl
+      const sp=liv.sponsors,pick=(i)=>sp[i%sp.length];
+      for(const side of [-1,1]){const m=mesh(body,new T.PlaneGeometry(1.05,.26),sponsorDecal(pick(side<0?0:1)),side*1.478,1.21,-.72);m.rotation.y=side*Math.PI/2;m.castShadow=false;}
+      const hd=mesh(body,new T.PlaneGeometry(.95,.24),sponsorDecal(pick(2)),0,1.425,2.32);hd.rotation.x=-Math.PI/2;hd.rotation.z=Math.PI;hd.castShadow=false;
+      const tk=mesh(body,new T.PlaneGeometry(1.0,.26),sponsorDecal(pick(3)),0,1.41,-2.35);tk.rotation.x=-Math.PI/2;tk.castShadow=false;
+    }
+    if(liv&&liv.roof){block(body,mat(liv.roof,.4,.35),1.5,.03,Math.max(.8,s.roofLen-.3),0,s.roof+.055,s.cabin).castShadow=false;}
     return {group:g,body,wheels,paint};
   }
   function part(type,color='#40baff'){
@@ -259,7 +295,7 @@ const RacingArt = (() => {
     camera=new T.PerspectiveCamera(34,800/480,.1,100);
   }
   function render(kind,key,color){
-    const id=kind+':'+(kind==='driver'?key.id:key)+':'+color;if(cache.has(id))return cache.get(id);
+    const id=kind+':'+(kind==='driver'?key.id:key)+':'+(color&&typeof color==='object'?JSON.stringify(color):color);if(cache.has(id))return cache.get(id);
     if(kind==='driver'){const url=portrait(key);cache.set(id,url);return url;}
     try{
       init();let model;
@@ -268,10 +304,10 @@ const RacingArt = (() => {
       studio.add(model);renderer.render(studio,camera);const url=renderer.domElement.toDataURL('image/png');studio.remove(model);
       const geometries=new Set(),materials=new Set(),textures=new Set();model.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material){for(const m of Array.isArray(o.material)?o.material:[o.material]){materials.add(m);if(m.map)textures.add(m.map);}}});geometries.forEach(o=>o.dispose());materials.forEach(o=>o.dispose());textures.forEach(o=>o.dispose());
       cache.set(id,url);return url;
-    }catch(err){console.warn('Artwork renderer unavailable:',err.message);return 'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120"><path fill="'+(color||'#e73549')+'" d="M20 80V50l40-30h65l40 30 18 8v22H20z"/><circle cx="50" cy="80" r="18" fill="#121827"/><circle cx="145" cy="80" r="18" fill="#121827"/><path d="M65 28h52l27 24H44z" fill="#213b54"/></svg>');}
+    }catch(err){console.warn('Artwork renderer unavailable:',err.message);return 'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120"><path fill="'+((color&&color.primary)||color||'#e73549')+'" d="M20 80V50l40-30h65l40 30 18 8v22H20z"/><circle cx="50" cy="80" r="18" fill="#121827"/><circle cx="145" cy="80" r="18" fill="#121827"/><path d="M65 28h52l27 24H44z" fill="#213b54"/></svg>');}
   }
   const escape = s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  function image(kind,key,color,cls=''){const k=kind==='driver'?key.id:key;const id=kind+':'+k+':'+color;let url=cache.get(id);if(!url){url=render(kind,key,color);cache.set(id,url);}return `<img class="art-render ${cls}" src="${url}" alt="${escape(kind==='driver'?'Piloto '+key.name:kind==='car'?(BODIES[key]?.name||key):PART_LABELS[key]||key)}" draggable="false">`;}
+  function image(kind,key,color,cls=''){const k=kind==='driver'?key.id:key;const id=kind+':'+k+':'+(color&&typeof color==='object'?JSON.stringify(color):color);let url=cache.get(id);if(!url){url=render(kind,key,color);cache.set(id,url);}return `<img class="art-render ${cls}" src="${url}" alt="${escape(kind==='driver'?'Piloto '+key.name:kind==='car'?(BODIES[key]?.name||key):PART_LABELS[key]||key)}" draggable="false">`;}
   let packSerial=0;
   function pack(key,cls=''){
     const colors={bronze:['#895038','#edbd91'],silver:['#65869f','#e7f5fc'],gold:['#b77c1b','#ffe8a0'],legend:['#7135b6','#ddb7ff']};

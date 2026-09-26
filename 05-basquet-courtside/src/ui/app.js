@@ -201,7 +201,7 @@ try {
         const t = p.teamId != null ? s.teams[p.teamId] : null, stats = {};
         Object.keys(ATTR_LABELS).forEach(k => { if (p.a[k] != null) stats[ATTR_LABELS[k]] = Math.round(p.a[k]); });
         return { id: 'lbo-' + p.id, name: p.first && p.last ? `${p.first} ${p.last}` : p.name, number: p.num, pos: p.role, posName: POS_NAMES[p.role], ovr: p.ovr, age: p.age, skin: p.skin,
-          team: t ? { id: t.id, name: t.name, short: t.short, primary: t.color, secondary: t.alt } : { id: 'libre', name: 'Agente libre', short: 'LIB', primary: '#5b6673', secondary: '#e8edf2' },
+          team: t ? { id: t.id, name: t.name, short: t.short, primary: t.color, secondary: t.alt, crest: t.crest } : { id: 'libre', name: 'Agente libre', short: 'LIB', primary: '#5b6673', secondary: '#e8edf2' },
           nation: window.LFONations.forPerson(p.id, t ? t.short : 'libre'), stats,
           info: [['Altura', p.h.toFixed(2) + ' m'], ['Edad', p.age + ' años'], ['Potencial', p.pot], ['Contrato', p.contract ? p.contract.salary + ' M€ · ' + p.contract.years + ' años' : 'sin contrato']] };
       });

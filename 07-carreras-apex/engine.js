@@ -9,7 +9,7 @@ if (!window.THREE) {
   throw new Error('Three.js dependency unavailable');
 }
 const V3 = THREE.Vector3;
-const CONFIG = { laps:4, carCount:10, trackWidth:17, fixedStep:1/60, strategy:'sprint' };
+const CONFIG = { laps:24, carCount:10, trackWidth:17, fixedStep:1/60, strategy:'sprint' };
 const TIRES = {
   S:{ name:'Soft', class:'soft', grip:1.045, wear:0.125 },
   M:{ name:'Medium', class:'medium', grip:1, wear:0.073 },
@@ -275,7 +275,7 @@ for(const s of [350,380,410,670,700])sign(String((Math.round(s/30)%3+1)*50),'',s
 const tireMat=material(0x171b18,{roughness:.93});
 const glassMat=material(0x273e3c,{metalness:.5,roughness:.18});
 function createCar(driver,index,team){
-  const model=RacingArt.car(team.bodyType,undefined,driver.number);
+  const model=RacingArt.car(team.bodyType,liveryFor(team),driver.number);
   scene.add(model.group);
   return model;
 }
@@ -373,7 +373,7 @@ function resetRace() {
     if(team.isPlayer&&team.gridPenaltyNext)startSlot=Math.min(9,i+5);
     const setupBonus=team.isPlayer?(Career.practice.score/100)*(Career.practice.confidence/100):0;
     const eff=effectiveStats(driver,team,setupBonus);
-    return {id:i,driver,team,top:eff.top,accel:eff.accel,brake:eff.brake,corner:eff.corner,control:eff.control,aggression:eff.aggression,consistency:eff.consistency,overtake:eff.overtake,mesh:createCar(driver,i,team),s:-8-Math.floor(startSlot/2)*9,v:0,lane:startSlot%2?3.2:-3.2,lateralV:0,targetLane:startSlot%2?3.2:-3.2,state:'Grid',lap:1,lapStart:0,lastLap:0,tire:team.isPlayer?Career.strategy.compound:(i%3===0?'S':i%3===1?'M':'H'),wear:100,damage:0,dnf:false,fuel:100,commands:{pace:'standard',tyres:'standard',pit:'stay',overtake:'standard',fuel:'standard'},errorTimer:0,errorCooldown:12+Math.random()*20,spin:0,spinDirection:1,pitLap:team.isPlayer?Math.max(2,Math.floor(CONFIG.laps/2)):2+i%2,pitDone:false,pitStage:0,pitTimer:0,pitStopS:0,finished:false,finishTime:0,rank:i+1,previousRank:i+1,decisionTimer:Math.random()*.4,attackCooldown:0,pace:.97+Math.random()*.06,slipstream:false,lastEvent:-20,position:new V3(),yaw:0,speedHistory:[]};
+    return {id:i,driver,team,top:eff.top,accel:eff.accel,brake:eff.brake,corner:eff.corner,control:eff.control,aggression:eff.aggression,consistency:eff.consistency,overtake:eff.overtake,mesh:createCar(driver,i,team),s:-8-Math.floor(startSlot/2)*9,v:0,lane:startSlot%2?3.2:-3.2,lateralV:0,targetLane:startSlot%2?3.2:-3.2,state:'Grid',lap:1,lapStart:0,lastLap:0,tire:team.isPlayer?Career.strategy.compound:(i%3===0?'S':i%3===1?'M':'H'),wear:100,damage:0,dnf:false,fuel:100,commands:{pace:'standard',tyres:'standard',pit:'stay',overtake:'standard',fuel:'standard'},errorTimer:0,errorCooldown:12+Math.random()*20,spin:0,spinDirection:1,pitLap:team.isPlayer?Math.max(2,Math.floor(CONFIG.laps/2)):Math.max(2,Math.floor(CONFIG.laps*(.3+((i*7)%10)/10*.4))),pitDone:false,pitStage:0,pitTimer:0,pitStopS:0,finished:false,finishTime:0,rank:i+1,previousRank:i+1,decisionTimer:Math.random()*.4,attackCooldown:0,pace:.97+Math.random()*.06,slipstream:false,lastEvent:-20,position:new V3(),yaw:0,speedHistory:[]};
   });
   state.order=[...state.cars];buildStandings();buildMap();updateCarsVisual(0);updateUI();updateRaceMeta();
   $('intro').style.display='block';$('start-lights').style.display='none';$('event-overlay').classList.remove('show');$('modal-backdrop').classList.remove('open');$('safety-badge').classList.remove('show');
@@ -443,15 +443,25 @@ function decide(car) {
   if(behind&&car.state!=='Overtaking'&&aggression>.78&&Math.abs(behind.lane-baseLane)>2) {
     car.targetLane=clamp(behind.lane*.7,-3.7,3.7);car.state='Defending';
   }
-  if(car.pitStage)car.targetLane=20;
+  if(car.pitStage)car.targetLane=PIT_FAST;
+}
+const PIT_BOX=14,PIT_FAST=21;
+// en el pit lane los autos hacen cola: nadie atraviesa a otro (se limita la velocidad al del que va adelante en el mismo carril)
+function pitQueueLimit(car,wanted){
+  for(const o of state.cars){
+    if(o===car||!o.pitStage||o.finished)continue;
+    const gap=o.s-car.s;
+    if(gap>0&&gap<13&&Math.abs(o.lane-car.lane)<3.2)wanted=Math.min(wanted,gap<8?0:Math.max(0,o.v));
+  }
+  return wanted;
 }
 function updateCar(car,dt) {
   if(car.finished){car.v=Math.max(0,car.v-dt*8);car.s+=car.v*dt;return;}
   car.errorCooldown-=dt;car.attackCooldown-=dt;car.decisionTimer-=dt;
   if(car.decisionTimer<=0){decide(car);car.decisionTimer=.22+Math.random()*.16;}
   const lapDistance=mod(car.s,trackLength);
-  if(CONFIG.strategy==='pit'&&!car.pitDone&&car.lap>=car.pitLap&&lapDistance>32&&lapDistance<55&&car.s>0){car.pitStage=1;car.pitStopS=Math.floor(car.s/trackLength)*trackLength+155+car.id*6;car.state='PitEntry';addEvent('PIT ENTRY',`${car.driver.short} toma el camino de boxes.`,car,20);}
-  if(car.commands&&car.commands.pit==='now'&&!car.pitStage&&!car.pitDone){car.pitStage=1;car.pitStopS=Math.floor(car.s/trackLength)*trackLength+155+car.id*6;car.state='PitEntry';addEvent('PIT NOW',`${car.driver.short} entra por orden del equipo.`,car,30);}
+  if(CONFIG.strategy==='pit'&&!car.pitDone&&car.lap>=car.pitLap&&lapDistance>32&&lapDistance<55&&car.s>0){car.pitStage=1;car.pitStopS=Math.floor(car.s/trackLength)*trackLength+155+car.id*9;car.state='PitEntry';addEvent('PIT ENTRY',`${car.driver.short} toma el camino de boxes.`,car,20);}
+  if(car.commands&&car.commands.pit==='now'&&!car.pitStage&&!car.pitDone){car.pitStage=1;car.pitStopS=Math.floor(car.s/trackLength)*trackLength+155+car.id*9;car.state='PitEntry';addEvent('PIT NOW',`${car.driver.short} entra por orden del equipo.`,car,30);}
   const paceCmd=car.commands?car.commands.pace:'standard';
   const fuelCmd=car.commands?car.commands.fuel:'standard';
   let maxSpeed=(64+car.top*10)*car.pace*(1-car.damage*.08)*(paceCmd==='push'?1.03:paceCmd==='conserve'?.95:1)*(fuelCmd==='save'?.97:fuelCmd==='push'?1.015:1);
@@ -471,15 +481,16 @@ function updateCar(car,dt) {
     if(gap<10+car.v*.14&&Math.abs(front.lane-car.lane)<2.9)wanted=Math.min(wanted,Math.max(0,front.v+(gap-7)*1.5));
   }
   if(car.pitStage===1) {
-    car.targetLane=20;car.state='PitEntry';wanted=Math.min(16,Math.sqrt(Math.max(0,2*braking*(car.pitStopS-car.s))));
+    car.targetLane=(car.pitStopS-car.s<30)?PIT_BOX:PIT_FAST;car.state='PitEntry';wanted=Math.min(16,Math.sqrt(Math.max(0,2*braking*(car.pitStopS-car.s))));
     if(car.pitStopS-car.s<.8&&car.v<3){car.pitStage=2;car.pitTimer=(4.5+Math.random()*2)*(state.safetyCar?.55:1);car.v=0;addEvent('PARADA EN BOXES',`${car.driver.short} · neumáticos nuevos.`,car,35);}
   }
   if(car.pitStage===2) {
     car.state='PitStop';car.v=0;car.pitTimer-=dt;
-    if(car.pitTimer<=0){car.pitStage=3;car.wear=100;car.tire=car.lap>=3?'S':'M';car.pitDone=true;if(car.commands)car.commands.pit='stay';addEvent('SALE DE BOXES',`${car.driver.short} vuelve a la pelea.`,car,25);}
+    if(car.pitTimer<=0){car.pitStage=3;car.wear=100;car.tire=car.lap>=CONFIG.laps-6?'S':(Math.random()<.5?'M':'H');car.pitDone=true;if(car.commands)car.commands.pit='stay';addEvent('SALE DE BOXES',`${car.driver.short} vuelve a la pelea.`,car,25);}
     return;
   }
-  if(car.pitStage===3){car.state='PitExit';wanted=17;car.targetLane=lapDistance<265?20:0;if(lapDistance>292){car.pitStage=0;car.targetLane=0;}}
+  if(car.pitStage===3){car.state='PitExit';wanted=17;car.targetLane=lapDistance<265?(car.s-car.pitStopS<7?PIT_BOX:PIT_FAST):0;if(lapDistance>292){car.pitStage=0;car.targetLane=0;}}
+  if(car.pitStage===1||car.pitStage===3)wanted=pitQueueLimit(car,wanted);
   const curvature=Math.abs(sample(car.s).curvature);
   const weatherRisk=2-CURRENT_WEATHER_GRIP;
   if(car.errorCooldown<=0&&!car.pitStage&&car.v>25&&curvature>.008) {
@@ -543,7 +554,7 @@ function resolveContacts(dt) {
         rear.s-=longitudinalOverlap*.65;front.s+=longitudinalOverlap*.35;
         const shared=(rear.v+front.v)/2;rear.v=Math.min(rear.v,shared-.2);front.v=Math.max(front.v,shared);
       }
-      if(impact>4&&state.elapsed-state.lastContact>12&&state.elapsed>4) {
+      if(impact>4&&!a.pitStage&&!b.pitStage&&state.elapsed-state.lastContact>12&&state.elapsed>4) {
         state.lastContact=state.elapsed;a.damage=Math.min(1,a.damage+.07);b.damage=Math.min(1,b.damage+.07);
         a.mesh.paint.color.multiplyScalar(.98);emit(a,'spark',10);audio.effect('contact');
         addEvent('CONTACTO',`${a.driver.short} y ${b.driver.short} se rozan. Ambos continúan.`,a,65);

@@ -1,11 +1,9 @@
+import { CLUBS } from '../../../assets/common/clubs.mjs';
 import { clamp } from './math.js';
 
 export const TEAM_STYLES = ['BALANCED', 'RUN HEAVY', 'PASS HEAVY', 'DEEP PASS', 'QUICK PASS'];
 export const DEFENSE_STYLES = ['BALANCED', 'PRESSURE', 'COVERAGE', 'RUN STOP'];
-export const TEAMS = [
-  { name: 'North Wolves', short: 'NTH', city: 'NORTH', mascot: 'WOLVES', color: '#49a6f5', dark: '#14375c', style: 'BALANCED', defense: 'COVERAGE' },
-  { name: 'Austin Outlaws', short: 'ATX', city: 'AUSTIN', mascot: 'OUTLAWS', color: '#ff8552', dark: '#542b20', style: 'RUN HEAVY', defense: 'PRESSURE' },
-];
+export const TEAMS = [0, 1].map(k => { const c = CLUBS[k]; return { name: `${c.nfl.city} ${c.nfl.nick}`, short: c.nfl.short, crest: '../../' + c.logo, city: c.nfl.city.toUpperCase(), mascot: c.nfl.nick.toUpperCase(), color: c.color, dark: c.dark, style: k ? 'RUN HEAVY' : 'BALANCED', defense: k ? 'PRESSURE' : 'COVERAGE' }; });
 export const ATTRIBUTES = ['speed','acceleration','agility','strength','awareness','armStrength','shortAccuracy','mediumAccuracy','deepAccuracy','mobility','decisionMaking','throwUnderPressure','vision','carrying','contactBalance','routeRunning','catching','release','contestedCatch','passBlocking','runBlocking','technique','passRush','tackling','pursuit','manCoverage','zoneCoverage','reaction','press','range','kickPower','kickAccuracy'];
 // Base profile per position (0-1). The manager layer scales these by player talent.
 export const PROFILE = {
