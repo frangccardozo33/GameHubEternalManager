@@ -110,7 +110,7 @@
         const s = res.playerStats[pid]; if (!s || s.minutes <= 0) continue;
         const p = state.players[pid], ro = TLM.roleOf(p.primaryPosition), share = Math.min(1, s.minutes / 90);
         let v = 6.0 + W * 0.3 * share + s.goals * 0.95 + s.assists * 0.55 + Math.min(1, s.shots * 0.05) + (ro === 'GK' ? s.saves * 0.14 + (s.cleanSheet ? 0.55 : 0) : 0) + (ro === 'DEF' ? (s.cleanSheet || opp === 0 ? 0.35 : -0.1 * opp) : 0) + s.tackles * 0.05 - s.yellow * 0.3 - s.red * 1.6 - (ro === 'GK' ? opp * 0.22 : 0);
-        v += r.gauss() * (0.45 - (p.personality.consistency - 60) / 400);
+        v += r.gauss() * (0.45 - (p.personality.consistency - 60) / 400) * (TLM.cardBoostBits ? TLM.cardBoostBits(p).noiseMul : 1); // "Capitán eterno"/"Última leyenda": menos variación
         s.rating = +clamp(v, 3.5, 10).toFixed(1);
       }
     });
@@ -132,7 +132,9 @@
         if (s.cleanSheet) t.cleanSheets++; if (s.rating) { t.ratingSum += s.rating; t.ratingN++; p.form = clamp(p.form * 0.65 + (s.rating - 4) * 20 * 0.35, 0, 100); }
         const drop = s.staminaEnd != null ? (100 - s.staminaEnd) * 0.55 : s.minutes / 90 * (24 - (p.attributes.physical - 60) * 0.12);
         p.fitness = clamp(p.fitness - drop, 20, 100);
-        p.morale = clamp(p.morale + (my > opp ? 3 : my < opp ? -3 : 0.3) + (s.goals ? 2.5 : 0) + (s.rating >= 8 ? 2 : 0), 0, 100);
+        const cardBits = TLM.cardBoostBits ? TLM.cardBoostBits(p) : { immune: false };
+        p.morale = clamp(p.morale + (my > opp ? 3 : my < opp ? (cardBits.immune ? 0 : -3) : 0.3) + (s.goals ? 2.5 : 0) + (s.rating >= 8 ? 2 : 0), 0, 100);
+        if (s.rating) { TLM.gainMatchXP(state, p, s.rating); TLM.rollCardDrop(state, p, s.rating); TLM.consumeCardUse(state, p); }
         p.yellowAccum = (p.yellowAccum || 0) + s.yellow;
         if (p.yellowAccum >= 5) { p.suspension = 1; p.yellowAccum = 0; addNews(state, 'ban', `${p.canonicalName} (${club.name}) cumple una fecha de suspensión por acumulación de amarillas.`, { playerId: p.id }); }
         if (s.red) { p.suspension = Math.max(p.suspension, 1 + (s.rating < 4 ? 1 : 0)); addNews(state, 'ban', `${p.canonicalName} (${club.name}) es sancionado tras su expulsión.`, { playerId: p.id }); }

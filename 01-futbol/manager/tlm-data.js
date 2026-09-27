@@ -67,13 +67,22 @@
   };
 
   // Ediciones especiales (cromos): NO son jugadores nuevos — sólo cambian la representación del MISMO playerId.
+  // Ediciones "base" (potrero/cobre): sólo cosmética, se compran libremente, sin límite de usos.
+  // Ediciones "especiales" (plata en adelante): son cartas de juego reales — no se compran, salen como drop de partidos
+  // brillantes (ver rollCardDrop en tlm-market.js), son instancias propias con usos limitados y se pueden vender por
+  // separado del jugador. `logic` define su efecto propio (ver applyCardLogic en tlm-players.js).
   const EDITIONS = [
     { id: 'potrero', name: 'Potrero', cost: 0, stars: 3 }, { id: 'cobre', name: 'Cobre', cost: 0.02, stars: 3 },
-    { id: 'plata', name: 'Plata', cost: 0.04, stars: 4 }, { id: 'oro', name: 'Oro de cancha', cost: 0.08, stars: 4 },
-    { id: 'barrio', name: 'Ídolo del barrio', cost: 0.1, stars: 4 }, { id: 'promesa', name: 'Primera ovación', cost: 0.06, stars: 4 },
-    { id: 'clasico', name: 'Noche de clásico', cost: 0.1, stars: 5 }, { id: 'apertura', name: 'Apertura 2008', cost: 0.12, stars: 5 },
-    { id: 'capitan', name: 'Capitán eterno', cost: 0.14, stars: 5 }, { id: 'copa', name: 'La vuelta olímpica', cost: 0.16, stars: 5 },
-    { id: 'archivo', name: 'Archivo 2000', cost: 0.12, stars: 4 }, { id: 'leyenda', name: 'Última leyenda', cost: 0.25, stars: 5 },
+    { id: 'plata', name: 'Plata', stars: 4, special: true, uses: 20, logic: 'boost', boost: 2 },
+    { id: 'oro', name: 'Oro de cancha', stars: 4, special: true, uses: 20, logic: 'boost', boost: 3 },
+    { id: 'barrio', name: 'Ídolo del barrio', stars: 4, special: true, uses: 20, logic: 'immune' },
+    { id: 'promesa', name: 'Primera ovación', stars: 4, special: true, uses: 20, logic: 'xp' },
+    { id: 'clasico', name: 'Noche de clásico', stars: 5, special: true, uses: 5, logic: 'derby', boost: 6 },
+    { id: 'apertura', name: 'Apertura 2008', stars: 5, special: true, uses: 5, logic: 'opener', boost: 6 },
+    { id: 'capitan', name: 'Capitán eterno', stars: 5, special: true, uses: 5, logic: 'consistency' },
+    { id: 'copa', name: 'La vuelta olímpica', stars: 5, special: true, uses: 5, logic: 'cup', boost: 6 },
+    { id: 'archivo', name: 'Archivo 2000', stars: 4, special: true, uses: 20, logic: 'veteran' },
+    { id: 'leyenda', name: 'Última leyenda', stars: 5, special: true, uses: 5, logic: 'legend', boost: 5 },
   ];
 
   // ---- Perfiles de manager IA: cada uno decide distinto (no "el mismo bot con ruido") ----

@@ -155,6 +155,7 @@
   function moveToClub(state, playerId, clubId, contract) {
     const p = state.players[playerId];
     if (!p) throw new Error('Jugador inexistente: ' + playerId);
+    if (p.equippedCardId && TLM.unequipCard) TLM.unequipCard(state, p); // la carta especial se queda con el club vendedor; viaja "pelado"
     const from = p.clubId && state.clubs[p.clubId];
     if (from) {
       from.squad = from.squad.filter((id) => id !== playerId);
@@ -196,14 +197,68 @@
     }
   }
 
-  // ---- stats efectivos para el partido: base + moral + forma + entrenamiento de equipo ----
+  // ---- carta especial equipada: cada "logic" tiene su propio efecto en el partido (ver EDITIONS en tlm-data.js).
+  // El contexto de partido (derby/apertura/copa) lo pone primeCardContext() antes de armar el once; el resto
+  // (boost/consistencia/inmunidad/XP/veteranía) sólo depende del jugador.
+  function cardBoostBits(p) {
+    const none = { flat: 0, noiseMul: 1, xpMul: 1, immune: false };
+    if (!p.equippedCardLogic) return none;
+    const ctx = p._cardCtx || {};
+    switch (p.equippedCardLogic) {
+      case 'boost': return { ...none, flat: p.equippedCardBoost || 0 };
+      case 'legend': return { flat: p.equippedCardBoost || 0, noiseMul: 0.7, xpMul: 1.5, immune: true };
+      case 'derby': return { ...none, flat: ctx.derby ? (p.equippedCardBoost || 0) : 0 };
+      case 'opener': return { ...none, flat: ctx.opener ? (p.equippedCardBoost || 0) : 0 };
+      case 'cup': return { ...none, flat: ctx.cup ? (p.equippedCardBoost || 0) : 0 };
+      case 'consistency': return { ...none, noiseMul: 0.3 };
+      case 'immune': return { ...none, immune: true };
+      case 'xp': return { ...none, xpMul: 2 };
+      case 'veteran': { const games = (p.careerTotals && p.careerTotals.matches) || 0; return { ...none, flat: Math.min(6, Math.floor(games / 40)) }; }
+      default: return none;
+    }
+  }
+  function primeCardContext(state, fixture) {
+    const home = state.clubs[fixture.homeId], away = state.clubs[fixture.awayId];
+    // "Derby": no hay geografía real entre clubes (cada uno es de una "nación" distinta), así que se define como un
+    // partido entre rivales parejos en la tabla (a 2 puestos o menos) — la tensión de un partido cerrado y directo.
+    let derby = false;
+    const comp = fixture.competitionId && state.competitions[fixture.competitionId];
+    if (comp && !fixture.cup) {
+      const table = TLM.computeTable(state, comp), rank = {}; table.forEach((r, i) => (rank[r.clubId] = i));
+      if (rank[home.id] != null && rank[away.id] != null) derby = Math.abs(rank[home.id] - rank[away.id]) <= 2;
+    }
+    const ctx = { derby, opener: fixture.round === 1 && !fixture.cup, cup: !!fixture.cup };
+    for (const club of [home, away]) for (const pid of club.squad) { const p = state.players[pid]; if (p) p._cardCtx = ctx; }
+  }
+
+  // ---- stats efectivos para el partido: base + moral + forma + entrenamiento de equipo + carta especial ----
   function effectiveStats(p, club) {
     const mm = clamp(round((p.morale - 60) / 15), -4, 3), fm = clamp(round((p.form - 50) / 25), -2, 2);
     const tb = (club && club.training && club.training.teamBoost) || 0, focus = club && club.training && club.training.team;
     const eff = TLM.TRAINING.teamEffect[focus] || [];
+    const cardFlat = cardBoostBits(p).flat;
     const out = {};
-    for (const k of TLM.STAT_KEYS) out[k] = clamp(round(p.attributes[k] + mm + fm + (eff.includes(k) ? tb : 0)), 20, 99);
+    for (const k of TLM.STAT_KEYS) out[k] = clamp(round(p.attributes[k] + mm + fm + (eff.includes(k) ? tb : 0) + cardFlat), 20, 99);
     return out;
+  }
+
+  // ---- XP por partido: rating alto da XP (multiplicado si tiene la carta "Primera ovación"); cada 60 XP hay chance
+  // de +1 en un atributo, con la misma gradación de edad/potencial que trainRound (no es rápido ni OP). ----
+  function gainMatchXP(state, p, rating) {
+    const r = R(state), xpMul = cardBoostBits(p).xpMul;
+    const gain = Math.max(0, round((rating - 5.5) * 3)) * xpMul;
+    if (!gain) return;
+    p.xp = (p.xp || 0) + gain;
+    while (p.xp >= 60) {
+      p.xp -= 60;
+      const ageF = p.age <= 21 ? 1.4 : p.age <= 25 ? 1 : p.age <= 29 ? 0.5 : 0.15;
+      const room = p.potential - p.overall;
+      if (r.chance((room > 0 ? 0.5 : 0.12) * ageF)) {
+        const ro = TLM.roleOf(p.primaryPosition), pool = ro === 'GK' ? ['reflexes', 'handling', 'positioning'] : ro === 'DEF' ? ['marking', 'tackling', 'strength'] : ro === 'MID' ? ['passing', 'vision', 'stamina'] : ['finishing', 'pace', 'dribbling'];
+        const k = pool.find((x) => TLM.STAT_KEYS.includes(x)) ? r.pick(pool.filter((x) => TLM.STAT_KEYS.includes(x))) : r.pick(TLM.STAT_KEYS);
+        if (p.attributes[k] < 96) { p.attributes[k]++; recalc(p); }
+      }
+    }
   }
 
   function isAvailable(p) { return !p.injury && !(p.suspension > 0); }
@@ -291,5 +346,6 @@
     if (p.age > 29) p.potential = p.overall;
   }
 
-  Object.assign(TLM, { assetURL, placeholderPhoto, rosterByClub, makeFromRoster, claimName, surOf, migrateNations, R, roleOf, overall, valueOf, salaryOf, recalc, makePlayer, moveToClub, assignNumber, closeHistoryStint, effectiveStats, isAvailable, injure, weeklyRecovery, trainRound, seasonProgress, usedNames, emptySeason, ageValueFactor });
+  Object.assign(TLM, { assetURL, placeholderPhoto, rosterByClub, makeFromRoster, claimName, surOf, migrateNations, R, roleOf, overall, valueOf, salaryOf, recalc, makePlayer, moveToClub, assignNumber, closeHistoryStint, effectiveStats, isAvailable, injure, weeklyRecovery, trainRound, seasonProgress, usedNames, emptySeason, ageValueFactor,
+    cardBoostBits, primeCardContext, gainMatchXP });
 })(typeof globalThis !== 'undefined' ? globalThis : this);

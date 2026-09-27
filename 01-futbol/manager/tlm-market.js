@@ -366,10 +366,12 @@
     return executeTransfer(state, o);
   }
 
-  // ---------- ediciones de cromo (el MISMO jugador; sólo cambia su carta) ----------
+  // ---------- ediciones de cromo base (el MISMO jugador; sólo cambia su carta). Las especiales (plata en adelante)
+  // ya no se compran acá: son cartas reales, ver rollCardDrop/equipCard más abajo. ----------
   function applyEdition(state, club, p, editionId, free) {
     const ed = TLM.EDITIONS.find((e) => e.id === editionId);
     if (!ed) return { ok: false, reason: 'Edición inexistente.' };
+    if (ed.special) return { ok: false, reason: 'Esa es una carta especial: se consigue jugando, no se compra.' };
     const cost = free ? 0 : roundMoney(Math.max(20000, p.marketValue * ed.cost));
     if (cost && !TLM.canSpend(club, cost)) return { ok: false, reason: 'Saldo insuficiente (' + money(cost) + ').' };
     if (cost) addTx(state, club, 'card', -cost, `Edición «${ed.name}» de ${p.canonicalName}`, p.id);
@@ -377,6 +379,70 @@
     return { ok: true, cost };
   }
   const buyEdition = (state, clubId, pid, editionId) => { const p = state.players[pid]; if (!p || p.clubId !== clubId) return { ok: false, reason: 'No es de tu club.' }; return applyEdition(state, clubOf(state, clubId), p, editionId, false); };
+
+  // ---------- CARTAS ESPECIALES: instancias con dueño (el club, no el jugador) y usos limitados ----------
+  // Drop tras un partido brillante (rating >= 8.7): probabilidad chica, elige una edición especial al azar
+  // ponderada (las de 5 estrellas son mucho más raras) y crea una instancia para el club actual del jugador.
+  const SPECIAL_EDITIONS = () => TLM.EDITIONS.filter((e) => e.special);
+  function rollCardDrop(state, p, rating) {
+    if (!p.clubId || rating < 8.7) return null;
+    const r = R(state), chance = (rating - 8.7) * 0.35; // 8.7 -> ~0%, 10.0 -> ~45%
+    if (!r.chance(chance)) return null;
+    const pool = SPECIAL_EDITIONS(), ed = r.weighted(pool, (e) => (e.stars >= 5 ? 1 : 4));
+    const id = 'card_' + (++state.cardSeq);
+    const card = { id, editionId: ed.id, playerId: p.id, ownerClubId: p.clubId, usesLeft: ed.uses, retired: false };
+    state.specialCards[id] = card;
+    addNews(state, 'card', `¡${p.canonicalName} se ganó la carta especial «${ed.name}»! (${state.clubs[p.clubId].name})`, { playerId: p.id, clubId: p.clubId });
+    return card;
+  }
+  const clubCards = (state, clubId) => Object.values(state.specialCards).filter((c) => c.ownerClubId === clubId && !c.retired);
+  const cardsOf = (state, pid) => Object.values(state.specialCards).filter((c) => c.playerId === pid && !c.retired);
+  // Equipar: el club tiene que ser dueño de la carta Y del jugador (la base). Al equipar también cambia la carta visual.
+  function equipCard(state, clubId, pid, cardId) {
+    const p = state.players[pid]; if (!p || p.clubId !== clubId) return { ok: false, reason: 'No es jugador de tu club.' };
+    if (!cardId) { unequipCard(state, p); return { ok: true }; }
+    const card = state.specialCards[cardId];
+    if (!card || card.retired) return { ok: false, reason: 'Carta inexistente.' };
+    if (card.ownerClubId !== clubId) return { ok: false, reason: 'Esa carta no es de tu club.' };
+    if (card.playerId !== pid) return { ok: false, reason: 'Esa carta es de otro jugador: para usarla necesitás tener también su versión base en tu plantilla.' };
+    const ed = TLM.EDITIONS.find((e) => e.id === card.editionId);
+    p.equippedCardId = cardId; p.card.edition = ed.id; p.card.stars = ed.stars;
+    p.equippedCardLogic = ed.logic; p.equippedCardBoost = ed.boost || 0;
+    return { ok: true };
+  }
+  function unequipCard(state, p) {
+    p.equippedCardId = null; p.equippedCardLogic = null; p.equippedCardBoost = 0;
+    const ov = p.overall; p.card.edition = ov >= 75 ? 'cobre' : 'potrero'; p.card.stars = 3;
+  }
+  // Se llama después de cada partido para el jugador que jugó con una carta especial puesta: gasta un uso.
+  function consumeCardUse(state, p) {
+    if (!p.equippedCardId) return;
+    const card = state.specialCards[p.equippedCardId]; if (!card) { p.equippedCardId = null; return; }
+    if (card.usesLeft == null) return; // uso ilimitado (no debería pasar con especiales, pero por si acaso)
+    card.usesLeft--;
+    if (card.usesLeft <= 0) { card.retired = true; addNews(state, 'card', `Se agotaron los usos de la carta «${TLM.EDITIONS.find((e) => e.id === card.editionId).name}» de ${p.canonicalName}.`, { playerId: p.id }); unequipCard(state, p); }
+  }
+  // Mercado de cartas: se venden por separado del jugador. El comprador puede quedarse con la carta aunque no
+  // tenga (todavía) al jugador — pero no podrá equiparla hasta que también lo fiche.
+  function listCard(state, clubId, cardId, price) {
+    const card = state.specialCards[cardId];
+    if (!card || card.retired || card.ownerClubId !== clubId) return { ok: false, reason: 'No es tu carta.' };
+    const p = state.players[card.playerId]; if (p && p.equippedCardId === cardId) return { ok: false, reason: 'Desequipala antes de vender.' };
+    state.cardListings[cardId] = roundMoney(Math.max(1000, price));
+    return { ok: true };
+  }
+  function unlistCard(state, clubId, cardId) { const card = state.specialCards[cardId]; if (!card || card.ownerClubId !== clubId) return { ok: false, reason: 'No es tu carta.' }; delete state.cardListings[cardId]; return { ok: true }; }
+  function buyCard(state, buyerClubId, cardId) {
+    const card = state.specialCards[cardId], price = state.cardListings[cardId];
+    if (!card || card.retired || price == null) return { ok: false, reason: 'Esa carta no está en venta.' };
+    const buyer = clubOf(state, buyerClubId); if (!TLM.canSpend(buyer, price)) return { ok: false, reason: 'Saldo insuficiente (' + money(price) + ').' };
+    const seller = state.clubs[card.ownerClubId];
+    addTx(state, buyer, 'card', -price, `Carta «${TLM.EDITIONS.find((e) => e.id === card.editionId).name}»`, card.playerId);
+    if (seller) addTx(state, seller, 'card', price, `Venta de carta «${TLM.EDITIONS.find((e) => e.id === card.editionId).name}»`, card.playerId);
+    card.ownerClubId = buyerClubId; delete state.cardListings[cardId];
+    const p = state.players[card.playerId]; if (p && p.equippedCardId === cardId) unequipCard(state, p);
+    return { ok: true };
+  }
 
   // ---------- SCOUTING ----------
   function scout(state, clubId, req) {
@@ -419,5 +485,6 @@
   }
 
   Object.assign(TLM, { reserveValue, contractDemand, transferStatus, listPlayer, unlistPlayer, refreshListings, searchMarket, makeOffer, evaluateOffer, resolveOffers, acceptCounter, counterOffer, withdrawOffer, buyNow,
-    signFreeAgent, respondToOffer, renewContract, contractStatus, sellNow, applyEdition, buyEdition, scout, executeTransfer, buyerCeiling, need, isSurplus, squadDepth, curRound, mainComp: comp });
+    signFreeAgent, respondToOffer, renewContract, contractStatus, sellNow, applyEdition, buyEdition, scout, executeTransfer, buyerCeiling, need, isSurplus, squadDepth, curRound, mainComp: comp,
+    rollCardDrop, clubCards, cardsOf, equipCard, unequipCard, consumeCardUse, listCard, unlistCard, buyCard });
 })(typeof globalThis !== 'undefined' ? globalThis : this);

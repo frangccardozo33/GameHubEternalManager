@@ -81,6 +81,7 @@
       counters: {}, clubs: {}, players: {}, competitions: {}, fixtures: {},
       market: { listings: {}, offers: {}, freeAgents: [] }, transfers: [], news: [], history: { seasons: [], records: {} },
       scoutReports: {}, matchRecords: {}, scout: { usedThisRound: 0 }, worldConfigId: cfg.id, log: [],
+      specialCards: {}, cardListings: {}, cardSeq: 0,
     };
     const r = R(state), used = new Set();
     const wantTotal = Math.max(3, Math.min(opts.totalClubs || cfg.clubs.length + 1, 40));

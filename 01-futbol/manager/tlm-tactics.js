@@ -244,6 +244,7 @@
     };
   }
   function buildMatchConfig(state, fixture) {
+    if (TLM.primeCardContext) TLM.primeCardContext(state, fixture);
     const home = state.clubs[fixture.homeId], away = state.clubs[fixture.awayId];
     const lab = TLM.fixtureLabel ? TLM.fixtureLabel(state, fixture) : null;
     return { fixtureId: fixture.id, homeClubId: home.id, awayClubId: away.id, season: state.season, round: fixture.round, competition: state.competitions[fixture.competitionId].name, seed: (state.seed + fixture.round * 977 + state.transfers.length + (fixture.cup ? 5003 : 0)) >>> 0,

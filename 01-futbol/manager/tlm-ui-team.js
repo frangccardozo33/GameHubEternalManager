@@ -45,7 +45,8 @@
         <div class="tlm-row"><input id="rnSal" type="number" step="10000" value="${dem}" style="width:130px"><select id="rnYrs">${[1, 2, 3, 4].map((y) => `<option ${y === 2 ? 'selected' : ''}>${y}</option>`).join('')}</select> años<button class="tlm-btn sm" data-act="renew" data-pid="${pid}">Renovar</button></div></div>
         <div class="tlm-box"><h4>Mercado</h4>${listed ? `<p>En venta por <b>${M(listed.askingPrice)}</b>.</p><button class="tlm-btn sm" data-act="unlist" data-pid="${pid}">Retirar de la venta</button>` : `<div class="tlm-row"><input id="lsPrice" type="number" step="50000" value="${Math.round(p.marketValue * 1.1)}" style="width:130px"><button class="tlm-btn sm" data-act="list" data-pid="${pid}">Poner en venta</button></div>`}
         <button class="tlm-btn sm danger" data-act="sellNow" data-pid="${pid}">Vender ya al mejor postor (~${M(sellPrice)})</button></div>
-        <div class="tlm-box"><h4>Cromo · ediciones especiales</h4><p class="muted sm">Es el mismo jugador; sólo cambia su carta. Actual: <b>${esc((TLM.EDITIONS.find((e) => e.id === p.card.edition) || {}).name)}</b>.</p><div class="tlm-row"><select id="edSel">${TLM.EDITIONS.map((e) => `<option value="${e.id}" ${e.id === p.card.edition ? 'selected' : ''}>${esc(e.name)} — ${M(Math.max(20000, p.marketValue * e.cost))}</option>`).join('')}</select><button class="tlm-btn sm" data-act="buyEdition" data-pid="${pid}">Cambiar edición</button></div></div>`;
+        <div class="tlm-box"><h4>Cromo base</h4><p class="muted sm">Es el mismo jugador; sólo cambia su carta de fondo. Actual: <b>${esc((TLM.EDITIONS.find((e) => e.id === p.card.edition) || {}).name)}</b>.</p><div class="tlm-row"><select id="edSel">${TLM.EDITIONS.filter((e) => !e.special).map((e) => `<option value="${e.id}" ${e.id === p.card.edition ? 'selected' : ''}>${esc(e.name)} — ${M(Math.max(20000, p.marketValue * e.cost))}</option>`).join('')}</select><button class="tlm-btn sm" data-act="buyEdition" data-pid="${pid}">Cambiar edición</button></div></div>
+        ${cardsBox(s, u, p, pid)}`;
     } else if (club || free) {
       actions = `<div class="tlm-box"><h4>${free ? 'Agente libre' : 'Fichaje'}</h4>${free ? `<p>Prima de fichaje ~${M(p.marketValue * 0.12)}, sin traspaso.</p>` : listed ? `<p>En venta por <b>${M(listed.askingPrice)}</b> (${esc(club.name)}).</p>` : `<p>${esc(club.name)} no lo tiene en venta: podés ofertar (valor estimado ${M(p.marketValue)}).</p>`}<button class="tlm-btn primary" data-act="buyModal" data-pid="${pid}">${free ? 'Ficharlo' : listed ? 'Comprar / ofertar' : 'Hacer una oferta'}</button></div>`;
     }
@@ -58,7 +59,21 @@
       <div id="tlm-pactions">${actions}</div></div></div>`, 'wide');
     void d;
   };
+  // Cartas especiales del jugador: las que puede EQUIPAR tu club (porque además de la carta tiene la base) y las
+  // que están sueltas en otros clubes (informativo: no se pueden usar hasta fichar también al jugador).
+  function cardsBox(s, u, p, pid) {
+    const mine = TLM.cardsOf(s, pid).filter((c) => c.ownerClubId === u.id);
+    const elsewhere = TLM.cardsOf(s, pid).filter((c) => c.ownerClubId !== u.id);
+    if (!mine.length && !elsewhere.length) return '';
+    const row = (c, canEquip) => { const ed = TLM.EDITIONS.find((e) => e.id === c.editionId); const usesTxt = ed.uses == null ? '' : ` · ${c.usesLeft}/${ed.uses} usos`; return `<div class="tlm-row" style="justify-content:space-between"><span><b>${esc(ed.name)}</b>${usesTxt}${canEquip ? '' : ` <small class="muted">(en ${esc((s.clubs[c.ownerClubId] || {}).name || '?')})</small>`}</span>${canEquip ? `<span>${p.equippedCardId === c.id ? `<button class="tlm-btn sm" data-act="unequipCard" data-pid="${pid}">Quitar</button>` : `<button class="tlm-btn sm primary" data-act="equipCard" data-pid="${pid}" data-cid="${c.id}">Equipar</button>`} <button class="tlm-btn sm ghost" data-act="listCardModal" data-pid="${pid}" data-cid="${c.id}">Vender</button></span>` : ''}</div>`; };
+    return `<div class="tlm-box"><h4>Cartas especiales</h4><p class="muted sm">Se consiguen jugando (no se compran). Para equipar una tenés que tener también al jugador en tu plantilla.</p>
+      ${mine.map((c) => row(c, true)).join('') || '<p class="muted sm">Tu club no tiene ninguna carta de este jugador.</p>'}
+      ${elsewhere.length ? '<p class="muted sm" style="margin-top:6px">También existen en otros clubes:</p>' + elsewhere.map((c) => row(c, false)).join('') : ''}</div>`;
+  }
   const refreshModal = (pid) => { const m = document.querySelector('.tlm-modal-bg'); if (m) m.remove(); UI.modalEl = null; A.playerModal({ dataset: { pid } }); UI.render(); };
+  A.equipCard = (el) => { const r = TLM.equipCard(S(), U().id, el.dataset.pid, el.dataset.cid); UI.toast(r.ok ? 'Carta equipada.' : r.reason, r.ok ? 'ok' : 'bad'); if (r.ok) { g.__tlmCardBust = 1; refreshModal(el.dataset.pid); } };
+  A.unequipCard = (el) => { TLM.equipCard(S(), U().id, el.dataset.pid, null); g.__tlmCardBust = 1; refreshModal(el.dataset.pid); };
+  A.listCardModal = (el) => { const price = prompt('¿Por cuánto la vendés?'); if (!price) return; const r = TLM.listCard(S(), U().id, el.dataset.cid, +price); UI.toast(r.ok ? 'Carta puesta en venta.' : r.reason, r.ok ? 'ok' : 'bad'); if (r.ok) refreshModal(el.dataset.pid); };
   A.renew = (el) => { const r = TLM.renewContract(S(), U().id, el.dataset.pid, +document.getElementById('rnSal').value, +document.getElementById('rnYrs').value); UI.toast(r.ok ? 'Contrato renovado.' : r.reason, r.ok ? 'ok' : 'bad'); if (r.ok) refreshModal(el.dataset.pid); else if (r.counter) document.getElementById('rnSal').value = r.counter; };
   A.list = (el) => { const r = TLM.listPlayer(S(), U().id, el.dataset.pid, +document.getElementById('lsPrice').value); UI.toast(r.ok ? 'Puesto en venta por ' + M(r.price) + '.' : r.reason, r.ok ? 'ok' : 'bad'); refreshModal(el.dataset.pid); };
   A.unlist = (el) => { TLM.unlistPlayer(S(), el.dataset.pid); refreshModal(el.dataset.pid); };

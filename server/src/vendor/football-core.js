@@ -257,13 +257,22 @@ import './football-shim.js';
   };
 
   // Ediciones especiales (cromos): NO son jugadores nuevos — sólo cambian la representación del MISMO playerId.
+  // Ediciones "base" (potrero/cobre): sólo cosmética, se compran libremente, sin límite de usos.
+  // Ediciones "especiales" (plata en adelante): son cartas de juego reales — no se compran, salen como drop de partidos
+  // brillantes (ver rollCardDrop en tlm-market.js), son instancias propias con usos limitados y se pueden vender por
+  // separado del jugador. `logic` define su efecto propio (ver applyCardLogic en tlm-players.js).
   const EDITIONS = [
     { id: 'potrero', name: 'Potrero', cost: 0, stars: 3 }, { id: 'cobre', name: 'Cobre', cost: 0.02, stars: 3 },
-    { id: 'plata', name: 'Plata', cost: 0.04, stars: 4 }, { id: 'oro', name: 'Oro de cancha', cost: 0.08, stars: 4 },
-    { id: 'barrio', name: 'Ídolo del barrio', cost: 0.1, stars: 4 }, { id: 'promesa', name: 'Primera ovación', cost: 0.06, stars: 4 },
-    { id: 'clasico', name: 'Noche de clásico', cost: 0.1, stars: 5 }, { id: 'apertura', name: 'Apertura 2008', cost: 0.12, stars: 5 },
-    { id: 'capitan', name: 'Capitán eterno', cost: 0.14, stars: 5 }, { id: 'copa', name: 'La vuelta olímpica', cost: 0.16, stars: 5 },
-    { id: 'archivo', name: 'Archivo 2000', cost: 0.12, stars: 4 }, { id: 'leyenda', name: 'Última leyenda', cost: 0.25, stars: 5 },
+    { id: 'plata', name: 'Plata', stars: 4, special: true, uses: 20, logic: 'boost', boost: 2 },
+    { id: 'oro', name: 'Oro de cancha', stars: 4, special: true, uses: 20, logic: 'boost', boost: 3 },
+    { id: 'barrio', name: 'Ídolo del barrio', stars: 4, special: true, uses: 20, logic: 'immune' },
+    { id: 'promesa', name: 'Primera ovación', stars: 4, special: true, uses: 20, logic: 'xp' },
+    { id: 'clasico', name: 'Noche de clásico', stars: 5, special: true, uses: 5, logic: 'derby', boost: 6 },
+    { id: 'apertura', name: 'Apertura 2008', stars: 5, special: true, uses: 5, logic: 'opener', boost: 6 },
+    { id: 'capitan', name: 'Capitán eterno', stars: 5, special: true, uses: 5, logic: 'consistency' },
+    { id: 'copa', name: 'La vuelta olímpica', stars: 5, special: true, uses: 5, logic: 'cup', boost: 6 },
+    { id: 'archivo', name: 'Archivo 2000', stars: 4, special: true, uses: 20, logic: 'veteran' },
+    { id: 'leyenda', name: 'Última leyenda', stars: 5, special: true, uses: 5, logic: 'legend', boost: 5 },
   ];
 
   // ---- Perfiles de manager IA: cada uno decide distinto (no "el mismo bot con ruido") ----
@@ -562,6 +571,7 @@ import './football-shim.js';
   function moveToClub(state, playerId, clubId, contract) {
     const p = state.players[playerId];
     if (!p) throw new Error('Jugador inexistente: ' + playerId);
+    if (p.equippedCardId && TLM.unequipCard) TLM.unequipCard(state, p); // la carta especial se queda con el club vendedor; viaja "pelado"
     const from = p.clubId && state.clubs[p.clubId];
     if (from) {
       from.squad = from.squad.filter((id) => id !== playerId);
@@ -603,14 +613,68 @@ import './football-shim.js';
     }
   }
 
-  // ---- stats efectivos para el partido: base + moral + forma + entrenamiento de equipo ----
+  // ---- carta especial equipada: cada "logic" tiene su propio efecto en el partido (ver EDITIONS en tlm-data.js).
+  // El contexto de partido (derby/apertura/copa) lo pone primeCardContext() antes de armar el once; el resto
+  // (boost/consistencia/inmunidad/XP/veteranía) sólo depende del jugador.
+  function cardBoostBits(p) {
+    const none = { flat: 0, noiseMul: 1, xpMul: 1, immune: false };
+    if (!p.equippedCardLogic) return none;
+    const ctx = p._cardCtx || {};
+    switch (p.equippedCardLogic) {
+      case 'boost': return { ...none, flat: p.equippedCardBoost || 0 };
+      case 'legend': return { flat: p.equippedCardBoost || 0, noiseMul: 0.7, xpMul: 1.5, immune: true };
+      case 'derby': return { ...none, flat: ctx.derby ? (p.equippedCardBoost || 0) : 0 };
+      case 'opener': return { ...none, flat: ctx.opener ? (p.equippedCardBoost || 0) : 0 };
+      case 'cup': return { ...none, flat: ctx.cup ? (p.equippedCardBoost || 0) : 0 };
+      case 'consistency': return { ...none, noiseMul: 0.3 };
+      case 'immune': return { ...none, immune: true };
+      case 'xp': return { ...none, xpMul: 2 };
+      case 'veteran': { const games = (p.careerTotals && p.careerTotals.matches) || 0; return { ...none, flat: Math.min(6, Math.floor(games / 40)) }; }
+      default: return none;
+    }
+  }
+  function primeCardContext(state, fixture) {
+    const home = state.clubs[fixture.homeId], away = state.clubs[fixture.awayId];
+    // "Derby": no hay geografía real entre clubes (cada uno es de una "nación" distinta), así que se define como un
+    // partido entre rivales parejos en la tabla (a 2 puestos o menos) — la tensión de un partido cerrado y directo.
+    let derby = false;
+    const comp = fixture.competitionId && state.competitions[fixture.competitionId];
+    if (comp && !fixture.cup) {
+      const table = TLM.computeTable(state, comp), rank = {}; table.forEach((r, i) => (rank[r.clubId] = i));
+      if (rank[home.id] != null && rank[away.id] != null) derby = Math.abs(rank[home.id] - rank[away.id]) <= 2;
+    }
+    const ctx = { derby, opener: fixture.round === 1 && !fixture.cup, cup: !!fixture.cup };
+    for (const club of [home, away]) for (const pid of club.squad) { const p = state.players[pid]; if (p) p._cardCtx = ctx; }
+  }
+
+  // ---- stats efectivos para el partido: base + moral + forma + entrenamiento de equipo + carta especial ----
   function effectiveStats(p, club) {
     const mm = clamp(round((p.morale - 60) / 15), -4, 3), fm = clamp(round((p.form - 50) / 25), -2, 2);
     const tb = (club && club.training && club.training.teamBoost) || 0, focus = club && club.training && club.training.team;
     const eff = TLM.TRAINING.teamEffect[focus] || [];
+    const cardFlat = cardBoostBits(p).flat;
     const out = {};
-    for (const k of TLM.STAT_KEYS) out[k] = clamp(round(p.attributes[k] + mm + fm + (eff.includes(k) ? tb : 0)), 20, 99);
+    for (const k of TLM.STAT_KEYS) out[k] = clamp(round(p.attributes[k] + mm + fm + (eff.includes(k) ? tb : 0) + cardFlat), 20, 99);
     return out;
+  }
+
+  // ---- XP por partido: rating alto da XP (multiplicado si tiene la carta "Primera ovación"); cada 60 XP hay chance
+  // de +1 en un atributo, con la misma gradación de edad/potencial que trainRound (no es rápido ni OP). ----
+  function gainMatchXP(state, p, rating) {
+    const r = R(state), xpMul = cardBoostBits(p).xpMul;
+    const gain = Math.max(0, round((rating - 5.5) * 3)) * xpMul;
+    if (!gain) return;
+    p.xp = (p.xp || 0) + gain;
+    while (p.xp >= 60) {
+      p.xp -= 60;
+      const ageF = p.age <= 21 ? 1.4 : p.age <= 25 ? 1 : p.age <= 29 ? 0.5 : 0.15;
+      const room = p.potential - p.overall;
+      if (r.chance((room > 0 ? 0.5 : 0.12) * ageF)) {
+        const ro = TLM.roleOf(p.primaryPosition), pool = ro === 'GK' ? ['reflexes', 'handling', 'positioning'] : ro === 'DEF' ? ['marking', 'tackling', 'strength'] : ro === 'MID' ? ['passing', 'vision', 'stamina'] : ['finishing', 'pace', 'dribbling'];
+        const k = pool.find((x) => TLM.STAT_KEYS.includes(x)) ? r.pick(pool.filter((x) => TLM.STAT_KEYS.includes(x))) : r.pick(TLM.STAT_KEYS);
+        if (p.attributes[k] < 96) { p.attributes[k]++; recalc(p); }
+      }
+    }
   }
 
   function isAvailable(p) { return !p.injury && !(p.suspension > 0); }
@@ -698,7 +762,8 @@ import './football-shim.js';
     if (p.age > 29) p.potential = p.overall;
   }
 
-  Object.assign(TLM, { assetURL, placeholderPhoto, rosterByClub, makeFromRoster, claimName, surOf, migrateNations, R, roleOf, overall, valueOf, salaryOf, recalc, makePlayer, moveToClub, assignNumber, closeHistoryStint, effectiveStats, isAvailable, injure, weeklyRecovery, trainRound, seasonProgress, usedNames, emptySeason, ageValueFactor });
+  Object.assign(TLM, { assetURL, placeholderPhoto, rosterByClub, makeFromRoster, claimName, surOf, migrateNations, R, roleOf, overall, valueOf, salaryOf, recalc, makePlayer, moveToClub, assignNumber, closeHistoryStint, effectiveStats, isAvailable, injure, weeklyRecovery, trainRound, seasonProgress, usedNames, emptySeason, ageValueFactor,
+    cardBoostBits, primeCardContext, gainMatchXP });
 })(typeof globalThis !== 'undefined' ? globalThis : this);
 
 }
@@ -971,6 +1036,7 @@ import './football-shim.js';
       counters: {}, clubs: {}, players: {}, competitions: {}, fixtures: {},
       market: { listings: {}, offers: {}, freeAgents: [] }, transfers: [], news: [], history: { seasons: [], records: {} },
       scoutReports: {}, matchRecords: {}, scout: { usedThisRound: 0 }, worldConfigId: cfg.id, log: [],
+      specialCards: {}, cardListings: {}, cardSeq: 0,
     };
     const r = R(state), used = new Set();
     const wantTotal = Math.max(3, Math.min(opts.totalClubs || cfg.clubs.length + 1, 40));
@@ -1397,6 +1463,7 @@ import './football-shim.js';
     };
   }
   function buildMatchConfig(state, fixture) {
+    if (TLM.primeCardContext) TLM.primeCardContext(state, fixture);
     const home = state.clubs[fixture.homeId], away = state.clubs[fixture.awayId];
     const lab = TLM.fixtureLabel ? TLM.fixtureLabel(state, fixture) : null;
     return { fixtureId: fixture.id, homeClubId: home.id, awayClubId: away.id, season: state.season, round: fixture.round, competition: state.competitions[fixture.competitionId].name, seed: (state.seed + fixture.round * 977 + state.transfers.length + (fixture.cup ? 5003 : 0)) >>> 0,
@@ -1813,10 +1880,12 @@ import './football-shim.js';
     return executeTransfer(state, o);
   }
 
-  // ---------- ediciones de cromo (el MISMO jugador; sólo cambia su carta) ----------
+  // ---------- ediciones de cromo base (el MISMO jugador; sólo cambia su carta). Las especiales (plata en adelante)
+  // ya no se compran acá: son cartas reales, ver rollCardDrop/equipCard más abajo. ----------
   function applyEdition(state, club, p, editionId, free) {
     const ed = TLM.EDITIONS.find((e) => e.id === editionId);
     if (!ed) return { ok: false, reason: 'Edición inexistente.' };
+    if (ed.special) return { ok: false, reason: 'Esa es una carta especial: se consigue jugando, no se compra.' };
     const cost = free ? 0 : roundMoney(Math.max(20000, p.marketValue * ed.cost));
     if (cost && !TLM.canSpend(club, cost)) return { ok: false, reason: 'Saldo insuficiente (' + money(cost) + ').' };
     if (cost) addTx(state, club, 'card', -cost, `Edición «${ed.name}» de ${p.canonicalName}`, p.id);
@@ -1824,6 +1893,70 @@ import './football-shim.js';
     return { ok: true, cost };
   }
   const buyEdition = (state, clubId, pid, editionId) => { const p = state.players[pid]; if (!p || p.clubId !== clubId) return { ok: false, reason: 'No es de tu club.' }; return applyEdition(state, clubOf(state, clubId), p, editionId, false); };
+
+  // ---------- CARTAS ESPECIALES: instancias con dueño (el club, no el jugador) y usos limitados ----------
+  // Drop tras un partido brillante (rating >= 8.7): probabilidad chica, elige una edición especial al azar
+  // ponderada (las de 5 estrellas son mucho más raras) y crea una instancia para el club actual del jugador.
+  const SPECIAL_EDITIONS = () => TLM.EDITIONS.filter((e) => e.special);
+  function rollCardDrop(state, p, rating) {
+    if (!p.clubId || rating < 8.7) return null;
+    const r = R(state), chance = (rating - 8.7) * 0.35; // 8.7 -> ~0%, 10.0 -> ~45%
+    if (!r.chance(chance)) return null;
+    const pool = SPECIAL_EDITIONS(), ed = r.weighted(pool, (e) => (e.stars >= 5 ? 1 : 4));
+    const id = 'card_' + (++state.cardSeq);
+    const card = { id, editionId: ed.id, playerId: p.id, ownerClubId: p.clubId, usesLeft: ed.uses, retired: false };
+    state.specialCards[id] = card;
+    addNews(state, 'card', `¡${p.canonicalName} se ganó la carta especial «${ed.name}»! (${state.clubs[p.clubId].name})`, { playerId: p.id, clubId: p.clubId });
+    return card;
+  }
+  const clubCards = (state, clubId) => Object.values(state.specialCards).filter((c) => c.ownerClubId === clubId && !c.retired);
+  const cardsOf = (state, pid) => Object.values(state.specialCards).filter((c) => c.playerId === pid && !c.retired);
+  // Equipar: el club tiene que ser dueño de la carta Y del jugador (la base). Al equipar también cambia la carta visual.
+  function equipCard(state, clubId, pid, cardId) {
+    const p = state.players[pid]; if (!p || p.clubId !== clubId) return { ok: false, reason: 'No es jugador de tu club.' };
+    if (!cardId) { unequipCard(state, p); return { ok: true }; }
+    const card = state.specialCards[cardId];
+    if (!card || card.retired) return { ok: false, reason: 'Carta inexistente.' };
+    if (card.ownerClubId !== clubId) return { ok: false, reason: 'Esa carta no es de tu club.' };
+    if (card.playerId !== pid) return { ok: false, reason: 'Esa carta es de otro jugador: para usarla necesitás tener también su versión base en tu plantilla.' };
+    const ed = TLM.EDITIONS.find((e) => e.id === card.editionId);
+    p.equippedCardId = cardId; p.card.edition = ed.id; p.card.stars = ed.stars;
+    p.equippedCardLogic = ed.logic; p.equippedCardBoost = ed.boost || 0;
+    return { ok: true };
+  }
+  function unequipCard(state, p) {
+    p.equippedCardId = null; p.equippedCardLogic = null; p.equippedCardBoost = 0;
+    const ov = p.overall; p.card.edition = ov >= 75 ? 'cobre' : 'potrero'; p.card.stars = 3;
+  }
+  // Se llama después de cada partido para el jugador que jugó con una carta especial puesta: gasta un uso.
+  function consumeCardUse(state, p) {
+    if (!p.equippedCardId) return;
+    const card = state.specialCards[p.equippedCardId]; if (!card) { p.equippedCardId = null; return; }
+    if (card.usesLeft == null) return; // uso ilimitado (no debería pasar con especiales, pero por si acaso)
+    card.usesLeft--;
+    if (card.usesLeft <= 0) { card.retired = true; addNews(state, 'card', `Se agotaron los usos de la carta «${TLM.EDITIONS.find((e) => e.id === card.editionId).name}» de ${p.canonicalName}.`, { playerId: p.id }); unequipCard(state, p); }
+  }
+  // Mercado de cartas: se venden por separado del jugador. El comprador puede quedarse con la carta aunque no
+  // tenga (todavía) al jugador — pero no podrá equiparla hasta que también lo fiche.
+  function listCard(state, clubId, cardId, price) {
+    const card = state.specialCards[cardId];
+    if (!card || card.retired || card.ownerClubId !== clubId) return { ok: false, reason: 'No es tu carta.' };
+    const p = state.players[card.playerId]; if (p && p.equippedCardId === cardId) return { ok: false, reason: 'Desequipala antes de vender.' };
+    state.cardListings[cardId] = roundMoney(Math.max(1000, price));
+    return { ok: true };
+  }
+  function unlistCard(state, clubId, cardId) { const card = state.specialCards[cardId]; if (!card || card.ownerClubId !== clubId) return { ok: false, reason: 'No es tu carta.' }; delete state.cardListings[cardId]; return { ok: true }; }
+  function buyCard(state, buyerClubId, cardId) {
+    const card = state.specialCards[cardId], price = state.cardListings[cardId];
+    if (!card || card.retired || price == null) return { ok: false, reason: 'Esa carta no está en venta.' };
+    const buyer = clubOf(state, buyerClubId); if (!TLM.canSpend(buyer, price)) return { ok: false, reason: 'Saldo insuficiente (' + money(price) + ').' };
+    const seller = state.clubs[card.ownerClubId];
+    addTx(state, buyer, 'card', -price, `Carta «${TLM.EDITIONS.find((e) => e.id === card.editionId).name}»`, card.playerId);
+    if (seller) addTx(state, seller, 'card', price, `Venta de carta «${TLM.EDITIONS.find((e) => e.id === card.editionId).name}»`, card.playerId);
+    card.ownerClubId = buyerClubId; delete state.cardListings[cardId];
+    const p = state.players[card.playerId]; if (p && p.equippedCardId === cardId) unequipCard(state, p);
+    return { ok: true };
+  }
 
   // ---------- SCOUTING ----------
   function scout(state, clubId, req) {
@@ -1866,7 +1999,8 @@ import './football-shim.js';
   }
 
   Object.assign(TLM, { reserveValue, contractDemand, transferStatus, listPlayer, unlistPlayer, refreshListings, searchMarket, makeOffer, evaluateOffer, resolveOffers, acceptCounter, counterOffer, withdrawOffer, buyNow,
-    signFreeAgent, respondToOffer, renewContract, contractStatus, sellNow, applyEdition, buyEdition, scout, executeTransfer, buyerCeiling, need, isSurplus, squadDepth, curRound, mainComp: comp });
+    signFreeAgent, respondToOffer, renewContract, contractStatus, sellNow, applyEdition, buyEdition, scout, executeTransfer, buyerCeiling, need, isSurplus, squadDepth, curRound, mainComp: comp,
+    rollCardDrop, clubCards, cardsOf, equipCard, unequipCard, consumeCardUse, listCard, unlistCard, buyCard });
 })(typeof globalThis !== 'undefined' ? globalThis : this);
 
 }
@@ -2194,7 +2328,7 @@ import './football-shim.js';
         const s = res.playerStats[pid]; if (!s || s.minutes <= 0) continue;
         const p = state.players[pid], ro = TLM.roleOf(p.primaryPosition), share = Math.min(1, s.minutes / 90);
         let v = 6.0 + W * 0.3 * share + s.goals * 0.95 + s.assists * 0.55 + Math.min(1, s.shots * 0.05) + (ro === 'GK' ? s.saves * 0.14 + (s.cleanSheet ? 0.55 : 0) : 0) + (ro === 'DEF' ? (s.cleanSheet || opp === 0 ? 0.35 : -0.1 * opp) : 0) + s.tackles * 0.05 - s.yellow * 0.3 - s.red * 1.6 - (ro === 'GK' ? opp * 0.22 : 0);
-        v += r.gauss() * (0.45 - (p.personality.consistency - 60) / 400);
+        v += r.gauss() * (0.45 - (p.personality.consistency - 60) / 400) * (TLM.cardBoostBits ? TLM.cardBoostBits(p).noiseMul : 1); // "Capitán eterno"/"Última leyenda": menos variación
         s.rating = +clamp(v, 3.5, 10).toFixed(1);
       }
     });
@@ -2216,7 +2350,9 @@ import './football-shim.js';
         if (s.cleanSheet) t.cleanSheets++; if (s.rating) { t.ratingSum += s.rating; t.ratingN++; p.form = clamp(p.form * 0.65 + (s.rating - 4) * 20 * 0.35, 0, 100); }
         const drop = s.staminaEnd != null ? (100 - s.staminaEnd) * 0.55 : s.minutes / 90 * (24 - (p.attributes.physical - 60) * 0.12);
         p.fitness = clamp(p.fitness - drop, 20, 100);
-        p.morale = clamp(p.morale + (my > opp ? 3 : my < opp ? -3 : 0.3) + (s.goals ? 2.5 : 0) + (s.rating >= 8 ? 2 : 0), 0, 100);
+        const cardBits = TLM.cardBoostBits ? TLM.cardBoostBits(p) : { immune: false };
+        p.morale = clamp(p.morale + (my > opp ? 3 : my < opp ? (cardBits.immune ? 0 : -3) : 0.3) + (s.goals ? 2.5 : 0) + (s.rating >= 8 ? 2 : 0), 0, 100);
+        if (s.rating) { TLM.gainMatchXP(state, p, s.rating); TLM.rollCardDrop(state, p, s.rating); TLM.consumeCardUse(state, p); }
         p.yellowAccum = (p.yellowAccum || 0) + s.yellow;
         if (p.yellowAccum >= 5) { p.suspension = 1; p.yellowAccum = 0; addNews(state, 'ban', `${p.canonicalName} (${club.name}) cumple una fecha de suspensión por acumulación de amarillas.`, { playerId: p.id }); }
         if (s.red) { p.suspension = Math.max(p.suspension, 1 + (s.rating < 4 ? 1 : 0)); addNews(state, 'ban', `${p.canonicalName} (${club.name}) es sancionado tras su expulsión.`, { playerId: p.id }); }
