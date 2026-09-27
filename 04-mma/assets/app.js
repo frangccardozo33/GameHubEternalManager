@@ -25326,34 +25326,28 @@ class qm {
   }
   update(t, e, n, s, r = null) {
     this.time += s;
-    const a = this.rig;
-    a.root.position.lerp(
-      vt(t.position.x, 0, t.position.z),
-      1 - Math.exp(-s * 18),
-    );
-    const o = Math.atan2(
-        e.position.x - t.position.x,
-        e.position.z - t.position.z,
-      ),
-      l = Math.atan2(
-        Math.sin(o - a.root.rotation.y),
-        Math.cos(o - a.root.rotation.y),
-      );
-    a.root.rotation.y += l * (1 - Math.exp(-s * 12));
+    const a = this.rig,
+      down = ["knockdown", "KO"].includes(t.state);
+    // en el piso (knockdown/KO) la raíz queda fija: el cuerpo no gira ni se desliza siguiendo al rival
+    if (!down) {
+      a.root.position.lerp(vt(t.position.x, 0, t.position.z), 1 - Math.exp(-s * 18));
+      const o = Math.atan2(e.position.x - t.position.x, e.position.z - t.position.z),
+        l = Math.atan2(Math.sin(o - a.root.rotation.y), Math.cos(o - a.root.rotation.y));
+      a.root.rotation.y += l * (1 - Math.exp(-s * (["ground-top", "ground-bottom"].includes(t.state) ? 5 : 12)));
+    }
     let c = this.standing(t);
     const h = ["ground-top", "ground-bottom"].includes(t.state);
     if (
-      (h && (c = this.ground(t, n)),
+      (h && (c = this.ground(t, n, e)),
       t.state === "takedown-attempt" ||
         (t.state === "defending" && t.defenseType === "sprawl"))
     ) {
-      const f = Math.sin(te(t.stateTime / 1.4, 0, 1) * Math.PI) * 0.4;
-      (Object.values(c).forEach((p) => {
-        p.y = Math.max(0.08, p.y - f);
-      }),
-        c.leftHand.set(-0.23, 0.75, 0.6),
-        c.rightHand.set(0.23, 0.75, 0.6),
-        (c.chest.z += 0.25));
+      const f = Math.sin(te(t.stateTime / 1.4, 0, 1) * Math.PI),
+        spr = t.state === "defending";
+      for (const k of ["pelvis", "leftHip", "rightHip"]) ((c[k].y -= f * (spr ? 0.3 : 0.38)), (c[k].z -= f * (spr ? 0.3 : 0.12)));
+      for (const k of ["abdomen", "chest", "neck", "head", "leftShoulder", "rightShoulder"]) ((c[k].y -= f * (spr ? 0.55 : 0.62)), (c[k].z += f * (spr ? 0.18 : 0.38)));
+      spr ? ((c.leftFoot.z -= 0.45 * f), (c.rightFoot.z -= 0.55 * f)) : (c.leftFoot.z += 0.35 * f);
+      (c.leftHand.lerp(vt(-0.24, 0.72, spr ? 0.45 : 0.75), f), c.rightHand.lerp(vt(0.24, 0.7, spr ? 0.45 : 0.72), f));
     }
     if (
       (t.state === "clinch" &&
@@ -25363,27 +25357,36 @@ class qm {
       t.state === "getting-up")
     ) {
       const f = te(t.stateTime / 1.5, 0, 1),
-        p = this.ground({ ...t, state: "ground-top" }, null);
-      for (const _ in c) p[_] && c[_].lerp(p[_], 1 - f);
+        k = f * f * (3 - 2 * f);
+      this.upFrom || (this.upFrom = this.lastPose ? Object.fromEntries(Object.entries(this.lastPose).map(([q, v]) => [q, v.clone()])) : this.ground({ ...t, state: "ground-top" }, null, e));
+      for (const _ in c) this.upFrom[_] && c[_].copy(this.upFrom[_].clone().lerp(c[_], k));
     }
     (t.action && this.attack(c, t, h),
       t.state === "defending" && !h && this.defend(c, t),
       ["rocked", "stunned"].includes(t.state) &&
-        ((c.head.x += Math.sin(this.time * 13) * 0.055),
-        (c.chest.z -= 0.12),
-        (c.head.z -= 0.16)));
-    const u = ["knockdown", "KO"].includes(t.state);
+        ((c.head.x += Math.sin(this.time * 5.5) * 0.06),
+        (c.neck.x += Math.sin(this.time * 5.5) * 0.04),
+        (c.chest.x += Math.sin(this.time * 5.5 - 0.6) * 0.03),
+        (c.chest.z -= 0.1),
+        (c.neck.z -= 0.12),
+        (c.head.z -= 0.14),
+        (c.leftHand.y -= 0.25),
+        (c.rightHand.y -= 0.22)));
+    t.state !== "getting-up" && (this.upFrom = null);
+    const u = down;
     (u
-      ? (this.ragdoll || (this.ragdoll = new Xm(this.lastPose || c)),
+      ? (this.ragdoll || (this.lastPose || (this.solveLimbs(c, !1), this.derived(c)), (this.ragdoll = new Xm(this.lastPose || c))),
         Object.assign(c, this.ragdoll.tick(s)))
       : (this.ragdoll = null),
       u || this.solveLimbs(c, h),
       (this.recoil *= Math.exp(-s * 10)),
-      !h && !u && ((c.head.z -= this.recoil), (c.chest.z -= this.recoil * 0.4)),
+      !h && !u && ((c.head.z -= this.recoil), (c.neck.z -= this.recoil * 0.7), (c.chest.z -= this.recoil * 0.4), (c.head.y -= this.recoil * 0.15)),
       (r == null ? void 0 : r.winner) === t.side &&
         !h &&
-        (c.leftHand.set(-0.45, 2.12, 0),
-        c.rightHand.set(0.45, 2.12, 0),
+        (c.leftHand.set(-0.62, 2.02, 0.12),
+        c.rightHand.set(0.62, 2.02, 0.12),
+        (c.head.y += 0.02),
+        (c.chest.z -= 0.04),
         this.solveLimbs(c, !1)),
       this.derived(c),
       a.apply(c, 1 - Math.exp(-s * (t.action ? 28 : 13))),
@@ -25419,25 +25422,29 @@ class qm {
       ),
     };
   }
-  ground(t, e) {
+  ground(t, e, opp) {
     if (t.state === "ground-top") {
-      const r = (e == null ? void 0 : e.position) === "side" ? 0.2 : 0;
+      const side = (e == null ? void 0 : e.position) === "side",
+        d = te(opp ? Math.hypot(opp.position.x - t.position.x, opp.position.z - t.position.z) : 0.55, 0.25, 0.95),
+        r = side ? 0.18 : 0,
+        br = Math.sin(this.time * 2.2) * 0.01;
+      // montada: rodillas a los costados de la cadera rival, tronco inclinado hacia adelante y manos adelante
       return {
-        pelvis: vt(r, 0.58, -0.15),
-        abdomen: vt(r, 0.77, 0.01),
-        chest: vt(r, 0.95, 0.15),
-        neck: vt(r, 1.09, 0.25),
-        head: vt(r, 1.23, 0.31),
-        leftShoulder: vt(-0.25 + r, 1, 0.16),
-        rightShoulder: vt(0.25 + r, 1, 0.13),
-        leftHand: vt(-0.22, 0.53, 0.45),
-        rightHand: vt(0.2, 0.63, 0.4),
-        leftHip: vt(-0.18, 0.55, -0.1),
-        rightHip: vt(0.18, 0.55, -0.1),
-        leftFoot: vt(-0.38, 0.07, -0.6),
-        rightFoot: vt(0.38, 0.07, -0.6),
-        leftKnee: vt(-0.4, 0.12, 0.04),
-        rightKnee: vt(0.4, 0.12, 0.04),
+        pelvis: vt(r, side ? 0.46 : 0.52, d - 0.2),
+        abdomen: vt(r, side ? 0.62 : 0.72, d - 0.02),
+        chest: vt(r, (side ? 0.72 : 0.9) + br, d + (side ? 0.22 : 0.14)),
+        neck: vt(r, (side ? 0.8 : 1.03) + br, d + (side ? 0.4 : 0.27)),
+        head: vt(r, (side ? 0.86 : 1.14) + br, d + (side ? 0.52 : 0.36)),
+        leftShoulder: vt(-0.24 + r, (side ? 0.78 : 0.97) + br, d + (side ? 0.26 : 0.18)),
+        rightShoulder: vt(0.24 + r, (side ? 0.78 : 0.97) + br, d + (side ? 0.26 : 0.18)),
+        leftHand: vt(-0.3 + r, side ? 0.28 : 0.42, d + 0.5),
+        rightHand: vt(0.3 + r, side ? 0.3 : 0.62, d + 0.42),
+        leftHip: vt(-0.15 + r, side ? 0.44 : 0.5, d - 0.2),
+        rightHip: vt(0.15 + r, side ? 0.44 : 0.5, d - 0.2),
+        leftKnee: vt(-0.36 + r, 0.1, d + 0.06),
+        rightKnee: vt(0.36 + r, 0.1, d + 0.06),
+        leftFoot: vt(-0.3 + r, 0.07, d - 0.42),
+        rightFoot: vt(0.3 + r, 0.07, d - 0.42),
       };
     }
     const s =
@@ -25485,12 +25492,17 @@ class qm {
     if (h.includes("Hand")) {
       const f = vt(
         h === "leftHand" ? -0.045 : 0.045,
-        n ? 0.33 : u,
-        n ? 0.66 : Math.min(e.distance - 0.12, 1.23),
+        n ? 0.3 + 0.55 * (1 - l) : u,
+        n ? 0.75 : Math.min(e.distance - 0.12, 1.23),
       );
+      const side = h === "leftHand" ? -1 : 1;
       ((s.type === "hook" || s.type === "bodyShot") &&
-        (f.x += Math.sin(a * Math.PI * 2) * 0.34),
-        s.type === "uppercut" && (f.y -= Math.sin(a * Math.PI * 2) * 0.3),
+        ((f.x += side * 0.42 * (1 - l)), (f.z -= 0.3 * (1 - l) + 0.12)),
+        s.type === "uppercut" && ((f.y -= 0.45 * (1 - l)), (f.z -= 0.2 * (1 - l))),
+        // rotación de cadera y hombros hacia el golpe
+        (t[side < 0 ? "leftShoulder" : "rightShoulder"].z += 0.12 * l),
+        (t[side < 0 ? "rightShoulder" : "leftShoulder"].z -= 0.06 * l),
+        s.type === "uppercut" && (t.pelvis.y -= 0.06 * l),
         t[h].lerp(f, l),
         (t.chest.x += (h === "leftHand" ? 0.05 : -0.05) * l));
     } else
@@ -25505,9 +25517,14 @@ class qm {
             ),
             l,
           ),
-          (t.pelvis.y -= 0.05 * l),
-          (t.chest.x -= 0.16 * l),
-          t.rightHand.lerp(vt(0.45, 1.16, -0.1), l));
+          (t.pelvis.y -= 0.07 * l),
+          (t.pelvis.x -= 0.06 * l),
+          (t.chest.x -= 0.18 * l),
+          (t.head.x -= 0.14 * l),
+          (t.neck.x -= 0.16 * l),
+          (t.leftFoot.x -= 0.05 * l),
+          t.rightHand.lerp(vt(0.45, 1.16, -0.1), l),
+          t.leftHand.lerp(vt(-0.12, 1.7, 0.3), l));
   }
   defend(t, e) {
     const n = e.defenseType;
@@ -25741,6 +25758,7 @@ class Km {
       this.camera.position.set(4, 4, 8),
       (this.cameraController = new Ym(this.camera)),
       (this.arena = Wm(this.scene)),
+
       (this.rigs = e.fighters.map((r, a) => {
         const o = new $m(r.profile, a);
         return (
