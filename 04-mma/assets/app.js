@@ -24901,150 +24901,232 @@ function pc(i, t, e, n) {
     r
   );
 }
+// Arena LLO (evento grande): octágono elevado con faldón y escaleras, lona con logo y publicidad (marcas acumulables con addMark),
+// reja de 8 paños con postes acolchados, puerta y cámaras robóticas, esquinas roja/azul con cornermen, tribuna en anillo con público
+// billboard (shader, sin cubos), palcos, pantalla gigante colgante, focos volumétricos y humo de presentación.
+// Devuelve { group, panels } como antes, más update(sim, dt, intro), addMark(x, z) y pulseCrowd(intensity).
 function Wm(i) {
   const t = new Kn();
   i.add(t);
-  const e = [],
-    n = fc(1024, 1024, (d, b, T) => {
-      ((d.fillStyle = "#a8adb2"),
-        d.fillRect(0, 0, b, T),
-        (d.strokeStyle = "#8c939c"),
-        (d.lineWidth = 4),
-        d.strokeRect(145, 145, 734, 734),
-        d.save(),
-        d.translate(b / 2, T / 2),
-        d.rotate(-Math.PI / 8),
-        (d.fillStyle = "#20252b"),
-        (d.font = "italic 900 145px Arial"),
-        (d.textAlign = "center"),
-        d.fillText("LLO", 0, 24),
-        (d.fillStyle = "#41494e"),
-        (d.font = "bold 22px Arial"),
-        d.fillText("L I G A   L U C H A   O N L I N E", 0, 72),
-        d.restore());
-      for (let y = 0; y < 4; y++)
-        (d.save(),
-          d.translate(512, 512),
-          d.rotate((y * Math.PI) / 2),
-          (d.fillStyle = "#20252b"),
-          d.fillRect(-168, -405, 336, 58),
-          (d.fillStyle = "#c4ed64"),
-          (d.font = "italic 900 35px Arial"),
-          (d.textAlign = "center"),
-          d.fillText(y % 2 ? "MMA" : "LLO", 0, -365),
-          d.restore());
-    }),
-    s = new me(
-      new ss(4.58, 4.58, 0.2, 8, 1),
-      new Ve({ color: "#171a1e", roughness: 0.9 }),
-    );
-  ((s.rotation.y = Math.PI / 8), (s.position.y = -0.16), t.add(s));
-  const r = new me(new $a(4.5, 8), new Ve({ map: n, roughness: 0.94 }));
-  ((r.rotation.x = -Math.PI / 2),
-    (r.rotation.z = Math.PI / 8),
-    (r.position.y = -0.048),
-    (r.receiveShadow = !0),
-    t.add(r));
-  const a = new Ve({ color: "#15181c", roughness: 0.85 }),
-    o = new Ve({ color: "#222930", roughness: 0.72 }),
-    l = Array.from(
-      { length: 8 },
-      (d, b) =>
-        new F(
-          Math.cos((b * Math.PI) / 4 + Math.PI / 8) * 4.5,
-          0,
-          Math.sin((b * Math.PI) / 4 + Math.PI / 8) * 4.5,
-        ),
-    );
-  for (let d = 0; d < 8; d++) {
-    const b = l[d],
-      T = l[(d + 1) % 8];
-    t.add(pc(b.clone().setY(0), b.clone().setY(2), 0.105, o));
-    for (const N of [0.04, 1.94])
-      t.add(pc(b.clone().setY(N), T.clone().setY(N), 0.055, a));
-    const y = [],
-      R = b.distanceTo(T),
-      w = T.clone().sub(b).normalize();
-    for (const N of [-1, 1])
-      for (let B = -2; B < R + 2; B += 0.12) {
-        const W = Math.max(0, N > 0 ? -B : B - R),
-          G = Math.min(1.88, N > 0 ? R - B : B);
-        if (G <= W) continue;
-        const X = b
-            .clone()
-            .addScaledVector(w, B + N * W)
-            .setY(W + 0.03),
-          j = b
-            .clone()
-            .addScaledVector(w, B + N * G)
-            .setY(G + 0.03);
-        y.push(...X.toArray(), ...j.toArray());
-      }
-    const C = new Ze();
-    C.setAttribute("position", new _e(y, 3));
-    const U = new $c({ color: "#6b747d", transparent: !0, opacity: 0.3 }),
-      S = new Qd(C, U);
-    (t.add(S),
-      e.push({ material: U, center: b.clone().add(T).multiplyScalar(0.5) }));
-    const M = fc(128, 512, (N, B, W) => {
-        ((N.fillStyle = d % 2 ? "#1a2029" : "#bdde55"),
-          N.fillRect(0, 0, B, W),
-          N.translate(64, 256),
-          N.rotate(-Math.PI / 2),
-          (N.fillStyle = d % 2 ? "#f4f4ed" : "#15181b"),
-          (N.font = "italic 900 61px Arial"),
-          (N.textAlign = "center"),
-          N.fillText("LLO", 0, 22));
-      }),
-      P = new me(new Ii(0.23, 1.55, 0.21), new Ve({ map: M, roughness: 0.8 }));
-    (P.position.copy(b).setY(1.02),
-      (P.rotation.y = -Math.atan2(b.z, b.x)),
-      t.add(P));
-  }
-  const c = new La(31),
-    h = new ge(),
-    u = new Yd(
-      new Qs(1, 6, 5),
-      new Ve({ color: "#36404b", roughness: 1 }),
-      720,
-    );
-  let f = 0;
-  for (let d = 0; d < 4; d++)
-    for (let b = 0; b < 90; b++) {
-      const T = (b / 90) * Math.PI * 2,
-        y = 6 + d * 0.85;
-      (h.position.set(Math.cos(T) * y, 0.44 + d * 0.48, Math.sin(T) * y),
-        h.scale.set(0.21, 0.34, 0.19),
-        h.updateMatrix(),
-        u.setMatrixAt(f, h.matrix),
-        u.setColorAt(f++, new Ht().setHSL(c.next(), 0.1, c.range(0.08, 0.22))),
-        (h.position.y += 0.44),
-        h.scale.set(0.105, 0.13, 0.11),
-        h.updateMatrix(),
-        u.setMatrixAt(f, h.matrix),
-        u.setColorAt(f++, new Ht().setHSL(0.08, 0.18, c.range(0.18, 0.35))));
+  const TAU = Math.PI * 2, rnd = new La(31), FLOOR = -1.05;
+  const std = (color, o = {}) => new Ve({ color, roughness: 0.8, ...o }), basic = (o) => new Va(o);
+  const SPONS = (window.EM && EM.sponsors && EM.sponsors.catalog ? EM.sponsors.catalog.slice(0, 8).map((s) => [s.name, s.hue]) : [["AURORA ENERGY", 32], ["NOVA BANK", 215], ["TURBO COLA", 4], ["KÓNDOR MOTORS", 355], ["RÍO SPORT", 175], ["TITÁN GEAR", 265], ["DELTA PAY", 150], ["LUMEN TECH", 50]]);
+  const img = (src, cb) => { const m = new Image(); m.onload = () => cb(m); m.src = src; };
+  // ---------------------------------------------------------------- lona (canvas 2048²) con logo, sponsors por cuadrante y marcas
+  const matCv = document.createElement("canvas"); matCv.width = matCv.height = 2048;
+  const mx = matCv.getContext("2d"), matTex = new Xc(matCv); matTex.colorSpace = He; matTex.anisotropy = 8;
+  const marks = [];
+  let logo = null;
+  function drawMat() {
+    const W = 2048, c = mx;
+    const g = c.createRadialGradient(W / 2, W / 2, 100, W / 2, W / 2, W * 0.55); g.addColorStop(0, "#d9dcdf"); g.addColorStop(1, "#b9bec3");
+    c.fillStyle = g; c.fillRect(0, 0, W, W);
+    // trama de la lona
+    c.globalAlpha = 0.05; for (let k = 0; k < 9000; k++) { c.fillStyle = k % 2 ? "#000" : "#fff"; c.fillRect(Math.random() * W, Math.random() * W, 2, 2); } c.globalAlpha = 1;
+    // anillo exterior oscuro (borde del octágono) y línea de la zona
+    c.save(); c.translate(W / 2, W / 2); c.rotate(Math.PI / 8);
+    const oct = (r) => { c.beginPath(); for (let k = 0; k < 8; k++) { const a = (k * TAU) / 8; c[k ? "lineTo" : "moveTo"](Math.cos(a) * r, Math.sin(a) * r); } c.closePath(); };
+    oct(1024); c.fillStyle = "#1a1d22"; c.fill(); oct(930); c.fillStyle = g; c.fill();
+    c.strokeStyle = "#7d858e"; c.lineWidth = 6; oct(900); c.stroke();
+    c.restore();
+    // sponsors en los cuatro cuadrantes (sobre el borde oscuro)
+    for (let k = 0; k < 4; k++) {
+      const [name, hue] = SPONS[k % SPONS.length];
+      c.save(); c.translate(W / 2, W / 2); c.rotate((k * Math.PI) / 2);
+      c.fillStyle = `hsl(${hue} 70% 40%)`; c.fillRect(-300, -640, 600, 150);
+      c.fillStyle = "#fff"; c.font = "900 italic 70px Arial Narrow, Arial"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(name, 0, -565, 560);
+      c.restore();
     }
-  t.add(u);
-  const p = new me(new Ui(60, 60), new Ve({ color: "#080b10", roughness: 1 }));
-  ((p.rotation.x = -Math.PI / 2), (p.position.y = -0.28), t.add(p));
-  const _ = new nh("#d8e4ff", "#36302a", 1.8);
-  i.add(_);
-  const x = new Ho("#fff0dc", 3.5);
-  (x.position.set(-3, 9, 4),
-    (x.castShadow = !0),
-    x.shadow.mapSize.set(1024, 1024),
-    Object.assign(x.shadow.camera, {
-      left: -6,
-      right: 6,
-      top: 6,
-      bottom: -6,
-      near: 0.1,
-      far: 25,
-    }),
-    (x.shadow.bias = -0.001),
-    i.add(x));
-  const m = new Ho("#aacaff", 2.1);
-  return (m.position.set(4, 5, -5), i.add(m), { group: t, panels: e });
+    // textos "LLO" en el borde
+    for (let k = 0; k < 8; k++) { c.save(); c.translate(W / 2, W / 2); c.rotate((k * TAU) / 8 + Math.PI / 8); c.fillStyle = "#c4ed64"; c.font = "900 italic 58px Arial"; c.textAlign = "center"; c.fillText(k % 2 ? "LIGA LUCHA ONLINE" : "LLO", 0, -960); c.restore(); }
+    // logo central
+    if (logo) { const s = 560; c.globalAlpha = 0.9; c.drawImage(logo, W / 2 - s / 2, W / 2 - s / 2, s, s); c.globalAlpha = 1; }
+    else { c.fillStyle = "#20252b"; c.font = "italic 900 240px Arial"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText("LLO", W / 2, W / 2); }
+    // marcas de sangre/sudor (se oscurecen con cada golpe en el mismo lugar)
+    for (const m of marks) {
+      const px = W / 2 + (m.x / 4.5) * 930, py = W / 2 + (m.z / 4.5) * 930;
+      for (let k = 0; k < m.drops.length; k++) { const d = m.drops[k]; c.fillStyle = m.kind === "sweat" ? `rgba(60,70,80,${0.1 + m.n * 0.03})` : `rgba(${110 - m.n * 6},${10},${12},${Math.min(0.85, 0.25 + m.n * 0.12)})`; c.beginPath(); c.ellipse(px + d[0], py + d[1], d[2], d[2] * d[3], d[4], 0, TAU); c.fill(); }
+    }
+    matTex.needsUpdate = true;
+  }
+  drawMat();
+  img("../assets/logos/llo.png", (m) => { logo = m; drawMat(); });
+  function addMark(x, z, kind = "blood") {
+    const r = Math.hypot(x, z); if (r > 4.2) { x *= 4.2 / r; z *= 4.2 / r; }
+    let m = marks.find((q) => Math.hypot(q.x - x, q.z - z) < 0.35 && q.kind === kind);
+    if (!m) { m = { x, z, n: 0, kind, drops: [] }; marks.push(m); if (marks.length > 40) marks.shift(); }
+    m.n = Math.min(10, m.n + 1);
+    for (let k = 0; k < 3 + m.n; k++) m.drops.push([(Math.random() - 0.5) * 40 * (1 + m.n * 0.2), (Math.random() - 0.5) * 40 * (1 + m.n * 0.2), 3 + Math.random() * 9, 0.5 + Math.random() * 0.8, Math.random() * TAU]);
+    drawMat();
+  }
+  // ---------------------------------------------------------------- base elevada: lona, faldón con sponsors, escaleras
+  const mat = new me(new $a(4.5, 8), new Ve({ map: matTex, roughness: 0.92 }));
+  mat.rotation.x = -Math.PI / 2; mat.rotation.z = Math.PI / 8; mat.position.y = -0.048; mat.receiveShadow = !0; t.add(mat);
+  const apron = new me(new ss(5.15, 5.15, 0.1, 8, 1), std("#15181c", { roughness: 0.6 })); apron.rotation.y = Math.PI / 8; apron.position.y = -0.1; apron.receiveShadow = !0; t.add(apron);
+  const skirtTex = fc(2048, 128, (c, w, h) => {
+    c.fillStyle = "#0c0e12"; c.fillRect(0, 0, w, h);
+    for (let k = 0; k < 8; k++) { const [n, hue] = SPONS[k % SPONS.length], x = (k * w) / 8; c.fillStyle = `hsl(${hue} 70% 34%)`; c.fillRect(x + 8, 14, w / 8 - 16, h - 28); c.fillStyle = "#fff"; c.font = "900 italic 46px Arial Narrow, Arial"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(n, x + w / 16, h / 2 + 2, w / 8 - 30); }
+  });
+  const skirt = new me(new ss(5.1, 5.25, -FLOOR - 0.1, 8, 1, !0), new Va({ map: skirtTex }));
+  skirt.rotation.y = Math.PI / 8; skirt.position.y = FLOOR / 2 - 0.1; t.add(skirt);
+  // escaleras de acceso (a la puerta y a la esquina opuesta)
+  const doorAngle = (5 * Math.PI) / 4 + Math.PI / 8; // paño de la puerta (entre posts 4 y 5)
+  for (const a of [doorAngle, doorAngle + Math.PI]) {
+    for (let s = 0; s < 4; s++) {
+      const st = new me(new Ii(1.3, 0.26, 0.4), std("#2a2f36", { metalness: 0.3 }));
+      const r = 5.35 + s * 0.38; st.position.set(Math.cos(a) * r, -0.23 - s * 0.26, Math.sin(a) * r); st.rotation.y = -a + Math.PI / 2; st.receiveShadow = !0; t.add(st);
+    }
+  }
+  // ---------------------------------------------------------------- reja de 8 paños: postes acolchados, rieles, malla, puerta
+  const e = [], railMat = std("#15181c", { roughness: 0.6 }), metal = std("#6b747d", { metalness: 0.8, roughness: 0.35 });
+  const posts = Array.from({ length: 8 }, (d, b) => new F(Math.cos((b * Math.PI) / 4 + Math.PI / 8) * 4.5, 0, Math.sin((b * Math.PI) / 4 + Math.PI / 8) * 4.5));
+  const padTex = (k) => fc(128, 512, (N, B, W) => { N.fillStyle = k === 0 ? "#c9302c" : k === 4 ? "#2f6fd6" : k % 2 ? "#1a2029" : "#bdde55"; N.fillRect(0, 0, B, W); N.translate(64, 256); N.rotate(-Math.PI / 2); N.fillStyle = k % 2 || k === 0 || k === 4 ? "#f4f4ed" : "#15181b"; N.font = "italic 900 61px Arial"; N.textAlign = "center"; N.fillText("LLO", 0, 22); });
+  for (let d = 0; d < 8; d++) {
+    const b = posts[d], T = posts[(d + 1) % 8];
+    t.add(pc(b.clone().setY(0), b.clone().setY(2.02), 0.1, metal));
+    // riel superior acolchado y riel inferior
+    t.add(pc(b.clone().setY(1.98), T.clone().setY(1.98), 0.075, railMat));
+    t.add(pc(b.clone().setY(0.04), T.clone().setY(0.04), 0.055, railMat));
+    // malla romboidal (líneas); se atenúa del lado de la cámara (panels)
+    const y = [], R = b.distanceTo(T), w = T.clone().sub(b).normalize();
+    for (const N of [-1, 1])
+      for (let B = -2; B < R + 2; B += 0.1) {
+        const W = Math.max(0, N > 0 ? -B : B - R), G = Math.min(1.9, N > 0 ? R - B : B);
+        if (G <= W) continue;
+        y.push(...b.clone().addScaledVector(w, B + N * W).setY(W + 0.05).toArray(), ...b.clone().addScaledVector(w, B + N * G).setY(G + 0.05).toArray());
+      }
+    const C = new Ze(); C.setAttribute("position", new _e(y, 3));
+    const U = new $c({ color: "#707b86", transparent: !0, opacity: 0.3 });
+    t.add(new Qd(C, U)); e.push({ material: U, center: b.clone().add(T).multiplyScalar(0.5) });
+    const P = new me(new Ii(0.26, 1.7, 0.24), new Ve({ map: padTex(d), roughness: 0.85 }));
+    P.position.copy(b).setY(1.05); P.rotation.y = -Math.atan2(b.z, b.x); P.castShadow = !0; t.add(P);
+    // cámara robótica en lo alto de cada poste (mira al centro)
+    const cam = new Kn(); cam.position.copy(b).multiplyScalar(1.04).setY(2.12); cam.lookAt(0, 1, 0); cam.scale.setScalar(0.6); t.add(cam);
+    const body = new me(new Ii(0.16, 0.14, 0.24), std("#0e1013", { metalness: 0.4 })); cam.add(body);
+    const lens = new me(new ss(0.045, 0.055, 0.1, 12), std("#050505")); lens.rotation.x = Math.PI / 2; lens.position.z = 0.16; cam.add(lens);
+    const tally = new me(new Qs(0.018, 8, 6), basic({ color: "#ff2a1a" })); tally.position.set(0.05, 0.08, 0.08); cam.add(tally);
+  }
+  // puerta: marco y cerrojo sobre el paño de la puerta
+  { const b = posts[4], T = posts[5], mid = b.clone().add(T).multiplyScalar(0.5), dir = T.clone().sub(b).normalize();
+    for (const s of [-0.55, 0.55]) t.add(pc(mid.clone().addScaledVector(dir, s).setY(0.05), mid.clone().addScaledVector(dir, s).setY(1.96), 0.035, metal));
+    const latch = new me(new Ii(0.14, 0.1, 0.06), std("#c7ced6", { metalness: 0.9, roughness: 0.2 })); latch.position.copy(mid).addScaledVector(dir, 0.42).setY(1.05); latch.position.multiplyScalar(1.01); t.add(latch); }
+  // ---------------------------------------------------------------- esquinas roja (poste 0) y azul (poste 4): taburete, balde, toallas, cornermen
+  const silTex = fc(512, 256, (c) => { for (let k = 0; k < 4; k++) { const x = k * 128 + 64; c.fillStyle = "#fff"; c.beginPath(); c.moveTo(x - 42, 256); c.quadraticCurveTo(x - 44, 142, x - 18, 128); c.lineTo(x + 18, 128); c.quadraticCurveTo(x + 44, 142, x + 42, 256); c.fill(); if (k === 1) { c.save(); c.translate(x - 36, 140); c.rotate(-0.35); c.fillRect(-7, -70, 14, 74); c.restore(); c.save(); c.translate(x + 36, 140); c.rotate(0.35); c.fillRect(-7, -70, 14, 74); c.restore(); } c.fillStyle = ["#c99a7a", "#8c6248", "#e2bfa3", "#6e4b36"][k]; c.beginPath(); c.ellipse(x, 100, 21, 26, 0, 0, TAU); c.fill(); c.fillStyle = ["#2b1d14", "#161616", "#6b4a2e", "#1d1712"][k]; c.beginPath(); c.ellipse(x, 86, 22, 15, 0, Math.PI, 0); c.fill(); } });
+  const silhouette = (x, z, col, v, s = 1.75) => { const g = new Ui(0.75 * s * 0.62, 1.05 * s * 0.62 * 1.55); g.translate(0, (1.05 * s * 0.62 * 1.55) / 2, 0); const uv = g.attributes.uv; for (let k = 0; k < uv.count; k++) uv.setX(k, (uv.getX(k) + v) * 0.25); const m = new me(g, new Nn({ uniforms: { map: { value: silTex }, tint: { value: new Ht(col) } }, vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }", fragmentShader: "uniform sampler2D map; uniform vec3 tint; varying vec2 vUv; void main(){ vec4 c = texture2D(map, vUv); if(c.a<.5) discard; float skin = step(.12, c.r-c.b); gl_FragColor = vec4(mix(tint*.55, c.rgb*.55, skin), 1.); }", side: 2 })); m.position.set(x, FLOOR, z); m.lookAt(0, FLOOR, 0); t.add(m); return m; };
+  for (const [k, col] of [[0, "#c9302c"], [4, "#2f6fd6"]]) {
+    const p = posts[k], out = p.clone().setY(0).normalize();
+    const stool = new me(new ss(0.2, 0.18, 0.5, 12), std("#20242a")); stool.position.copy(p).addScaledVector(out, -0.45).setY(0.25); t.add(stool);
+    const bucket = new me(new ss(0.16, 0.13, 0.3, 12), std(col, { roughness: 0.5 })); bucket.position.copy(p).addScaledVector(out, 1.15).setY(FLOOR + 1.2); t.add(bucket);
+    const towel = new me(new Ii(0.5, 0.04, 0.3), std("#f1efe8", { roughness: 1 })); towel.position.copy(p).setY(2.02); towel.rotation.y = -Math.atan2(p.z, p.x); t.add(towel);
+    const side = new F(-out.z, 0, out.x);
+    silhouette(p.x * 1.2 + side.x * 0.55, p.z * 1.2 + side.z * 0.55, col, 1);
+    silhouette(p.x * 1.22 - side.x * 0.6, p.z * 1.22 - side.z * 0.6, "#1b1f26", 3);
+  }
+  // ---------------------------------------------------------------- piso de la sala, mesa de prensa/jueces y tribuna en anillo
+  const floor = new me(new $a(40, 48), std("#07090d", { roughness: 1 })); floor.rotation.x = -Math.PI / 2; floor.position.y = FLOOR; floor.receiveShadow = !0; t.add(floor);
+  for (let k = 0; k < 16; k++) { const a = (k / 16) * TAU; if (Math.abs(((a - doorAngle + Math.PI * 3) % TAU) - Math.PI) < 0.4) continue; const tb = new me(new Ii(1.6, 0.75, 0.6), std("#101318")); tb.position.set(Math.cos(a) * 7.6, FLOOR + 0.37, Math.sin(a) * 7.6); tb.rotation.y = -a + Math.PI / 2; t.add(tb); const scr = new me(new Ui(0.4, 0.26), basic({ color: "#3b6ea8" })); scr.position.set(Math.cos(a) * 7.45, FLOOR + 0.9, Math.sin(a) * 7.45); scr.lookAt(0, FLOOR + 0.9, 0); t.add(scr); }
+  // gradas: anillos escalonados (cilindros abiertos) — de 9 a 21 m
+  const tiers = new Kn(); t.add(tiers);
+  const ringGeo = (r0, r1, n) => { const p = [], ix = []; for (let k = 0; k <= n; k++) { const a = (k / n) * TAU, c = Math.cos(a), s2 = Math.sin(a); p.push(c * r0, 0, s2 * r0, c * r1, 0, s2 * r1); if (k) { const q = (k - 1) * 2; ix.push(q, q + 2, q + 1, q + 1, q + 2, q + 3); } } const g = new Ze(); g.setAttribute("position", new _e(p, 3)); g.setIndex(ix); g.computeVertexNormals(); return g; };
+  const ROWS = 18, R0 = 9, DR = 0.75, RISE = 0.5, rowMat = std("#15191f", { roughness: 0.95, side: 2 }), seatMat = std("#3a1820", { roughness: 0.8 });
+  for (let r = 0; r < ROWS; r++) {
+    const rad = R0 + r * DR, top = FLOOR + 0.45 + r * RISE;
+    const step = new me(new ss(rad + DR, rad + DR, top - FLOOR + 0.01, 64, 1, !0), rowMat); step.position.y = (top + FLOOR) / 2; tiers.add(step);
+    const tread = new me(ringGeo(rad, rad + DR, 64), rowMat); tread.position.y = top; tread.receiveShadow = !0; tiers.add(tread);
+    const seat = new me(new ss(rad + DR * 0.62, rad + DR * 0.62, 0.2, 64, 1, !0), seatMat); seat.position.y = top + 0.1; tiers.add(seat);
+  }
+  // palcos: frente vidriado iluminado sobre la última fila
+  const topY = FLOOR + 0.45 + ROWS * RISE, RB = R0 + ROWS * DR;
+  const boxTex = fc(1024, 128, (c, w, h) => { c.fillStyle = "#0d1116"; c.fillRect(0, 0, w, h); for (let k = 0; k < 16; k++) { const x = k * 64 + 4, g = c.createLinearGradient(0, 10, 0, h - 16); g.addColorStop(0, "#ffcf8a"); g.addColorStop(1, "#6a3f1f"); c.fillStyle = g; c.fillRect(x, 12, 56, h - 30); c.fillStyle = "rgba(20,14,10,.85)"; for (let q = 0; q < 3; q++) { const px = x + 8 + q * 16; c.beginPath(); c.ellipse(px, 64, 5, 6, 0, 0, TAU); c.fill(); c.fillRect(px - 7, 70, 14, 30); } } });
+  boxTex.wrapS = 1000; boxTex.repeat.set(8, 1);
+  const suites = new me(new ss(RB + 0.2, RB + 0.2, 2.2, 64, 1, !0), new Va({ map: boxTex, side: 1 })); suites.position.y = topY + 1.3; t.add(suites);
+  const wall = new me(new ss(RB + 1.5, RB + 1.5, 20, 48, 1, !0), new Ve({ color: "#07090d", roughness: 1, side: 1 })); wall.position.y = topY + 8; t.add(wall);
+  // público: billboards instanciados con atlas de siluetas; salto y flashes de celulares con pulseCrowd()
+  const slots = [];
+  for (let r = 0; r < ROWS; r++) { const rad = R0 + r * DR + DR * 0.45, n = Math.floor((TAU * rad) / 0.62); for (let k = 0; k < n; k++) { const a = (k / n) * TAU + r * 0.13; if (Math.abs(((a - doorAngle + Math.PI * 3) % TAU) - Math.PI) < 0.09 || Math.abs(((a - doorAngle + Math.PI * 4) % TAU) - Math.PI) < 0.09) continue; slots.push([a, rad, FLOOR + 0.45 + r * RISE]); } }
+  const crowdU = { map: { value: silTex }, uTime: { value: 0 }, uPulse: { value: 0 }, uLight: { value: 0.55 } };
+  const crowd = new Yd(new Ui(0.64, 1.02), new Nn({
+    uniforms: crowdU, side: 2,
+    vertexShader: `uniform float uTime; uniform float uPulse; varying vec2 vUv; varying vec3 vCol; varying float vFlash;
+      float h(float n){ return fract(sin(n*12.9898)*43758.5453); }
+      void main(){
+        float id = float(gl_InstanceID), v = floor(h(id)*4.), ph = h(id+7.);
+        vUv = vec2((uv.x + v) * .25, uv.y);
+        #ifdef USE_INSTANCING_COLOR
+          vCol = instanceColor;
+        #else
+          vCol = vec3(.4);
+        #endif
+        vec3 p = position + vec3(0., .51, 0.);
+        p.y += sin(uTime*1.3+ph*6.28)*.015 + uPulse*abs(sin(uTime*(7.+ph*3.)+ph*6.28))*.32;
+        vFlash = step(.985 - uPulse*.05, h(id + floor(uTime*6.)));
+        gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix * vec4(p, 1.);
+      }`,
+    fragmentShader: `uniform sampler2D map; uniform float uLight; varying vec2 vUv; varying vec3 vCol; varying float vFlash;
+      void main(){ vec4 c = texture2D(map, vUv); if (c.a < .5) discard; float skin = step(.12, c.r - c.b);
+        vec3 col = mix(vCol, c.rgb, skin) * uLight; col += vFlash * step(.6, vUv.y) * vec3(1.6);
+        gl_FragColor = vec4(col, 1.); }`
+  }), slots.length);
+  crowd.frustumCulled = !1;
+  const dm = new ge(), col = new Ht(), shirts = ["#1c1f25", "#2b3440", "#e9e4da", "#5a1e22", "#1d3a5c", "#3d4a3a", "#6b6f78", "#1c1f25", "#2b3440", "#c4ed64"];
+  slots.forEach(([a, rad, y], k) => { dm.position.set(Math.cos(a) * rad, y, Math.sin(a) * rad); dm.rotation.set(0, -a - Math.PI / 2, 0); const s = rnd.range(0.92, 1.08); dm.scale.set(s, s, s); dm.updateMatrix(); crowd.setMatrixAt(k, dm.matrix); col.set(shirts[Math.floor(rnd.next() * shirts.length)]).offsetHSL(0, 0, rnd.range(-0.05, 0.05)); crowd.setColorAt(k, col); });
+  t.add(crowd);
+  // ---------------------------------------------------------------- pantalla gigante colgante (4 caras) con peleadores, golpes y reloj
+  const jb = new Kn(); jb.position.y = 6.4; t.add(jb);
+  const jbCv = document.createElement("canvas"); jbCv.width = 1024; jbCv.height = 512; const jbx = jbCv.getContext("2d"), jbTex = new Xc(jbCv); jbTex.colorSpace = He;
+  jb.add(new me(new Ii(4.6, 2.3, 4.6), std("#0a0c10", { metalness: 0.5 })));
+  for (let k = 0; k < 4; k++) { const s = new me(new Ui(4.4, 2.2), new Va({ map: jbTex, toneMapped: !1 })); s.position.set(Math.sin((k * Math.PI) / 2) * 2.31, 0, Math.cos((k * Math.PI) / 2) * 2.31); s.rotation.y = (k * Math.PI) / 2; jb.add(s); }
+  const ringBar = new me(new ss(2.5, 2.5, 0.3, 32, 1, !0), new Va({ color: "#c4ed64", toneMapped: !1 })); ringBar.position.y = -1.3; jb.add(ringBar);
+  for (const [x, z] of [[-1.6, -1.6], [1.6, -1.6], [-1.6, 1.6], [1.6, 1.6]]) { const cable = new me(new ss(0.015, 0.015, 8, 4), std("#20242a")); cable.position.set(x, 5.1, z); jb.add(cable); }
+  let jbKey = "";
+  function drawBoard(sim) {
+    if (!sim || !sim.fighters) return;
+    const [a, b] = sim.fighters, name = (k) => { try { return String(Ks(sim, k)).toUpperCase(); } catch (e) { return k ? "AZUL" : "ROJO"; } };
+    const clock = Math.max(0, sim.clock || 0), key = [a.stats && a.stats.landed, b.stats && b.stats.landed, sim.round, Math.floor(clock)].join("|"); if (key === jbKey) return; jbKey = key;
+    const c = jbx, W = 1024, H = 512; c.fillStyle = "#05070a"; c.fillRect(0, 0, W, H);
+    for (let k = 0; k < 2; k++) { const f = sim.fighters[k], x0 = k ? W / 2 : 0; c.fillStyle = k ? "#2f6fd6" : "#c9302c"; c.fillRect(x0 + 14, 14, W / 2 - 28, 96); c.fillStyle = "#fff"; c.font = "900 italic 52px Arial Narrow, Arial"; c.textAlign = "center"; c.fillText(name(k).slice(0, 18), x0 + W / 4, 80, W / 2 - 50);
+      c.fillStyle = "#9fb3c8"; c.font = "700 30px Arial"; c.fillText("GOLPES CONECTADOS", x0 + W / 4, 160); c.fillStyle = "#ffd24a"; c.font = "900 150px Arial Narrow, Arial"; c.fillText(String((f.stats && f.stats.landed) || 0), x0 + W / 4, 300);
+      const st = Math.max(0, Math.min(100, f.stamina || 0)); c.fillStyle = "#1b222c"; c.fillRect(x0 + 60, 330, W / 2 - 120, 22); c.fillStyle = st > 50 ? "#57e27b" : st > 25 ? "#f2c230" : "#e0302a"; c.fillRect(x0 + 60, 330, (W / 2 - 120) * st / 100, 22); }
+    c.fillStyle = "#0f1620"; c.fillRect(0, 380, W, 132); c.fillStyle = "#c4ed64"; c.font = "900 44px Arial"; c.textAlign = "left"; c.fillText("ROUND " + (sim.round || 1), 40, 462);
+    c.textAlign = "right"; c.fillStyle = "#ff4a3a"; c.font = "900 96px Arial Narrow, Arial"; c.fillText(`${Math.floor(clock / 60)}:${String(Math.floor(clock % 60)).padStart(2, "0")}`, W - 40, 478);
+    c.fillStyle = "rgba(0,0,0,.22)"; for (let y = 0; y < H; y += 4) c.fillRect(0, y, W, 1); jbTex.needsUpdate = !0;
+  }
+  // ---------------------------------------------------------------- luces: dramáticas sobre el octágono, penumbra afuera, conos volumétricos
+  const _ = new nh("#b8c6e0", "#1a1612", 0.55); i.add(_);
+  const x = new Ho("#fff0dc", 4.2);
+  x.position.set(-2, 11, 3); x.castShadow = !0; x.shadow.mapSize.set(1024, 1024);
+  Object.assign(x.shadow.camera, { left: -6, right: 6, top: 6, bottom: -6, near: 0.1, far: 25 }); x.shadow.bias = -0.001; i.add(x);
+  const m = new Ho("#aacaff", 1.2); m.position.set(4, 5, -5); i.add(m);
+  const coneMat = new Va({ color: "#fff4dc", transparent: !0, opacity: 0.06, blending: 2, depthWrite: !1, side: 2, toneMapped: !1 });
+  const rig = new me(new ss(3.4, 3.4, 0.25, 8, 1, !0), std("#1a1d22", { metalness: 0.5 })); rig.position.y = 9.4; rig.rotation.y = Math.PI / 8; t.add(rig);
+  const cones = [];
+  for (let k = 0; k < 8; k++) { const a = (k / 8) * TAU + Math.PI / 8, top = new F(Math.cos(a) * 3.3, 9.3, Math.sin(a) * 3.3), aim = new F(Math.cos(a) * 1.2, 0, Math.sin(a) * 1.2), len = top.distanceTo(aim);
+    const g = new ss(0.1, 1.05, len, 20, 1, !0); g.translate(0, -len / 2, 0); g.rotateX(-Math.PI / 2);
+    const cone = new me(g, coneMat); cone.position.copy(top); cone.lookAt(aim); t.add(cone); cones.push(cone);
+    const lamp = new me(new ss(0.16, 0.2, 0.25, 12), basic({ color: "#fffbe8", toneMapped: !1 })); lamp.position.copy(top); t.add(lamp); }
+  // ---------------------------------------------------------------- humo (presentación): planos con textura suave, billboard en el shader
+  const smokeTex = fc(128, 128, (c, w, h) => { const g = c.createRadialGradient(64, 64, 4, 64, 64, 62); g.addColorStop(0, "rgba(255,255,255,.55)"); g.addColorStop(1, "rgba(255,255,255,0)"); c.fillStyle = g; c.fillRect(0, 0, w, h); });
+  const smokeU = { map: { value: smokeTex }, uTime: { value: 0 }, uAmt: { value: 0 } };
+  const SMOKE = 70, smoke = new Yd(new Ui(1, 1), new Nn({ uniforms: smokeU, transparent: !0, depthWrite: !1,
+    vertexShader: `uniform float uTime; varying vec2 vUv; varying float vA; float h(float n){ return fract(sin(n*12.9898)*43758.5453); }
+      void main(){ float id=float(gl_InstanceID); vUv=uv; float ph=h(id), r=4.8+h(id+3.)*4.5, a=h(id+5.)*6.2831+uTime*.03*(ph-.5);
+        vec3 c=vec3(cos(a)*r, -.7+mod(uTime*.12+ph*3.,3.), sin(a)*r); float s=2.2+ph*2.5; vA=sin(clamp((c.y+.7)/3.,0.,1.)*3.1416);
+        vec4 mv=viewMatrix*vec4(c,1.); mv.xy+=position.xy*s; gl_Position=projectionMatrix*mv; }`,
+    fragmentShader: `uniform sampler2D map; uniform float uAmt; varying vec2 vUv; varying float vA; void main(){ float a=texture2D(map,vUv).a*vA*uAmt*.55; if(a<.01) discard; gl_FragColor=vec4(vec3(.78,.8,.85),a); }` }), SMOKE);
+  smoke.frustumCulled = !1; smoke.renderOrder = 5; t.add(smoke);
+  // ---------------------------------------------------------------- estado por cuadro
+  let time = 0, pulse = 0, boardT = 0;
+  function pulseCrowd(k = 1) { pulse = Math.max(pulse, Math.min(1.4, k)); }
+  function update(sim, dt, intro) {
+    dt = dt || 0.016; time += dt; pulse = Math.max(0, pulse - dt / 3);
+    crowdU.uTime.value = time; crowdU.uPulse.value = Math.min(1, pulse); crowdU.uLight.value = 0.5 + pulse * 0.25;
+    smokeU.uTime.value = time; smokeU.uAmt.value += ((intro ? 1 : 0.12) - smokeU.uAmt.value) * Math.min(1, dt * 0.8);
+    coneMat.opacity = intro ? 0.06 : 0.025 + pulse * 0.02; _.intensity = intro ? 0.25 : 0.55;
+    boardT += dt; if (boardT > 0.25) { boardT = 0; drawBoard(sim); }
+  }
+  const api = { group: t, panels: e, addMark, pulseCrowd, update };
+  window.LLOarena = api;
+  return api;
 }
 const vt = (i, t, e) => new F(i, t, e),
   mc = vt(0, 1, 0);
@@ -25140,6 +25222,18 @@ class $m {
     for (const [r, a] of Object.entries(t))
       ((s = this.joints)[r] ?? (s[r] = a.clone()), this.joints[r].lerp(a, e));
     const n = this.joints;
+    // esqueleto rígido: cuello, cabeza y hombros quedan a distancia fija del pecho (nunca se despegan del tronco)
+    if (n.chest && n.pelvis) {
+      const up = n.chest.clone().sub(n.pelvis).normalize(),
+        tie = (child, parent, len, bias) => {
+          if (!n[child] || !n[parent]) return;
+          const d = n[child].clone().sub(n[parent]);
+          (d.lengthSq() < 1e-6 && d.copy(up), d.normalize(), bias && d.lerp(up, bias).normalize(), n[child].copy(n[parent]).addScaledVector(d, len));
+        };
+      (tie("neck", "chest", 0.2, 0.5), tie("head", "neck", 0.16, 0.25));
+      for (const k of ["leftShoulder", "rightShoulder"]) if (n[k]) { const d = n[k].distanceTo(n.chest); d > 0.3 && n[k].copy(n.chest.clone().lerp(n[k], 0.3 / d)); }
+      if (n.abdomen) n.abdomen.copy(n.pelvis.clone().lerp(n.chest, 0.48));
+    }
     for (const r of this.parts) {
       const { mesh: a } = r;
       if (r.joint) n[r.joint] && a.position.copy(n[r.joint]);
@@ -25244,34 +25338,28 @@ class qm {
   }
   update(t, e, n, s, r = null) {
     this.time += s;
-    const a = this.rig;
-    a.root.position.lerp(
-      vt(t.position.x, 0, t.position.z),
-      1 - Math.exp(-s * 18),
-    );
-    const o = Math.atan2(
-        e.position.x - t.position.x,
-        e.position.z - t.position.z,
-      ),
-      l = Math.atan2(
-        Math.sin(o - a.root.rotation.y),
-        Math.cos(o - a.root.rotation.y),
-      );
-    a.root.rotation.y += l * (1 - Math.exp(-s * 12));
+    const a = this.rig,
+      down = ["knockdown", "KO"].includes(t.state);
+    // en el piso (knockdown/KO) la raíz queda fija: el cuerpo no gira ni se desliza siguiendo al rival
+    if (!down) {
+      a.root.position.lerp(vt(t.position.x, 0, t.position.z), 1 - Math.exp(-s * 18));
+      const o = Math.atan2(e.position.x - t.position.x, e.position.z - t.position.z),
+        l = Math.atan2(Math.sin(o - a.root.rotation.y), Math.cos(o - a.root.rotation.y));
+      a.root.rotation.y += l * (1 - Math.exp(-s * (["ground-top", "ground-bottom"].includes(t.state) ? 5 : 12)));
+    }
     let c = this.standing(t);
     const h = ["ground-top", "ground-bottom"].includes(t.state);
     if (
-      (h && (c = this.ground(t, n)),
+      (h && (c = this.ground(t, n, e)),
       t.state === "takedown-attempt" ||
         (t.state === "defending" && t.defenseType === "sprawl"))
     ) {
-      const f = Math.sin(te(t.stateTime / 1.4, 0, 1) * Math.PI) * 0.4;
-      (Object.values(c).forEach((p) => {
-        p.y = Math.max(0.08, p.y - f);
-      }),
-        c.leftHand.set(-0.23, 0.75, 0.6),
-        c.rightHand.set(0.23, 0.75, 0.6),
-        (c.chest.z += 0.25));
+      const f = Math.sin(te(t.stateTime / 1.4, 0, 1) * Math.PI),
+        spr = t.state === "defending";
+      for (const k of ["pelvis", "leftHip", "rightHip"]) ((c[k].y -= f * (spr ? 0.3 : 0.38)), (c[k].z -= f * (spr ? 0.3 : 0.12)));
+      for (const k of ["abdomen", "chest", "neck", "head", "leftShoulder", "rightShoulder"]) ((c[k].y -= f * (spr ? 0.55 : 0.62)), (c[k].z += f * (spr ? 0.18 : 0.38)));
+      spr ? ((c.leftFoot.z -= 0.45 * f), (c.rightFoot.z -= 0.55 * f)) : (c.leftFoot.z += 0.35 * f);
+      (c.leftHand.lerp(vt(-0.24, 0.72, spr ? 0.45 : 0.75), f), c.rightHand.lerp(vt(0.24, 0.7, spr ? 0.45 : 0.72), f));
     }
     if (
       (t.state === "clinch" &&
@@ -25281,27 +25369,36 @@ class qm {
       t.state === "getting-up")
     ) {
       const f = te(t.stateTime / 1.5, 0, 1),
-        p = this.ground({ ...t, state: "ground-top" }, null);
-      for (const _ in c) p[_] && c[_].lerp(p[_], 1 - f);
+        k = f * f * (3 - 2 * f);
+      this.upFrom || (this.upFrom = this.lastPose ? Object.fromEntries(Object.entries(this.lastPose).map(([q, v]) => [q, v.clone()])) : this.ground({ ...t, state: "ground-top" }, null, e));
+      for (const _ in c) this.upFrom[_] && c[_].copy(this.upFrom[_].clone().lerp(c[_], k));
     }
     (t.action && this.attack(c, t, h),
       t.state === "defending" && !h && this.defend(c, t),
       ["rocked", "stunned"].includes(t.state) &&
-        ((c.head.x += Math.sin(this.time * 13) * 0.055),
-        (c.chest.z -= 0.12),
-        (c.head.z -= 0.16)));
-    const u = ["knockdown", "KO"].includes(t.state);
+        ((c.head.x += Math.sin(this.time * 5.5) * 0.06),
+        (c.neck.x += Math.sin(this.time * 5.5) * 0.04),
+        (c.chest.x += Math.sin(this.time * 5.5 - 0.6) * 0.03),
+        (c.chest.z -= 0.1),
+        (c.neck.z -= 0.12),
+        (c.head.z -= 0.14),
+        (c.leftHand.y -= 0.25),
+        (c.rightHand.y -= 0.22)));
+    t.state !== "getting-up" && (this.upFrom = null);
+    const u = down;
     (u
-      ? (this.ragdoll || (this.ragdoll = new Xm(this.lastPose || c)),
+      ? (this.ragdoll || (this.lastPose || (this.solveLimbs(c, !1), this.derived(c)), (this.ragdoll = new Xm(this.lastPose || c))),
         Object.assign(c, this.ragdoll.tick(s)))
       : (this.ragdoll = null),
       u || this.solveLimbs(c, h),
       (this.recoil *= Math.exp(-s * 10)),
-      !h && !u && ((c.head.z -= this.recoil), (c.chest.z -= this.recoil * 0.4)),
+      !h && !u && ((c.head.z -= this.recoil), (c.neck.z -= this.recoil * 0.7), (c.chest.z -= this.recoil * 0.4), (c.head.y -= this.recoil * 0.15)),
       (r == null ? void 0 : r.winner) === t.side &&
         !h &&
-        (c.leftHand.set(-0.45, 2.12, 0),
-        c.rightHand.set(0.45, 2.12, 0),
+        (c.leftHand.set(-0.62, 2.02, 0.12),
+        c.rightHand.set(0.62, 2.02, 0.12),
+        (c.head.y += 0.02),
+        (c.chest.z -= 0.04),
         this.solveLimbs(c, !1)),
       this.derived(c),
       a.apply(c, 1 - Math.exp(-s * (t.action ? 28 : 13))),
@@ -25337,25 +25434,29 @@ class qm {
       ),
     };
   }
-  ground(t, e) {
+  ground(t, e, opp) {
     if (t.state === "ground-top") {
-      const r = (e == null ? void 0 : e.position) === "side" ? 0.2 : 0;
+      const side = (e == null ? void 0 : e.position) === "side",
+        d = te(opp ? Math.hypot(opp.position.x - t.position.x, opp.position.z - t.position.z) : 0.55, 0.25, 0.95),
+        r = side ? 0.18 : 0,
+        br = Math.sin(this.time * 2.2) * 0.01;
+      // montada: rodillas a los costados de la cadera rival, tronco inclinado hacia adelante y manos adelante
       return {
-        pelvis: vt(r, 0.58, -0.15),
-        abdomen: vt(r, 0.77, 0.01),
-        chest: vt(r, 0.95, 0.15),
-        neck: vt(r, 1.09, 0.25),
-        head: vt(r, 1.23, 0.31),
-        leftShoulder: vt(-0.25 + r, 1, 0.16),
-        rightShoulder: vt(0.25 + r, 1, 0.13),
-        leftHand: vt(-0.22, 0.53, 0.45),
-        rightHand: vt(0.2, 0.63, 0.4),
-        leftHip: vt(-0.18, 0.55, -0.1),
-        rightHip: vt(0.18, 0.55, -0.1),
-        leftFoot: vt(-0.38, 0.07, -0.6),
-        rightFoot: vt(0.38, 0.07, -0.6),
-        leftKnee: vt(-0.4, 0.12, 0.04),
-        rightKnee: vt(0.4, 0.12, 0.04),
+        pelvis: vt(r, side ? 0.46 : 0.52, d - 0.2),
+        abdomen: vt(r, side ? 0.62 : 0.72, d - 0.02),
+        chest: vt(r, (side ? 0.72 : 0.9) + br, d + (side ? 0.22 : 0.14)),
+        neck: vt(r, (side ? 0.8 : 1.03) + br, d + (side ? 0.4 : 0.27)),
+        head: vt(r, (side ? 0.86 : 1.14) + br, d + (side ? 0.52 : 0.36)),
+        leftShoulder: vt(-0.24 + r, (side ? 0.78 : 0.97) + br, d + (side ? 0.26 : 0.18)),
+        rightShoulder: vt(0.24 + r, (side ? 0.78 : 0.97) + br, d + (side ? 0.26 : 0.18)),
+        leftHand: vt(-0.3 + r, side ? 0.28 : 0.42, d + 0.5),
+        rightHand: vt(0.3 + r, side ? 0.3 : 0.62, d + 0.42),
+        leftHip: vt(-0.15 + r, side ? 0.44 : 0.5, d - 0.2),
+        rightHip: vt(0.15 + r, side ? 0.44 : 0.5, d - 0.2),
+        leftKnee: vt(-0.36 + r, 0.1, d + 0.06),
+        rightKnee: vt(0.36 + r, 0.1, d + 0.06),
+        leftFoot: vt(-0.3 + r, 0.07, d - 0.42),
+        rightFoot: vt(0.3 + r, 0.07, d - 0.42),
       };
     }
     const s =
@@ -25403,12 +25504,17 @@ class qm {
     if (h.includes("Hand")) {
       const f = vt(
         h === "leftHand" ? -0.045 : 0.045,
-        n ? 0.33 : u,
-        n ? 0.66 : Math.min(e.distance - 0.12, 1.23),
+        n ? 0.3 + 0.55 * (1 - l) : u,
+        n ? 0.75 : Math.min(e.distance - 0.12, 1.23),
       );
+      const side = h === "leftHand" ? -1 : 1;
       ((s.type === "hook" || s.type === "bodyShot") &&
-        (f.x += Math.sin(a * Math.PI * 2) * 0.34),
-        s.type === "uppercut" && (f.y -= Math.sin(a * Math.PI * 2) * 0.3),
+        ((f.x += side * 0.42 * (1 - l)), (f.z -= 0.3 * (1 - l) + 0.12)),
+        s.type === "uppercut" && ((f.y -= 0.45 * (1 - l)), (f.z -= 0.2 * (1 - l))),
+        // rotación de cadera y hombros hacia el golpe
+        (t[side < 0 ? "leftShoulder" : "rightShoulder"].z += 0.12 * l),
+        (t[side < 0 ? "rightShoulder" : "leftShoulder"].z -= 0.06 * l),
+        s.type === "uppercut" && (t.pelvis.y -= 0.06 * l),
         t[h].lerp(f, l),
         (t.chest.x += (h === "leftHand" ? 0.05 : -0.05) * l));
     } else
@@ -25423,9 +25529,14 @@ class qm {
             ),
             l,
           ),
-          (t.pelvis.y -= 0.05 * l),
-          (t.chest.x -= 0.16 * l),
-          t.rightHand.lerp(vt(0.45, 1.16, -0.1), l));
+          (t.pelvis.y -= 0.07 * l),
+          (t.pelvis.x -= 0.06 * l),
+          (t.chest.x -= 0.18 * l),
+          (t.head.x -= 0.14 * l),
+          (t.neck.x -= 0.16 * l),
+          (t.leftFoot.x -= 0.05 * l),
+          t.rightHand.lerp(vt(0.45, 1.16, -0.1), l),
+          t.leftHand.lerp(vt(-0.12, 1.7, 0.3), l));
   }
   defend(t, e) {
     const n = e.defenseType;
@@ -25659,6 +25770,7 @@ class Km {
       this.camera.position.set(4, 4, 8),
       (this.cameraController = new Ym(this.camera)),
       (this.arena = Wm(this.scene)),
+
       (this.rigs = e.fighters.map((r, a) => {
         const o = new $m(r.profile, a);
         return (
@@ -25671,8 +25783,9 @@ class Km {
       (this.unsubscribe = e.subscribe((r) => {
         (this.audio.event(r),
           r.type === "impact" && this.animators[r.target].impact(r.damage),
+          r.type === "impact" && r.damage > 6 && Math.random() < 0.25 && this.arena.addMark && (() => { const f = this.sim.fighters[r.target]; this.arena.addMark(f.position.x + (Math.random() - 0.5) * 0.6, f.position.z + (Math.random() - 0.5) * 0.6, r.damage > 12 ? "blood" : "sweat"); })(),
           ["knockdown", "finish"].includes(r.type) &&
-            (this.cameraController.special = 4));
+            ((this.cameraController.special = 4), this.arena.pulseCrowd && this.arena.pulseCrowd(r.type === "finish" ? 1.4 : 1)));
       })),
       (this.resizeObserver = new ResizeObserver(() => this.resize())),
       this.resizeObserver.observe(t),
@@ -25710,6 +25823,7 @@ class Km {
       ),
     ),
       (!this.cameraController.__em && window.EM && window.EM.cams && window.EM.cams.wrap(this.cameraController, { THREE: { Vector3: F }, dom: this.renderer.domElement, axis: 'x', half: [4.5, 4.5], hLow: 1.3, hHigh: 7, r: 6.5, hOrb: 2.6, pad: 3, speed: 5, defaultMode: 'broadcast', focus: (a) => ({ x: (a[0][0].position.x + a[0][1].position.x) / 2, y: 0.9, z: (a[0][0].position.z + a[0][1].position.z) / 2 }) }), this.cameraController.update(this.sim.fighters, e, this.preview)));
+    this.arena.update && this.arena.update(this.sim, n || e, this.preview || (this.sim.time || 0) < 4);
     for (const s of this.arena.panels)
       s.material.opacity =
         s.center.dot(this.camera.position) > 0 ? 0.035 : 0.32;

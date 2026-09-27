@@ -41,23 +41,50 @@ export function cleanAction(m, side, msg) {
   return null;
 }
 
-// Foto de las variables numéricas/texto del motor (para corregir a un cliente que se desvió del servidor).
-const PRIM = (v) => ['number', 'boolean', 'string'].includes(typeof v);
+// Foto COMPLETA del estado del motor (grafo de objetos simples, con referencias compartidas y ciclos) para corregir a un cliente
+// que se desvió del servidor. Se recorre por claves ordenadas; los objetos no simples (modelos 3D, DOM, funciones) se omiten.
+const SKIP = new Set(['onEvent', 'onTlmSwap', 'running']);
+const plainObj = (v) => { const pr = Object.getPrototypeOf(v); return pr === Object.prototype || pr === null || Array.isArray(v); };
 export function snapOf(m) {
-  const o = {};
-  for (const k in m) { const v = m[k]; if (k === 'running') continue; if (PRIM(v)) o[k] = v; else if (v && typeof v === 'object' && !Array.isArray(v) && k !== 'ball' && k !== 'players') for (const q in v) if (PRIM(v[q])) o[k + '.' + q] = v[q]; }
-  m.players.forEach((p, i) => { for (const k in p) if (PRIM(p[k])) o['p' + i + '.' + k] = p[k]; });
-  for (const k in m.ball) if (PRIM(m.ball[k])) o['ball.' + k] = m.ball[k];
-  return o;
+  const ids = new Map(); let n = 0;
+  const walk = (v, root) => {
+    if (typeof v === 'function' || typeof v === 'symbol' || typeof v === 'undefined') return undefined;
+    if (typeof v === 'number') return Number.isFinite(v) ? v : { $n: String(v) };
+    if (v === null || typeof v !== 'object') return v;
+    if (ArrayBuffer.isView(v) && !(v instanceof DataView)) return { $t: v.constructor.name, d: Array.from(v) };
+    if (!root && !plainObj(v)) return undefined;
+    if (ids.has(v)) return { $r: ids.get(v) };
+    const id = n++; ids.set(v, id);
+    if (Array.isArray(v)) return { $i: id, a: v.map((x) => { const w = walk(x); return w === undefined ? { $s: 1 } : w; }) };
+    const o = {};
+    for (const k of Object.keys(v).sort()) { if (SKIP.has(k)) continue; const w = walk(v[k]); if (w !== undefined) o[k] = w; }
+    return { $i: id, o };
+  };
+  return walk(m, true);
 }
-export function applySnap(m, o) {
-  for (const key in o) {
-    const v = o[key];
-    if (key.startsWith('ball.')) m.ball[key.slice(5)] = v;
-    else if (/^p\d+\./.test(key)) { const i = key.indexOf('.'); const p = m.players[+key.slice(1, i)]; if (p) p[key.slice(i + 1)] = v; }
-    else if (key.includes('.')) { const i = key.indexOf('.'), t = m[key.slice(0, i)]; if (t && typeof t === 'object') t[key.slice(i + 1)] = v; }
-    else m[key] = v;
-  }
+const num = (x) => (x && x.$n !== undefined ? Number(x.$n) : x);
+export function applySnap(m, snap, diffs) {
+  const map = new Map(), refs = [];
+  const fix = (live, sn, path) => { // devuelve el valor que debe quedar en la posición
+    if (sn === null || typeof sn !== 'object') { if (diffs && live !== sn && diffs.length < 40) diffs.push(path + ': ' + live + ' -> ' + sn); return sn; }
+    if (sn.$n !== undefined) return num(sn);
+    if (sn.$s !== undefined) return live;
+    if (sn.$t !== undefined) { const C = globalThis[sn.$t]; if (live && live.constructor === C && live.length === sn.d.length) { live.set(sn.d); return live; } return C.from(sn.d); }
+    if (sn.$r !== undefined) return { $$ref: sn.$r };
+    const isArr = sn.a !== undefined;
+    let t = live && typeof live === 'object' && (Array.isArray(live) === isArr) && (live === m || plainObj(live)) ? live : (isArr ? [] : {});
+    if (diffs && t !== live && diffs.length < 40) diffs.push(path + ': objeto distinto');
+    map.set(sn.$i, t);
+    if (isArr) {
+      t.length = sn.a.length;
+      sn.a.forEach((x, i) => { const r = fix(t[i], x, path + '[' + i + ']'); if (r && r.$$ref !== undefined) refs.push([t, i, r.$$ref]); else t[i] = r; });
+    } else {
+      for (const k in sn.o) { const r = fix(t[k], sn.o[k], path + '.' + k); if (r && r.$$ref !== undefined) refs.push([t, k, r.$$ref]); else t[k] = r; }
+    }
+    return t;
+  };
+  fix(m, snap, 'm');
+  for (const [t, k, id] of refs) { const v = map.get(id); if (v) t[k] = v; }
 }
 
 export class Lockstep {

@@ -53,9 +53,8 @@ window.LFO_LIVE = {
 // Corrección de desvíos: se le pide al servidor una foto del estado y se restaura (si se repite muy seguido, se recarga la transmisión).
 let fixes = [];
 function askSnap() {
-  if (!QS.get('snapfix')) return resync(); // la foto de estado (solo variables numéricas) no alcanza: el desvío reaparece; por defecto se recarga
   const now = Date.now(); fixes = fixes.filter((t) => now - t < 60000);
-  if (fixes.length >= 4) return resync();
+  if (fixes.length >= 6) return resync();
   fixes.push(now); send({ type: 'snap' });
 }
 function resync() { // el estado local se desvió del servidor: se recarga la transmisión (rara vez)
@@ -139,7 +138,7 @@ function onMsg(d) {
       if (!QS.get('nodesync')) askSnap();
     }
   }
-  else if (d.type === 'snap') { if (ls) { applySnap(m, d.snap); ls.rewind(d.step); } }
+  else if (d.type === 'snap') { if (ls) { const df = []; applySnap(m, d.snap, df); ls.rewind(d.step); window.__snapdiff = df; console.warn('SNAP', d.step, JSON.stringify(df.slice(0, 25))); } }
   else if (d.type === 'final') finished = true;
   else if (d.type === 'error') { status(d.error); setTimeout(() => status(''), 3000); }
 }
