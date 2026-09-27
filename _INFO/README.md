@@ -28,6 +28,9 @@ Si un espacio queda en "Aleatorio (como siempre)", ese gol usa el sistema viejo 
 - `01-futbol/manager/tlm-ui-wardrobe.js` (nuevo): la pantalla de Vestuario dentro del manager.
 - **Nueva animación** "Baile Básico" (`variant: 'dance'`): se agregó un `case 'dance'` a la función `celebrate()` del motor 3D — un balanceo rítmico simple con brazos y piernas. Es deliberadamente básica, pensada para reemplazarse cuando haya mejores animaciones.
 
+## Online
+Liga compartida en vivo con cuentas, gestión de clubes y partidos en vivo: ver [ONLINE.md](ONLINE.md).
+
 ## Cómo correr el juego
 
 Courtside, Gridiron y Apex usan ES modules (`<script type="module">`), que los navegadores **bloquean si abrís el HTML directamente con doble clic** (protocolo `file://`). Hace falta un servidor local estático. Desde esta carpeta:
