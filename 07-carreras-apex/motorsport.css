@@ -91,3 +91,97 @@ button.ghost:hover{background:rgba(255,255,255,.12)}
 .lx-pips{position:absolute;inset:0;pointer-events:none;z-index:12}.lx-pip{position:absolute;border:2px solid #fff;box-shadow:0 4px 14px #000a;pointer-events:auto;cursor:pointer;display:none}.lx-pip:hover{outline:2px solid #ffd24a}
 .lx-pip .pt{position:absolute;left:0;top:0;background:#0b152bee;color:#ffd24a;font:700 9px var(--mono);letter-spacing:1px;padding:3px 6px}.lx-pip .pl{position:absolute;left:0;bottom:0;right:0;background:#000000b0;color:#fff;font:700 10px var(--mono);padding:3px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lx-help{position:absolute;left:50%;top:56px;transform:translateX(-50%);background:#000000c8;color:#fff;font:600 12px var(--mono);padding:8px 14px;border-left:3px solid #ffd24a;opacity:0;transition:.3s;z-index:15;pointer-events:none;max-width:90%}.lx-help.on{opacity:1}
+
+/* ==================================================================================================
+   LRO · UI de transmisión v2 — grilla de anclajes, torre horizontal, placas en cola, barra de cámaras
+   Anclajes (todo lo que flota sobre la escena usa uno; el centro queda libre para el auto en foco):
+     top        → torre de posiciones (barra completa)
+     top-left   → EN VIVO · bandera SC/VSC      top-center → semáforos · ayuda
+     top-right  → logo + etiqueta de cámara · debajo las ventanas PiP (columna derecha)
+     bottom-left→ placas de eventos + radio       bottom-right → mapa
+     bottom     → barra de cámaras
+   ================================================================================================== */
+.broadcast{--ui-in:12px;--tw-h:42px;--tw-top:var(--ui-in);--row2:calc(var(--tw-top) + var(--tw-h) + 10px);--bar-h:46px;--safe-l:max(var(--ui-in),var(--em-sal,0px));--safe-r:max(var(--ui-in),var(--em-sar,0px));--safe-b:0px}
+.broadcast .vignette{background:linear-gradient(180deg,#05080ecc 0,transparent 18%,transparent 70%,#05080e99 100%)}
+/* ---- torre de posiciones horizontal */
+.broadcast .timing{left:var(--safe-l);right:var(--safe-r);top:var(--tw-top);width:auto;height:var(--tw-h);display:flex;align-items:stretch;background:#070b14e6;border:1px solid #ffffff1c;border-radius:3px;box-shadow:0 6px 22px #0008;color:#fff;z-index:11;overflow:hidden;backdrop-filter:blur(3px)}
+.broadcast .timing-head{flex:none;display:grid;grid-template-columns:auto auto;grid-template-rows:1fr 1fr;align-items:center;column-gap:10px;padding:0 12px;background:linear-gradient(90deg,#e5233d,#b6162b);color:#fff;font:700 11px var(--display);letter-spacing:1px;min-width:0}
+.tw-series{grid-column:1;grid-row:1;font:800 12px var(--display);letter-spacing:1.4px;white-space:nowrap;text-transform:uppercase}
+.tw-lap{grid-column:2;grid-row:1/3;display:flex;flex-direction:column;align-items:center;line-height:1;padding-left:10px;border-left:1px solid #ffffff55}
+.tw-lap small{font:600 8px var(--mono);letter-spacing:1.4px;opacity:.85}.broadcast .tw-lap strong{font:italic 900 21px/1 var(--display);letter-spacing:.5px}
+.tw-flag{grid-column:1;grid-row:2;justify-self:start;font:800 10px var(--mono);letter-spacing:1px;padding:1px 6px;border-radius:2px;background:#0a0f18;color:#8df0a0;white-space:nowrap;max-width:170px;overflow:hidden;text-overflow:ellipsis}
+.tw-flag::before{content:'';display:inline-block;width:7px;height:7px;margin-right:5px;border-radius:1px;background:currentColor;vertical-align:0}
+.tw-flag.green{color:#57e27b}.tw-flag.yellow{background:#f2c230;color:#221a00}.tw-flag.red{background:#e0302a;color:#fff}.tw-flag.sc{background:#f2c230;color:#221a00}.tw-flag.vsc{background:#b7d86a;color:#1b2208}
+.tw-flag.chk{background:repeating-conic-gradient(#fff 0 25%,#111 0 50%) 0 0/8px 8px;color:#111;text-shadow:0 0 3px #fff,0 0 3px #fff}
+.tw-flag.grid{color:#c9d3e6}
+.tw-clock,.tw-session{display:none}
+.broadcast .timing #standings{flex:1;min-width:0;height:auto!important;display:flex;align-items:stretch;position:relative;overflow:hidden}
+.broadcast .timing .driver-row{position:relative!important;transform:none!important;left:auto;right:auto;height:auto;flex:1 1 0;min-width:0;display:grid;grid-template-columns:auto 24px minmax(0,1fr);grid-template-rows:1fr 1fr;align-items:center;column-gap:6px;row-gap:0;padding:2px 8px 2px 6px;border:0;border-right:1px solid #ffffff14;transition:background .25s,opacity .35s;cursor:pointer}
+.broadcast .timing .driver-row.tw-off{display:none}
+.broadcast .timing .driver-row.tw-in{animation:twIn .45s cubic-bezier(.2,.9,.3,1) both}
+@keyframes twIn{from{opacity:.35;translate:0 -8px}to{opacity:1;translate:0 0}}
+.broadcast .timing .driver-row.tw-lead{background:#ffffff10;border-right:2px solid #ffffff38}
+.broadcast .timing .driver-row .pos{grid-row:1/3;grid-column:1;min-width:16px;font:italic 900 19px var(--display);color:#fff;text-align:center}
+.broadcast .timing .driver-row.tw-lead .pos{color:#ffd24a}
+.broadcast .timing .driver-row .stripe{grid-row:1;grid-column:2;width:24px;height:auto;padding:1px 0;border-radius:2px;font:800 11px/1.1 var(--display);color:var(--tx,#fff);text-align:center}
+.broadcast .timing .driver-row .lx-logo{grid-row:2;grid-column:2;width:24px!important;height:13px!important;object-fit:contain;border-radius:2px;background:#ffffffe6;padding:1px}
+.broadcast .timing .driver-row .name{grid-row:1;grid-column:3;min-width:0;font:700 13px/1.1 var(--display);letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.broadcast .timing .driver-row .gap{grid-row:2;grid-column:3;min-width:0;font:600 10px/1.1 var(--mono);color:#cfd8e6;text-align:left;white-space:nowrap}
+.broadcast .timing .driver-row.tw-lead .gap{color:#ffd24a}
+.broadcast .timing .driver-row .compound{display:none}
+.broadcast .timing .driver-row:hover{background:#ffffff14}
+.broadcast .timing .driver-row.selected{background:linear-gradient(180deg,#ffffff26,#ffffff10);box-shadow:inset 0 -3px 0 #ffd24a}
+.broadcast .timing .driver-row.selected .name{color:#ffd24a}
+.broadcast .timing .driver-row.tw-up .gap::after{content:' ▲';color:#57e27b}
+.tw-dots{position:absolute;right:4px;bottom:2px;display:flex;gap:3px;pointer-events:none}.tw-dots i{width:4px;height:4px;border-radius:50%;background:#ffffff40}.tw-dots i.on{background:#ffd24a}
+.broadcast .tw-btn{display:none!important}
+/* ---- fila 2: en vivo (izq.), semáforos/SC (centro), logo + cámara (der.) */
+.broadcast .feed-label{left:var(--safe-l);top:var(--row2);z-index:10;font-size:9px}.broadcast .feed-label>span{padding:5px 8px}
+.broadcast .tv-logo{top:var(--row2);right:var(--safe-r);display:flex;align-items:baseline;gap:8px;z-index:10}.broadcast .tv-logo b{font-size:20px}.broadcast .tv-logo small{margin:0;font-size:7px;letter-spacing:2px}
+.broadcast .camera-indicator{top:calc(var(--row2) + 26px);right:var(--safe-r);z-index:10;padding:4px 8px;font-size:9px;background:#070b14b0;border-right:2px solid #e5233d}
+.broadcast .start-lights{top:var(--row2);z-index:12}
+.broadcast .safety-badge{top:var(--row2);z-index:12;padding:5px 14px;font-size:12px}
+.broadcast .lx-help{top:calc(var(--row2) + 42px)}
+.broadcast .onboard-hud{display:none!important}
+/* PiP: columna derecha, debajo de la etiqueta de cámara (lro-cams.js calcula las posiciones con estas variables) */
+.broadcast .lx-pip{border-width:1px;border-radius:2px}
+/* ---- placas de eventos (abajo a la izquierda, en cola; máx. 2) */
+.broadcast .event-overlay{display:none!important}
+.lx-plates{position:absolute;left:var(--safe-l);bottom:calc(var(--bar-h) + var(--safe-b) + 12px);z-index:14;display:flex;flex-direction:column-reverse;gap:6px;width:min(330px,42%);pointer-events:none}
+.lx-plate{position:relative;display:grid;grid-template-columns:5px auto 1fr;align-items:stretch;background:#070b14ee;color:#fff;box-shadow:0 6px 20px #000a;overflow:hidden;transform:translateX(-110%);opacity:0;transition:transform .45s cubic-bezier(.2,.9,.25,1),opacity .35s;clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%)}
+.lx-plate.in{transform:none;opacity:1}.lx-plate.out{transform:translateX(-30px);opacity:0;transition-duration:.35s}
+.lx-plate>i{background:var(--pc,#e5233d)}
+.lx-plate .pk{display:grid;place-items:center;padding:0 10px;font:900 18px var(--display);background:color-mix(in srgb,var(--pc,#e5233d) 30%,#070b14);min-width:40px}
+.lx-plate .pb{padding:7px 18px 7px 10px;min-width:0}.lx-plate strong{display:block;font:italic 800 16px/1.05 var(--display);letter-spacing:.8px;text-transform:uppercase}
+.lx-plate span{display:block;margin-top:2px;font:500 10px var(--mono);color:#c9d3e6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lx-plate::after{content:'';position:absolute;left:5px;bottom:0;height:2px;background:var(--pc,#e5233d);width:100%;transform-origin:left;animation:plT var(--pd,3.8s) linear forwards}
+@keyframes plT{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.broadcast .lx-radio{left:var(--safe-l);margin-left:0;bottom:calc(var(--bar-h) + var(--safe-b) + 12px + var(--plates-h,0px));width:min(320px,42%);transition:.35s,bottom .3s}
+.broadcast .intro{left:var(--safe-l);right:auto;max-width:min(520px,60%);bottom:calc(var(--bar-h) + 24px)}
+/* ---- mapa (abajo a la derecha, ocultable) */
+.broadcast .map-box{right:var(--safe-r);bottom:calc(var(--bar-h) + var(--safe-b) + 10px);width:150px;height:104px;opacity:1;background:#070b14b8;border:1px solid #ffffff18;border-radius:3px;padding:6px;z-index:10;transition:transform .3s,opacity .3s}
+.broadcast .map-box svg{overflow:visible}
+.broadcast .map-edge{stroke:#000a;stroke-width:9}.broadcast .map-track{stroke:#dfe6f2aa;stroke-width:4}
+.broadcast .map-car{stroke:#0a0f18;stroke-width:1.2}.broadcast .map-car.lead{stroke:#ffd24a;stroke-width:2.2}.broadcast .map-car.foc{stroke:#fff;stroke-width:2.4}
+.map-num{font:800 7.5px var(--mono);fill:#fff;paint-order:stroke;stroke:#000;stroke-width:2.2px;pointer-events:none}.map-num.lead{fill:#ffd24a}
+.map-toggle{position:absolute;top:-1px;right:-1px;z-index:2;width:20px;height:20px;padding:0;border:0;border-radius:0 3px 0 3px;background:#e5233d;color:#fff;font:700 11px/20px system-ui;min-height:0!important}
+.broadcast .map-box.off{transform:translateY(calc(100% - 20px));opacity:.75;width:60px;height:24px}.broadcast .map-box.off svg{display:none}.map-box.off .map-toggle{transform:rotate(180deg)}
+/* ---- barra de cámaras compacta */
+.broadcast .broadcast-bottom{height:var(--bar-h);padding:0 var(--safe-r) 0 var(--safe-l);background:linear-gradient(180deg,#070b14cc,#070b14f2);border-top:1px solid #ffffff18;z-index:16;gap:10px}
+.broadcast .view-controls{gap:3px;flex-wrap:nowrap;min-width:0}
+.broadcast .view-controls>span{display:none}
+.broadcast .view-controls button{position:relative;display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 9px;border:1px solid #ffffff1f;border-radius:3px;background:#ffffff08;color:#dbe3f0;font:600 10px var(--mono);letter-spacing:.4px;white-space:nowrap}
+.broadcast .view-controls button svg{width:16px;height:16px;flex:none}
+.broadcast .view-controls button kbd{font:600 8px var(--mono);color:#8b97ad;border:1px solid #ffffff26;border-radius:2px;padding:0 3px;line-height:12px}
+.broadcast .view-controls button.active{background:#e5233d;border-color:#e5233d;color:#fff}.broadcast .view-controls button.active kbd{color:#fff;border-color:#ffffff80}
+.broadcast .view-controls .vc-sep{width:1px;height:22px;background:#ffffff22;margin:0 4px;flex:none}
+.broadcast .director-status{flex:none;font-size:9px;white-space:nowrap}
+.lx-cam-toggle{display:none}
+.broadcast{container-type:inline-size;container-name:bc}
+.broadcast .view-controls button:not(.active) .vl{display:none}
+@container bc (min-width:1500px){.broadcast .view-controls button .vl{display:inline}}
+@container bc (max-width:1100px){.broadcast .view-controls button kbd{display:none}.broadcast .director-status{display:none}}
+/* ---- a bordo: el tablero de cabina reemplaza al HUD; panel grande sólo en teléfono vertical */
+.lx-dash{display:none;position:absolute;left:50%;top:calc(var(--row2) + 50px);transform:translateX(-50%);width:min(92%,420px);aspect-ratio:2/1;height:auto;border:1px solid #ffffff26;border-radius:6px;box-shadow:0 8px 24px #000a;z-index:9;pointer-events:none}
+html.lx-onboard.em-portrait .lx-dash{display:block}
+html.lx-onboard .broadcast .map-box{opacity:.85}
