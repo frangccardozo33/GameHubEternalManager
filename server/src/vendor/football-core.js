@@ -638,6 +638,24 @@ import './football-shim.js';
     // sin jugar minutos, el jugador con ovr alto se molesta un poco; los que juegan suben.
     if (!played && !p.injury && p.suspension <= 0) p.morale = clamp(p.morale - (p.overall >= 70 ? 0.8 : 0.3), 20, 100);
     p.morale += (65 - p.morale) * 0.04; // deriva a neutro
+    updateDiscontent(state, p);
+  }
+
+  // Descontento: moral floja sostenida o sueldo muy por debajo de su valor de mercado, acumulado varias jornadas seguidas.
+  // Al cruzar el umbral el jugador "quiere salir": otros clubes lo ofertan más fácil (reserveValue más bajo) y, si es tuyo,
+  // se avisa por noticias para que decidas si lo dejás ir, intentás retenerlo (renovar/mejorar sueldo) o lo ignorás.
+  const DISCONTENT_THRESHOLD = 8;
+  function updateDiscontent(state, p) {
+    if (!p.clubId) { p.discontentStreak = 0; p.wantsOut = false; return; }
+    const underpaid = p.marketValue > 0 && p.salary < p.marketValue * 0.05;
+    const unhappy = p.morale < 35 || underpaid;
+    p.discontentStreak = unhappy ? (p.discontentStreak || 0) + 1 : Math.max(0, (p.discontentStreak || 0) - 2);
+    const was = p.wantsOut;
+    p.wantsOut = p.discontentStreak >= DISCONTENT_THRESHOLD;
+    if (p.wantsOut && !was) {
+      const club = state.clubs[p.clubId];
+      if (club && TLM.addNews) TLM.addNews(state, 'contract', `${p.canonicalName} está descontento en ${club.name} y pide que lo transfieran.`, { playerId: p.id, clubId: club.id });
+    }
   }
 
   // ---- Entrenamiento individual: probabilidad pequeña por jornada de +1 en los atributos del foco ----
@@ -1462,6 +1480,7 @@ import './football-shim.js';
     if (p.age <= 22 && p.potential > p.overall + 8) f *= 1 + prof.youth * 0.3;
     const left = p.contract.endSeason - state.season;
     if (left <= 0) f *= 0.6; else if (left === 1) f *= 0.88;
+    if (p.wantsOut) f *= 0.75; // quiere salir: el club vende más barato para sacárselo de encima
     const bal = seller.finances.balance;
     if (bal < 0) f *= 0.8; else if (bal < 2e6) f *= 0.93;
     const avgOvr = TLM.avg(seller.squad.map((id) => state.players[id].overall));
@@ -1775,7 +1794,7 @@ import './football-shim.js';
     return { ok: false, status: 'rejected', counter: demand, reason: `Pide ${money(demand)} anuales.` };
   }
   function applyRenewal(state, p, salary, years) {
-    p.contract.salary = salary; p.salary = salary; p.contract.endSeason = Math.max(p.contract.endSeason, state.season) + (years || 2); p.contract.status = 'active';
+    p.contract.salary = salary; p.salary = salary; p.contract.endSeason = Math.max(p.contract.endSeason, state.season) + clamp(years || 2, 1, 5); p.contract.status = 'active';
     p.morale = clamp(p.morale + 5, 0, 100);
     addNews(state, 'contract', `${state.clubs[p.clubId].name} renueva a ${p.canonicalName} hasta ${p.contract.endSeason}.`, { playerId: p.id });
   }
@@ -2017,8 +2036,12 @@ import './football-shim.js';
     const user = state.clubs[state.currentClubId], r = R(state);
     if (!user || !user.squad.length) return [];
     const cands = user.squad.map((id) => state.players[id]).filter((p) => p.overall >= 62 && TLM.transferStatus(state, p.id) == null);
-    if (!cands.length || !r.chance(0.28)) return [];
-    const p = r.weighted(cands, (x) => Math.max(1, x.overall - 55) * (state.market.listings[x.id] ? 2.5 : 1));
+    if (!cands.length) return [];
+    const unhappy = cands.filter((p) => p.wantsOut);
+    // un jugador que pide la salida se ofrece prácticamente siempre; si no hay ninguno, la IA solo scoutea de tanto en tanto.
+    if (!unhappy.length && !r.chance(0.28)) return [];
+    const pool = unhappy.length ? unhappy : cands;
+    const p = r.weighted(pool, (x) => Math.max(1, x.overall - 55) * (state.market.listings[x.id] ? 2.5 : 1) * (x.wantsOut ? 3 : 1));
     const buyers = Object.values(state.clubs).filter((c) => c.controlledBy !== 'user' && !c.foreign && c.finances.balance > p.marketValue).map((c) => ({ c, nd: TLM.need(state, c, p) })).filter((x) => x.nd > 0.15).sort((a, b) => b.nd - a.nd);
     if (!buyers.length) return [];
     const b = buyers[Math.floor(r.next() * Math.min(3, buyers.length))].c;

@@ -231,6 +231,24 @@
     // sin jugar minutos, el jugador con ovr alto se molesta un poco; los que juegan suben.
     if (!played && !p.injury && p.suspension <= 0) p.morale = clamp(p.morale - (p.overall >= 70 ? 0.8 : 0.3), 20, 100);
     p.morale += (65 - p.morale) * 0.04; // deriva a neutro
+    updateDiscontent(state, p);
+  }
+
+  // Descontento: moral floja sostenida o sueldo muy por debajo de su valor de mercado, acumulado varias jornadas seguidas.
+  // Al cruzar el umbral el jugador "quiere salir": otros clubes lo ofertan más fácil (reserveValue más bajo) y, si es tuyo,
+  // se avisa por noticias para que decidas si lo dejás ir, intentás retenerlo (renovar/mejorar sueldo) o lo ignorás.
+  const DISCONTENT_THRESHOLD = 8;
+  function updateDiscontent(state, p) {
+    if (!p.clubId) { p.discontentStreak = 0; p.wantsOut = false; return; }
+    const underpaid = p.marketValue > 0 && p.salary < p.marketValue * 0.05;
+    const unhappy = p.morale < 35 || underpaid;
+    p.discontentStreak = unhappy ? (p.discontentStreak || 0) + 1 : Math.max(0, (p.discontentStreak || 0) - 2);
+    const was = p.wantsOut;
+    p.wantsOut = p.discontentStreak >= DISCONTENT_THRESHOLD;
+    if (p.wantsOut && !was) {
+      const club = state.clubs[p.clubId];
+      if (club && TLM.addNews) TLM.addNews(state, 'contract', `${p.canonicalName} está descontento en ${club.name} y pide que lo transfieran.`, { playerId: p.id, clubId: club.id });
+    }
   }
 
   // ---- Entrenamiento individual: probabilidad pequeña por jornada de +1 en los atributos del foco ----

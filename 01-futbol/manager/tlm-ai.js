@@ -161,8 +161,12 @@
     const user = state.clubs[state.currentClubId], r = R(state);
     if (!user || !user.squad.length) return [];
     const cands = user.squad.map((id) => state.players[id]).filter((p) => p.overall >= 62 && TLM.transferStatus(state, p.id) == null);
-    if (!cands.length || !r.chance(0.28)) return [];
-    const p = r.weighted(cands, (x) => Math.max(1, x.overall - 55) * (state.market.listings[x.id] ? 2.5 : 1));
+    if (!cands.length) return [];
+    const unhappy = cands.filter((p) => p.wantsOut);
+    // un jugador que pide la salida se ofrece prácticamente siempre; si no hay ninguno, la IA solo scoutea de tanto en tanto.
+    if (!unhappy.length && !r.chance(0.28)) return [];
+    const pool = unhappy.length ? unhappy : cands;
+    const p = r.weighted(pool, (x) => Math.max(1, x.overall - 55) * (state.market.listings[x.id] ? 2.5 : 1) * (x.wantsOut ? 3 : 1));
     const buyers = Object.values(state.clubs).filter((c) => c.controlledBy !== 'user' && !c.foreign && c.finances.balance > p.marketValue).map((c) => ({ c, nd: TLM.need(state, c, p) })).filter((x) => x.nd > 0.15).sort((a, b) => b.nd - a.nd);
     if (!buyers.length) return [];
     const b = buyers[Math.floor(r.next() * Math.min(3, buyers.length))].c;

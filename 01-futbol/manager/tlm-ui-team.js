@@ -6,7 +6,7 @@
   const { esc, M, bar, pill, crest, formPills } = { esc: UI.esc, M: UI.M, bar: UI.bar, pill: UI.pill, crest: UI.crest, formPills: UI.formPills };
   const A = UI.actions, S = () => UI.career.state, U = () => UI.career.user;
   const ROLES = [['all', 'Todos'], ['GK', 'Porteros'], ['DEF', 'Defensas'], ['MID', 'Medios'], ['FWD', 'Delanteros']];
-  const stateTag = (p, st) => (p.injury ? pill(`Lesión ${p.injury.matchdays}J`, 'bad') : p.suspension > 0 ? pill('Sancionado', 'warn') : TLM.transferStatus(st, p.id) === 'OFFERED' ? pill('Oferta', 'info') : st.market.listings[p.id] ? pill('En venta', 'info') : '');
+  const stateTag = (p, st) => (p.injury ? pill(`Lesión ${p.injury.matchdays}J`, 'bad') : p.suspension > 0 ? pill('Sancionado', 'warn') : p.wantsOut ? pill('Quiere salir', 'bad') : TLM.transferStatus(st, p.id) === 'OFFERED' ? pill('Oferta', 'info') : st.market.listings[p.id] ? pill('En venta', 'info') : '');
   const conTag = (st, p) => { const cs = TLM.contractStatus(st, p), left = p.contract.endSeason - st.season; return cs === 'expiring' ? pill('Vence', 'warn') : `${p.contract.endSeason}${left <= 1 ? ' ⚠' : ''}`; };
   UI.stateTag = stateTag;
 

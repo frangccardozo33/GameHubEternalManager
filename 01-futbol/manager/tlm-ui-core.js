@@ -87,6 +87,8 @@
     if (sus.length) out.push({ k: 'warn', t: `${sus.length} sancionado${sus.length > 1 ? 's' : ''}`, go: 'squad' });
     const exp = u.squad.map((id) => s.players[id]).filter((p) => p.contract.endSeason <= s.season && p.overall >= 60);
     if (exp.length) out.push({ k: 'info', t: `${exp.length} contrato${exp.length > 1 ? 's' : ''} vence${exp.length > 1 ? 'n' : ''} esta temporada`, go: 'squad' });
+    const wantOut = u.squad.map((id) => s.players[id]).filter((p) => p.wantsOut);
+    if (wantOut.length) out.push({ k: 'bad', t: `${wantOut.length} jugador${wantOut.length > 1 ? 'es' : ''} quiere${wantOut.length > 1 ? 'n' : ''} salir: ${wantOut.slice(0, 2).map((p) => p.canonicalName).join(', ')}`, go: 'squad' });
     const fs = TLM.financeStatus(s, u); if (fs !== 'ok') out.push({ k: 'bad', t: fs === 'crisis' ? 'Crisis económica: la directiva puede vender jugadores.' : 'Saldo negativo: no podés fichar.', go: 'club' });
     const offers = Object.values(s.market.offers).filter((o) => o.toClubId === u.id && ['OFFERED', 'NEGOTIATING'].includes(o.status));
     if (offers.length) out.push({ k: 'info', t: `${offers.length} oferta${offers.length > 1 ? 's' : ''} por tus jugadores`, go: 'transfers', p: { tab: 'offers' } });

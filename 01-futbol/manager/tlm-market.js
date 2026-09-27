@@ -33,6 +33,7 @@
     if (p.age <= 22 && p.potential > p.overall + 8) f *= 1 + prof.youth * 0.3;
     const left = p.contract.endSeason - state.season;
     if (left <= 0) f *= 0.6; else if (left === 1) f *= 0.88;
+    if (p.wantsOut) f *= 0.75; // quiere salir: el club vende más barato para sacárselo de encima
     const bal = seller.finances.balance;
     if (bal < 0) f *= 0.8; else if (bal < 2e6) f *= 0.93;
     const avgOvr = TLM.avg(seller.squad.map((id) => state.players[id].overall));
@@ -346,7 +347,7 @@
     return { ok: false, status: 'rejected', counter: demand, reason: `Pide ${money(demand)} anuales.` };
   }
   function applyRenewal(state, p, salary, years) {
-    p.contract.salary = salary; p.salary = salary; p.contract.endSeason = Math.max(p.contract.endSeason, state.season) + (years || 2); p.contract.status = 'active';
+    p.contract.salary = salary; p.salary = salary; p.contract.endSeason = Math.max(p.contract.endSeason, state.season) + clamp(years || 2, 1, 5); p.contract.status = 'active';
     p.morale = clamp(p.morale + 5, 0, 100);
     addNews(state, 'contract', `${state.clubs[p.clubId].name} renueva a ${p.canonicalName} hasta ${p.contract.endSeason}.`, { playerId: p.id });
   }
