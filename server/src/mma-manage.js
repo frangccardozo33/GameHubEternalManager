@@ -1,5 +1,6 @@
 // Gestión de la cuadra por el DT humano de una liga online de MMA (LLO): táctica de cada peleador, campamento, mercado de peleadores y
 // traspasos entre DT. El cliente es una página liviana (04-mma/mma-manager.html): recibe una vista de la cuadra (exportState) y manda órdenes.
+import { equipCard, listCard, unlistCard, buyCard, EDITIONS, cardsOf } from './mma-cards.js';
 
 export const DIVS = ['fly', 'bantam', 'feather', 'light', 'welter', 'middle', 'lightheavy', 'heavy'];
 // Campamentos (mismos valores que el modo carrera): atributos que mejoran, costo y carga de cansancio.
@@ -25,14 +26,17 @@ export function setHumans(g, ids, names = {}) {
 }
 
 const view = (f) => ({ id: f.id, name: `${f.firstName} ${f.lastName}`, nickname: f.nickname, country: f.country, age: f.age, division: f.division, style: f.style, rating: f.rating, potential: f.potential,
-  attributes: f.attributes, record: f.record, condition: Math.round(f.condition == null ? 100 : f.condition), morale: Math.round(f.morale == null ? 80 : f.morale), photo: f.photo || null, tactics: f.tactics, program: f.program || null, fee: fee(f) });
+  attributes: f.attributes, record: f.record, condition: Math.round(f.condition == null ? 100 : f.condition), morale: Math.round(f.morale == null ? 80 : f.morale), photo: f.photo || null, tactics: f.tactics, program: f.program || null, fee: fee(f),
+  xp: f.xp || 0, equippedCardId: f.equippedCardId || null, equippedCardLogic: f.equippedCardLogic || null });
+const cardView = (g, f) => cardsOf(g, f.id).map((c) => ({ id: c.id, editionId: c.editionId, name: EDITIONS.find((e) => e.id === c.editionId)?.name, uses: EDITIONS.find((e) => e.id === c.editionId)?.uses, usesLeft: c.usesLeft, ownerStableId: c.ownerStableId }));
 
 export function exportState(g, club) {
   const st = stable(g, club), ev = g.evs.find((e) => e.n === g.event);
   const mine = ev ? ev.bouts.filter((b) => fighter(g, b.a).stable === club || fighter(g, b.b).stable === club) : [];
   return JSON.stringify({
     module: 'mma', me: club, stable: { id: st.id, name: st.name, color: st.color, money: Math.round(st.money), w: st.w, l: st.l }, programs: PROGRAMS, maxRoster: MAX_ROSTER,
-    fighters: st.roster.map((id) => view(fighter(g, id))),
+    fighters: st.roster.map((id) => ({ ...view(fighter(g, id)), cards: cardView(g, fighter(g, id)) })),
+    cardListings: Object.entries(g.cardListings || {}).map(([id, price]) => { const c = g.specialCards[id], f = c && fighter(g, c.fighterId), sOwn = c && stable(g, c.ownerStableId); return c && f ? { id, price, fighterName: `${f.firstName} ${f.lastName}`, editionName: EDITIONS.find((e) => e.id === c.editionId)?.name, ownerStableId: c.ownerStableId, ownerName: sOwn && sOwn.name } : null; }).filter(Boolean),
     market: g.market.slice().sort((a, b) => b.rating - a.rating).map(view),
     stables: g.stables.map((s) => ({ id: s.id, name: s.name, color: s.color, w: s.w, l: s.l, human: isHuman(g, s.id), humanName: s.humanName || null, roster: s.roster.map((id) => { const f = fighter(g, id); return { id, name: `${f.firstName} ${f.lastName}`, division: f.division, rating: f.rating }; }) })),
     event: ev ? `Cartelera ${ev.n + 1}` : null, myMatch: mine.length ? mine[0].id : null,
@@ -80,6 +84,11 @@ const OPS = {
     A.roster = A.roster.filter((x) => x !== fa.id).concat(fb.id); B.roster = B.roster.filter((x) => x !== fb.id).concat(fa.id); fa.stable = B.id; fb.stable = A.id; fa.program = fb.program = null;
     return { ok: true, msg: 'Traspaso completado.' };
   },
+  // cartas especiales: se ganan peleando, se pueden vender por separado del peleador (ver mma-cards.js)
+  equipCard: (g, st, a) => equipCard(g, st.id, a[0], a[1] || null),
+  listCard: (g, st, a) => listCard(g, st.id, a[0], num(a[1], 1, 1e9)),
+  unlistCard: (g, st, a) => unlistCard(g, st.id, a[0]),
+  buyCard: (g, st, a) => buyCard(g, st.id, a[0]),
 };
 
 export function command(g, club, body, ctx) {

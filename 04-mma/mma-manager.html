@@ -17,9 +17,14 @@ window.saveTac = (fid) => {
   E.cmd('tactics', [fid, t]);
 };
 const face = (f) => f.photo ? `<img src="../${esc(f.photo)}" alt="">` : '';
+// Cartas especiales: se ganan peleando (no se compran), son propiedad de la cuadra y tienen usos limitados.
+// Se pueden vender por separado del peleador base; para equipar una necesitás tener también al peleador.
+const cardsBlock = (f) => f.cards && f.cards.length ? `<div style="margin-top:6px"><b>Cartas especiales</b>${f.cards.map((c) => `<div class="row" style="margin:2px 0"><span>${esc(c.name)}${c.uses == null ? '' : ` (${c.usesLeft}/${c.uses} usos)`}</span>
+  ${f.equippedCardId === c.id ? `<button class="b" data-cmd="equipCard" data-args='["${f.id}",null]'>Quitar</button>` : `<button class="b g" data-cmd="equipCard" data-args='["${f.id}","${c.id}"]'>Equipar</button>`}
+  <button class="b" onclick="const p=prompt('¿Por cuánto la vendés?'); if(p) E.cmd('listCard',['${c.id}',+p])">Vender</button></div>`).join('')}</div>` : '';
 const card = (f, extra) => `<div class="item">${face(f)}<b>${esc(f.name)}</b> <span class="tag">${esc(f.country)}</span><div class="muted">“${esc(f.nickname)}” · ${f.age} años · ${DIV[f.division] || f.division} · ${STYLE[f.style] || f.style}</div>
-  <div class="muted">Rating <b>${f.rating}</b> · Pot. ${f.potential} · Récord ${f.record.wins}-${f.record.losses}-${f.record.draws} · Condición ${f.condition}% · Moral ${f.morale}</div>
-  <div class="muted" style="clear:both;margin-top:4px">${Object.entries(ATTR).map(([k, l]) => `${l} ${Math.round(f.attributes[k])}`).join(' · ')}</div>${extra || ''}</div>`;
+  <div class="muted">Rating <b>${f.rating}</b> · Pot. ${f.potential} · Récord ${f.record.wins}-${f.record.losses}-${f.record.draws} · Condición ${f.condition}% · Moral ${f.morale}${f.xp != null ? ` · XP ${f.xp}/60` : ''}</div>
+  <div class="muted" style="clear:both;margin-top:4px">${Object.entries(ATTR).map(([k, l]) => `${l} ${Math.round(f.attributes[k])}`).join(' · ')}</div>${cardsBlock(f)}${extra || ''}</div>`;
 E.boot('LLO · Gestión de la cuadra', (s, ui) => {
   const me = s.stable, others = s.stables.filter((t) => t.human && t.id !== me.id), tgt = others.find((t) => t.id === ui.tradeTeam) || others[0];
   const props = s.tradeProps.filter((t) => t.to === me.id);
@@ -34,6 +39,7 @@ E.boot('LLO · Gestión de la cuadra', (s, ui) => {
     <div style="margin-top:6px"><b>Campamento</b> <select data-cmd-change="program" data-args='["${f.id}"]'><option value="">Sin campamento</option>${Object.entries(s.programs).map(([k, p]) => `<option value="${k}" ${f.program === k ? 'selected' : ''}>${esc(p.name)} (${money(p.cost)})</option>`).join('')}</select>
     <button class="b r" data-cmd="releaseFighter" data-args='["${f.id}"]' ${s.fighters.length <= 2 ? 'disabled' : ''}>Liberar</button></div>`)).join('')}</div></div>
   <div class="card"><h2>Mercado de peleadores</h2><p class="muted">Agentes libres y prospectos. La firma se paga al contado. Una cuadra tiene entre 2 y ${s.maxRoster} peleadores.</p><div class="grid">${s.market.slice(0, 40).map((f) => card(f, `<div class="muted">Firma ${money(f.fee)}</div><button class="b g" data-cmd="signFighter" data-args='["${f.id}"]' ${s.fighters.length >= s.maxRoster || s.stable.money < f.fee ? 'disabled' : ''}>Fichar</button>`)).join('')}</div></div>
+  <div class="card"><h2>Mercado de cartas especiales</h2><p class="muted">Salen jugando (no se compran). Se venden por separado del peleador base.</p>${s.cardListings.length ? s.cardListings.map((c) => `<div class="item" style="margin:6px 0"><b>${esc(c.editionName)}</b> de ${esc(c.fighterName)} <span class="tag">${esc(c.ownerName)}</span> · ${money(c.price)} ${c.ownerStableId !== me.id ? `<button class="b g" data-cmd="buyCard" data-args='["${c.id}"]' ${me.money < c.price ? 'disabled' : ''}>Comprar</button>` : `<button class="b r" data-cmd="unlistCard" data-args='["${c.id}"]'>Retirar</button>`}</div>`).join('') : '<p class="muted">No hay cartas en venta.</p>'}</div>
   <div class="card"><h2>Traspasos con otros DT</h2>${others.length ? `<div class="row"><label>Cuadra <select data-ui="tradeTeam">${others.map((t) => `<option value="${t.id}" ${tgt && t.id === tgt.id ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</select></label>
     <label>Doy <select id="tGive">${s.fighters.map((f) => `<option value="${f.id}">${esc(f.name)} (${f.rating})</option>`).join('')}</select></label>
     <label>Recibo <select id="tGet">${tgt.roster.map((f) => `<option value="${f.id}">${esc(f.name)} (${f.rating} · ${DIV[f.division] || f.division})</option>`).join('')}</select></label>

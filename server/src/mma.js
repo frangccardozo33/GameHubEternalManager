@@ -4,6 +4,7 @@
 import { Hs, dl, La, fighterFromRoster, $t } from './vendor/mma-core.js';
 import { Lockstep, cleanAction, LEAD_STEPS, snapOf } from '../../04-mma/online/lockstep.mjs';
 import { setHumans, exportState, command, afterRound, DIVS, PROGRAMS } from './mma-manage.js';
+import { fixCards, boostedAttributes, cardBoostBits, primeCardContext, fightRating, gainMatchXP, rollCardDrop, consumeCardUse, clubCards, cardsOf, equipCard, listCard, unlistCard, buyCard } from './mma-cards.js';
 
 const PER_DIV = 4, ROUNDS = 3, ROUND_SECONDS = 300;
 export const GYMS = [['Dragon Team', '#c0392b'], ['Hierro Norte', '#5d6d7e'], ['Iron Coast', '#1f7a8c'], ['Lobos Gym', '#7d6608'], ['Team Tempest', '#6c3483'], ['Fénix MMA', '#d35400'], ['Casa Roja', '#a93226'], ['Vértice', '#1e8449']];
@@ -33,7 +34,7 @@ class MmaLive {
   constructor(g, matchId, startAt, extras = {}, now = startAt) {
     this.g = g; this.bout = eventOf(g).bouts.find((b) => b.id === matchId);
     if (!this.bout) throw new Error('partido inexistente');
-    this.cfg = extras.cfg || { profiles: [structuredClone(fighter(g, this.bout.a)), structuredClone(fighter(g, this.bout.b))], seed: ((g.seed * 31 + g.event * 977 + +matchId.split('_')[1] * 13) % 1e9) + 1, rounds: ROUNDS, roundSeconds: ROUND_SECONDS };
+    this.cfg = extras.cfg || { profiles: [fighter(g, this.bout.a), fighter(g, this.bout.b)].map((f) => ({ ...structuredClone(f), attributes: boostedAttributes(f) })), seed: ((g.seed * 31 + g.event * 977 + +matchId.split('_')[1] * 13) % 1e9) + 1, rounds: ROUNDS, roundSeconds: ROUND_SECONDS };
     this.sim = new Hs(this.cfg.profiles, { seed: this.cfg.seed, rounds: this.cfg.rounds, roundSeconds: this.cfg.roundSeconds });
     this.startAt = startAt;
     this.ls = new Lockstep(this.sim, startAt, extras.actions || []);
@@ -92,10 +93,12 @@ export const mma = {
     const R = globalThis.LLO_ROSTER, taken = new Set(fighters.map((f) => f.rosterId));
     const market = R.pool.filter((e) => !taken.has(e.id)).slice(0, 60).map((e, i) => { const f = fighterFromRoster(e, 'm' + i); f.stable = null; f.program = null; return f; });
     const g = { v: 2, seed, event: 0, fighters, stables, market, evs: [], done: [], humans: [], tradeProps: [], tradeSeq: 0 };
+    fixCards(g);
     g.evs.push(pairEvent(g, 0));
+    primeCardContext(g, g.evs[0]);
     return g;
   },
-  load: (json) => JSON.parse(json),
+  load: (json) => { const g = JSON.parse(json); fixCards(g); return g; },
   serialize: (g) => JSON.stringify(g),
   clubs: (g) => g.stables.map((s) => s.id),
   teams: (g) => g.stables.map(pubStable),
@@ -110,15 +113,29 @@ export const mma = {
     for (const b of e.bouts) {
       const A = fighter(g, b.a), B = fighter(g, b.b), w = b.res && b.res.winner, SA = g.stables.find((s) => s.id === A.stable), SB = g.stables.find((s) => s.id === B.stable);
       if (!w) { A.record.draws++; B.record.draws++; A.streak = B.streak = 0; SA.d++; SB.d++; SA.money += 4000; SB.money += 4000; }
-      else { const W = w === b.a ? A : B, Lo = w === b.a ? B : A, SW = W === A ? SA : SB, SL = W === A ? SB : SA; W.record.wins++; Lo.record.losses++; W.lw++; Lo.ll++; W.rating += 18; Lo.rating -= 18; W.streak = Math.max(1, W.streak + 1); Lo.streak = Math.min(-1, Lo.streak - 1); SW.w++; SL.l++; SW.money += 8000; SL.money += 3000; }
+      else { const W = w === b.a ? A : B, Lo = w === b.a ? B : A, SW = W === A ? SA : SB, SL = W === A ? SB : SA; W.record.wins++; Lo.record.losses++; W.lw++; Lo.ll++; W.rating += 18; if (!cardBoostBits(Lo).immune) Lo.rating -= 18; W.streak = Math.max(1, W.streak + 1); Lo.streak = Math.min(-1, Lo.streak - 1); SW.w++; SL.l++; SW.money += 8000; SL.money += 3000; }
       g.done.push({ id: b.id, week: e.n + 1, home: A.stable, away: B.stable, score: !w ? [0, 0] : w === b.a ? [1, 0] : [0, 1], text: `${name(A)} vs ${name(B)}: ${!w ? 'empate' : 'gana ' + name(w === b.a ? A : B)} (${b.res && b.res.method})`, method: b.res && b.res.method });
+      // rating de combate (1-10) -> XP y drop de cartas especiales, para los dos peleadores (jugado por CPU o por un DT humano)
+      for (const [f, won, draw] of [[A, w === b.a, !w], [B, w === b.b, !w]]) {
+        f.careerFights = (f.careerFights || 0) + 1;
+        f._lastRating = fightRating(f, won, draw, b.res && b.res.method);
+        gainMatchXP(f); rollCardDrop(g, f); consumeCardUse(g, f);
+      }
     }
     afterRound(g);
     g.event++; g.evs.push(pairEvent(g, g.event));
+    primeCardContext(g, g.evs[g.evs.length - 1]);
     g.evs = g.evs.slice(-2); g.done = g.done.slice(-80);
   },
   results: (g) => g.done.slice(-40),
   makeLive: (g, matchId, startAt, extras, now) => new MmaLive(g, matchId, startAt, extras, now),
   setHumans, exportState, command,
+  // cartas especiales (drop por combate, dueño = cuadra, uso limitado, mercado propio)
+  clubCards: (g, stableId) => clubCards(g, stableId),
+  cardsOf: (g, fid) => cardsOf(g, fid),
+  equipCard: (g, stableId, fid, cardId) => equipCard(g, stableId, fid, cardId),
+  listCard: (g, stableId, cardId, price) => listCard(g, stableId, cardId, price),
+  unlistCard: (g, stableId, cardId) => unlistCard(g, stableId, cardId),
+  buyCard: (g, stableId, cardId) => buyCard(g, stableId, cardId),
 };
 export { PROGRAMS };
