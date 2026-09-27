@@ -295,8 +295,7 @@
   const DISCONTENT_THRESHOLD = 8;
   function updateDiscontent(state, p) {
     if (!p.clubId) { p.discontentStreak = 0; p.wantsOut = false; return; }
-    const underpaid = p.marketValue > 0 && p.salary < p.marketValue * 0.05;
-    const unhappy = p.morale < 35 || underpaid;
+    const unhappy = p.morale < 35;
     p.discontentStreak = unhappy ? (p.discontentStreak || 0) + 1 : Math.max(0, (p.discontentStreak || 0) - 2);
     const was = p.wantsOut;
     p.wantsOut = p.discontentStreak >= DISCONTENT_THRESHOLD;

@@ -23,7 +23,7 @@ function anyPid(s, id) { if (typeof id !== 'string' || !s.players[id]) throw new
 function offerOf(s, id, side, me) { const o = s.market.offers[id]; if (!o) throw new Error('La oferta ya no existe'); if ((side === 'from' ? o.fromClubId : o.toClubId) !== me) throw new Error('Esa oferta no es tuya'); return id; }
 
 const OPS = {
-  renewContract: (s, me, a) => TLM.renewContract(s, me, myPid(s, me, a[0]), num(a[1], 0, 1e9), Math.round(num(a[2], 1, 6))),
+  renewContract: (s, me, a) => TLM.renewContract(s, me, myPid(s, me, a[0]), Math.round(num(a[1], 1, 6))),
   listPlayer: (s, me, a) => TLM.listPlayer(s, me, myPid(s, me, a[0]), num(a[1], 0, 1e10)),
   unlistPlayer: (s, me, a) => { const l = s.market.listings[a[0]]; if (!l || l.clubId !== me) throw new Error('Ese jugador no lo pusiste en venta'); TLM.unlistPlayer(s, a[0]); return { ok: true }; },
   sellNow: (s, me, a) => TLM.sellNow(s, me, myPid(s, me, a[0])),

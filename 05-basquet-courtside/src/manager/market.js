@@ -9,21 +9,11 @@ const r1 = x => Math.round(x * 10) / 10;
 
 export function install(Game) {
   Object.assign(Game.prototype, {
-    // ---------- salario y ofertas ----------
-    capRoom(team) { return this.cfg.salaryCap - this.payroll(team); },
-    askFor(p, renewal = false) {
-      let a = valueOf(p);
-      if (renewal) a *= clamp(1 + (65 - p.morale) / 65 * 0.15, 0.92, 1.2); // descontento → pide más
-      return Math.max(0.5, r1(a));
-    },
-    // Evalúa una oferta {salary, years, role}. Acepta si cubre lo que pide (ajustado por rol y duración).
-    evalOffer(p, o, renewal = false) {
-      let ask = this.askFor(p, renewal); const desired = ROLE_LVL[autoRole(p)], offered = ROLE_LVL[o.role] ?? 0;
-      if (offered < desired) ask *= 1 + 0.08 * (desired - offered);
-      ask *= 1 + 0.02 * Math.abs(o.years - prefYears(p)); ask = Math.max(0.5, r1(ask));
-      const ratio = o.salary / ask;
-      return { status: ratio >= 0.98 ? 'accept' : ratio >= 0.88 ? 'counter' : 'reject', ask, ratio };
-    },
+    // ---------- ofertas (sin sueldos: el juego no tiene salarios, sólo duración y rol) ----------
+    capRoom() { return Infinity; },
+    askFor() { return 0; },
+    // Sin sueldos: fichar/renovar siempre se acepta (ver signFreeAgent/renewPlayer).
+    evalOffer() { return { status: 'accept', ask: 0, ratio: 1 }; },
     freeNumber(team) { const used = new Set(team.roster.map(id => this.player(id).num)); for (let n = 0; n < 100; n++) if (!used.has(n)) return n; return 99; },
     attach(p, team, contract) {
       p.teamId = team.id; p.contract = contract; p.morale = 70; p.num = this.freeNumber(team); p.prospect = false;
@@ -89,13 +79,8 @@ export function install(Game) {
       const p = this.player(pid), t = this.user;
       if (!this.s.fa.includes(pid)) return { ok: false, msg: 'El jugador ya no está disponible.' };
       if (t.roster.length >= LIM.max) return { ok: false, msg: `Plantilla completa (máximo ${LIM.max}). Libera a alguien primero.` };
-      const room = this.capRoom(t);
-      if (this.fin.cash < 0) return { ok: false, msg: 'Saldo negativo: no puedes fichar.' };
-      if (o.salary > room + 1e-9 && o.salary > LIM.minContract) return { ok: false, msg: `No cabe en el tope salarial (margen ${r1(room)} M€). Con el tope superado solo se pueden fichar contratos mínimos (≤ ${LIM.minContract} M€).` };
-      const ev = this.evalOffer(p, o);
-      if (ev.status !== 'accept') return { ok: false, ...ev, msg: ev.status === 'counter' ? `Casi: pide ${ev.ask} M€ para ese rol y duración.` : `Oferta muy baja: pide ${ev.ask} M€.` };
-      this.attach(p, t, { salary: o.salary, years: o.years + (this.s.phase === 'offseason' ? 1 : 0), role: o.role, bonus: 0, clauses: { noTrade: false, rolePromise: false } });
-      this.repairLineup(t); this.news('Fichaje', `${p.name} (${p.role}, OVR ${p.ovr}) firma ${o.years} año(s) por ${o.salary} M€.`);
+      this.attach(p, t, { salary: 0, years: o.years + (this.s.phase === 'offseason' ? 1 : 0), role: o.role, bonus: 0, clauses: { noTrade: false, rolePromise: false } });
+      this.repairLineup(t); this.news('Fichaje', `${p.name} (${p.role}, OVR ${p.ovr}) firma ${o.years} año(s).`);
       return { ok: true, msg: `${p.name} ha firmado.` };
     },
     // ---------- renovaciones ----------
@@ -103,25 +88,21 @@ export function install(Game) {
       const p = this.player(pid), t = this.user;
       if (p.teamId !== t.id) return { ok: false, msg: 'Ese jugador no es tuyo.' };
       if (p.contract.years > 1) return { ok: false, msg: 'Solo se puede renovar cuando le queda 1 año de contrato.' };
-      const ev = this.evalOffer(p, o, true);
-      if (ev.status !== 'accept') return { ok: false, ...ev, msg: ev.status === 'counter' ? `Casi: pide ${ev.ask} M€.` : `Muy lejos de lo que pide (${ev.ask} M€).` };
-      p.contract = { salary: o.salary, years: 1 + o.years, role: o.role, bonus: 0, clauses: p.contract.clauses }; p.morale = clamp(p.morale + 4, 0, 100);
-      this.news('Renovación', `${p.name} renueva ${o.years} año(s) por ${o.salary} M€.`); return { ok: true, msg: `${p.name} ha renovado.` };
+      p.contract = { salary: 0, years: 1 + o.years, role: o.role, bonus: 0, clauses: p.contract.clauses }; p.morale = clamp(p.morale + 4, 0, 100);
+      this.news('Renovación', `${p.name} renueva ${o.years} año(s).`); return { ok: true, msg: `${p.name} ha renovado.` };
     },
-    // ---------- liberar (con indemnización) ----------
+    // ---------- liberar ----------
     releasePlayer(pid, teamId = this.s.userId) {
       const t = this.team(teamId), p = this.player(pid);
       if (t.roster.length <= LIM.min) return { ok: false, msg: `Necesitas al menos ${LIM.min} jugadores.` };
-      const c = p.contract, buy = r1(c.salary * 0.5), yrs = Math.min(c.years, 3); (t.dead ??= []).push({ name: p.name, amt: buy, years: yrs });
       t.roster = t.roster.filter(id => id !== pid); p.teamId = null; p.contract = null; this.s.fa.push(pid); this.repairLineup(t);
-      if (t.isUser) this.news('Jugador liberado', `${p.name} deja el club. Indemnización: ${buy} M€ durante ${yrs} temporada(s).`);
-      return { ok: true, msg: `Liberado. Pagarás ${buy} M€ durante ${yrs} temporada(s).` };
+      if (t.isUser) this.news('Jugador liberado', `${p.name} deja el club.`);
+      return { ok: true, msg: `${p.name} liberado.` };
     },
     // ---------- traspasos ----------
     tradeValue(p) {
       const eff = p.ovr + Math.max(0, p.pot - p.ovr) * clamp((27 - p.age) / 8, 0, 1) * 0.6, age = p.age > 30 ? Math.max(0.3, 1 - 0.08 * (p.age - 30)) : 1;
-      const sur = clamp((valueOf(p) - (p.contract?.salary ?? 0)) / Math.max(valueOf(p), 1), -0.3, 0.3);
-      return Math.pow(Math.max(0, eff - 58), 2.4) * age * (1 + sur) / 40;
+      return Math.pow(Math.max(0, eff - 58), 2.4) * age / 40;
     },
     evalTrade(teamId, mine, theirs) {
       const u = this.user, t = this.team(teamId), sum = (ids, f) => ids.reduce((a, id) => a + f(this.player(id)), 0);
@@ -130,9 +111,6 @@ export function install(Game) {
       const nu = u.roster.length - mine.length + theirs.length, nt = t.roster.length - theirs.length + mine.length;
       if (nu < LIM.min || nu > LIM.max) return { ok: false, msg: `Tu plantilla quedaría en ${nu} jugadores (debe estar entre ${LIM.min} y ${LIM.max}).` };
       if (nt < LIM.min || nt > LIM.max) return { ok: false, msg: `${t.short} quedaría con ${nt} jugadores: no lo aceptan.` };
-      const sal = p => p.contract.salary, outU = sum(mine, sal), inU = sum(theirs, sal);
-      if (this.payroll(u) - outU + inU > this.cfg.salaryCap && inU > outU) return { ok: false, msg: `Superarías el tope salarial: el salario entrante (${r1(inU)} M€) no puede exceder el saliente (${r1(outU)} M€).` };
-      if (this.payroll(t) - inU + outU > this.cfg.salaryCap && outU > inU) return { ok: false, msg: `${t.short} superaría el tope: no pueden absorber ${r1(outU)} M€ a cambio de ${r1(inU)} M€.` };
       const give = sum(mine, p => this.tradeValue(p)), get = sum(theirs, p => this.tradeValue(p)), star = t.roster.map(id => this.player(id)).sort((a, b) => b.ovr - a.ovr)[0];
       const need = theirs.includes(star.id) ? 1.3 : 1.1, ratio = get > 0 ? give / get : 9;
       return ratio >= need ? { ok: true, ratio, msg: '¡Aceptan!' } : { ok: false, ratio, msg: `Valoran tu oferta en un ${Math.round(ratio / need * 100)}% de lo que necesitan${theirs.includes(star.id) ? ' (es su jugador franquicia: exigen un plus)' : ''}.` };
@@ -165,7 +143,6 @@ export function install(Game) {
       if (p.scout >= 100) return { ok: false, msg: 'Ya lo conoces al detalle.' };
       this.s.scoutPts--; p.scout = Math.min(100, p.scout + 35); return { ok: true };
     },
-    rookieSalary: n => Math.max(0.6, r1(3.0 * Math.exp(-0.06 * (n - 1)))),
     startDraft() {
       const s = this.s; if (!s.prospects?.length) this.generateProspects();
       const order = this.standings().map(x => x.id).reverse(), picks = []; let n = 1;
@@ -176,9 +153,9 @@ export function install(Game) {
     draftSelect(pid) {
       const off = this.s.off, pick = off.picks[off.pos], p = this.player(pid), t = this.team(pick.teamId);
       if (t.roster.length >= LIM.max + 3) { /* margen de plantilla en offseason; se recorta al empezar la temporada */ }
-      this.s.prospects = this.s.prospects.filter(id => id !== pid); p.prospect = false; p.teamId = t.id; p.contract = { salary: this.rookieSalary(pick.n), years: 4, role: 'prospect', bonus: 0, clauses: { noTrade: false, rolePromise: false } };
+      this.s.prospects = this.s.prospects.filter(id => id !== pid); p.prospect = false; p.teamId = t.id; p.contract = { salary: 0, years: 4, role: 'prospect', bonus: 0, clauses: { noTrade: false, rolePromise: false } };
       p.num = this.freeNumber(t); p.morale = 75; t.roster.push(pid); off.made.push({ ...pick, pid }); off.pos++;
-      if (t.isUser) this.news('Draft', `Eliges a ${p.name} en el puesto #${pick.n} (${this.rookieSalary(pick.n)} M€ · 4 temporadas).`);
+      if (t.isUser) this.news('Draft', `Eliges a ${p.name} en el puesto #${pick.n} (4 temporadas).`);
       if (off.pos >= off.picks.length) this.finishDraft();
     },
     draftPickAI() {
@@ -198,18 +175,18 @@ export function install(Game) {
       for (const t of s.teams) if (!t.isUser) while (t.roster.length > LIM.max) { const w = this.roster(t).sort((a, b) => a.ovr - b.ovr)[0]; t.roster = t.roster.filter(id => id !== w.id); w.teamId = null; w.contract = null; s.fa.push(w.id); }
       const order = s.teams.filter(t => !t.isUser).sort(() => this.rng.next() - 0.5);
       for (const t of order) for (let g = 0; g < 6 && t.roster.length < 14; g++) {
-        const room = this.capRoom(t), c = s.fa.map(id => this.player(id)).filter(p => !p.retired).sort((a, b) => b.ovr - a.ovr).find(p => { const a = this.askFor(p); return a <= room || a <= LIM.minContract; });
-        if (!c) break; this.attach(c, t, { salary: Math.max(0.5, this.askFor(c)), years: prefYears(c), role: autoRole(c), bonus: 0, clauses: { noTrade: false, rolePromise: false } });
+        const c = s.fa.map(id => this.player(id)).filter(p => !p.retired).sort((a, b) => b.ovr - a.ovr)[0];
+        if (!c) break; this.attach(c, t, { salary: 0, years: prefYears(c), role: autoRole(c), bonus: 0, clauses: { noTrade: false, rolePromise: false } });
       }
     },
-    // Garantiza que el usuario pueda jugar: ficha automáticamente contratos mínimos si tiene menos de 10 jugadores.
+    // Garantiza que el usuario pueda jugar: ficha automáticamente si tiene menos de 10 jugadores.
     ensureUserRoster() {
       const t = this.user, added = [];
       while (t.roster.length < LIM.min) {
         const c = this.s.fa.map(id => this.player(id)).filter(p => !p.retired).sort((a, b) => b.ovr - a.ovr)[0]; if (!c) break;
-        this.attach(c, t, { salary: LIM.minContract, years: 1, role: 'bench', bonus: 0, clauses: { noTrade: false, rolePromise: false } }); added.push(c.name);
+        this.attach(c, t, { salary: 0, years: 1, role: 'bench', bonus: 0, clauses: { noTrade: false, rolePromise: false } }); added.push(c.name);
       }
-      if (added.length) { this.repairLineup(t); this.news('Fichajes de emergencia', `Con menos de ${LIM.min} jugadores no se puede jugar: se han fichado ${added.join(', ')} con contrato mínimo.`); }
+      if (added.length) { this.repairLineup(t); this.news('Fichajes de emergencia', `Con menos de ${LIM.min} jugadores no se puede jugar: se han fichado ${added.join(', ')}.`); }
       return added;
     },
   });

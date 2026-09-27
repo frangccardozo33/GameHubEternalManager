@@ -131,8 +131,6 @@
   function executeTransfer(state, offer) {
     const p = state.players[offer.playerId], buyer = clubOf(state, offer.fromClubId), seller = offer.toClubId ? clubOf(state, offer.toClubId) : null;
     if (!p || (seller && p.clubId !== seller.id) || (!seller && p.clubId)) { finish(state, offer, 'CANCELLED', 'El jugador ya no está disponible.'); return { ok: false, reason: offer.reason }; }
-    const demand = contractDemand(state, p, buyer);
-    const salary = Math.max(offer.salary || 0, Math.round(demand * (offer.demandLocked ? 1 : 0.9)));
     const cost = offer.amount + (seller ? 0 : 0);
     if (!TLM.canSpend(buyer, cost)) { finish(state, offer, 'CANCELLED', 'Saldo insuficiente para cerrar la operación.'); return { ok: false, reason: offer.reason }; }
     if (buyer.squad.length >= 32) { finish(state, offer, 'CANCELLED', 'Plantilla completa (máx. 32).'); return { ok: false, reason: offer.reason }; }
@@ -141,17 +139,17 @@
     if (seller) addTx(state, seller, 'transfer_out', cost, `Venta de ${p.canonicalName} a ${buyer.name}`, p.id);
     if (!seller) state.market.freeAgents = state.market.freeAgents.filter((id) => id !== p.id);
     delete state.market.listings[p.id];
-    TLM.moveToClub(state, p.id, buyer.id, { salary, endSeason: state.season + (offer.years || 3) });
+    TLM.moveToClub(state, p.id, buyer.id, { salary: 0, endSeason: state.season + (offer.years || 3) });
     p.morale = clamp(p.morale + 4, 0, 100);
     if (offer.edition && offer.edition !== p.card.edition) applyEdition(state, buyer, p, offer.edition, false); // la edición especial se paga aparte y es del MISMO jugador
     finish(state, offer, 'TRANSFERRED');
     cancelOtherOffers(state, p.id, offer.id, 'El jugador fue traspasado a otro club.');
-    const rec = { id: nextId(state, 'transfer', 'tr'), season: state.season, round: state.currentMatchday, playerId: p.id, from: seller ? seller.id : null, to: buyer.id, fee: cost, salary };
+    const rec = { id: nextId(state, 'transfer', 'tr'), season: state.season, round: state.currentMatchday, playerId: p.id, from: seller ? seller.id : null, to: buyer.id, fee: cost };
     state.transfers.unshift(rec); if (state.transfers.length > 400) state.transfers.length = 400;
     const who = `${p.canonicalName} (${p.primaryPosition}, ${p.overall})`;
     if (seller) addNews(state, 'transfer', `${buyer.name} incorpora a ${who} desde ${seller.name} por ${money(cost)}.`, { playerId: p.id, from: seller.id, to: buyer.id, fee: cost });
     else addNews(state, 'transfer', `${buyer.name} ficha como agente libre a ${who}.`, { playerId: p.id, to: buyer.id, fee: cost });
-    return { ok: true, rec, salary };
+    return { ok: true, rec };
   }
 
   function makeOffer(state, buyerId, pid, amount, terms) {
@@ -164,10 +162,7 @@
     amount = roundMoney(amount);
     if (amount <= 0) return { ok: false, reason: 'Monto inválido.' };
     if (!TLM.canSpend(buyer, amount)) return { ok: false, reason: 'Tu saldo no alcanza para esa oferta.' };
-    const demand = contractDemand(state, p, buyer);
-    const salary = terms.salary || demand;
-    if (salary < demand * 0.85) return { ok: false, reason: `El jugador exige al menos ${money(demand)} anuales.`, demand };
-    const o = { id: nextId(state, 'offer', 'off'), playerId: pid, fromClubId: buyerId, toClubId: p.clubId, amount, salary: Math.max(salary, Math.round(demand * 0.95)), years: terms.years || 3, status: 'OFFERED',
+    const o = { id: nextId(state, 'offer', 'off'), playerId: pid, fromClubId: buyerId, toClubId: p.clubId, amount, years: terms.years || 3, status: 'OFFERED',
       createdRound: state.currentMatchday, createdSeason: state.season, expiresRound: state.currentMatchday + D().offerLifeRounds, history: [{ by: 'buyer', amount, round: state.currentMatchday }], counterAmount: null, reason: null, source: buyer.controlledBy, edition: terms.edition || null };
     state.market.offers[o.id] = o;
     return { ok: true, offer: o };
@@ -278,10 +273,8 @@
     if (!l || !p) return { ok: false, reason: 'No está en venta.' };
     if (l.clubId === buyerId) return { ok: false, reason: 'Es tu propio jugador.' };
     if (!TLM.canSpend(buyer, l.askingPrice)) return { ok: false, reason: 'Saldo insuficiente (' + money(l.askingPrice) + ').' };
-    const demand = contractDemand(state, p, buyer);
-    const o = { id: nextId(state, 'offer', 'off'), playerId: pid, fromClubId: buyerId, toClubId: l.clubId, amount: l.askingPrice, salary: (terms && terms.salary) || demand, years: (terms && terms.years) || 3, status: 'ACCEPTED',
+    const o = { id: nextId(state, 'offer', 'off'), playerId: pid, fromClubId: buyerId, toClubId: l.clubId, amount: l.askingPrice, years: (terms && terms.years) || 3, status: 'ACCEPTED',
       createdRound: state.currentMatchday, createdSeason: state.season, expiresRound: state.currentMatchday, history: [{ by: 'buyer', amount: l.askingPrice, round: state.currentMatchday, note: 'compra directa' }], reason: null, source: buyer.controlledBy, edition: (terms && terms.edition) || null };
-    if (o.salary < demand * 0.85) return { ok: false, reason: `El jugador exige al menos ${money(demand)} anuales.`, demand };
     state.market.offers[o.id] = o;
     return executeTransfer(state, o);
   }
@@ -289,11 +282,9 @@
   function signFreeAgent(state, clubId, pid, terms) {
     const p = state.players[pid], club = clubOf(state, clubId);
     if (!p || p.clubId || !state.market.freeAgents.includes(pid)) return { ok: false, reason: 'No es agente libre.' };
-    const demand = contractDemand(state, p, club), bonus = roundMoney(p.marketValue * 0.12);
-    const salary = (terms && terms.salary) || demand;
-    if (salary < demand * 0.85) return { ok: false, reason: `Exige al menos ${money(demand)} anuales.`, demand };
+    const bonus = roundMoney(p.marketValue * 0.12);
     if (!TLM.canSpend(club, bonus)) return { ok: false, reason: 'Saldo insuficiente para la prima de fichaje (' + money(bonus) + ').' };
-    const o = { id: nextId(state, 'offer', 'off'), playerId: pid, fromClubId: clubId, toClubId: null, amount: bonus, salary, years: (terms && terms.years) || 2, status: 'ACCEPTED', createdRound: state.currentMatchday, createdSeason: state.season,
+    const o = { id: nextId(state, 'offer', 'off'), playerId: pid, fromClubId: clubId, toClubId: null, amount: bonus, years: (terms && terms.years) || 2, status: 'ACCEPTED', createdRound: state.currentMatchday, createdSeason: state.season,
       expiresRound: state.currentMatchday, history: [{ by: 'buyer', amount: bonus, round: state.currentMatchday, note: 'agente libre' }], source: club.controlledBy, edition: (terms && terms.edition) || null };
     state.market.offers[o.id] = o;
     return executeTransfer(state, o);
@@ -335,19 +326,14 @@
   }
 
   // ---------- contratos ----------
-  function renewContract(state, clubId, pid, salary, years) {
+  function renewContract(state, clubId, pid, years) {
     const p = state.players[pid], club = clubOf(state, clubId);
     if (!p || p.clubId !== clubId) return { ok: false, reason: 'No es jugador de tu club.' };
-    const demand = contractDemand(state, p, club, true);
     if (p.morale < 25) { return { ok: false, reason: `${p.canonicalName} no quiere renovar: está muy desmotivado.` }; }
-    salary = salary || demand;
-    if (salary >= demand) { applyRenewal(state, p, salary, years); return { ok: true, status: 'accepted', salary }; }
-    if (salary >= demand * 0.9) return { ok: false, status: 'counter', counter: demand, reason: `Acepta si le ofrecés ${money(demand)} anuales.` };
-    p.morale = clamp(p.morale - 2, 0, 100);
-    return { ok: false, status: 'rejected', counter: demand, reason: `Pide ${money(demand)} anuales.` };
+    applyRenewal(state, p, years); return { ok: true, status: 'accepted' };
   }
-  function applyRenewal(state, p, salary, years) {
-    p.contract.salary = salary; p.salary = salary; p.contract.endSeason = Math.max(p.contract.endSeason, state.season) + clamp(years || 2, 1, 5); p.contract.status = 'active';
+  function applyRenewal(state, p, years) {
+    p.contract.endSeason = Math.max(p.contract.endSeason, state.season) + clamp(years || 2, 1, 5); p.contract.status = 'active';
     p.morale = clamp(p.morale + 5, 0, 100);
     addNews(state, 'contract', `${state.clubs[p.clubId].name} renueva a ${p.canonicalName} hasta ${p.contract.endSeason}.`, { playerId: p.id });
   }
@@ -361,7 +347,7 @@
     const buyers = Object.values(state.clubs).filter((c) => c.controlledBy !== 'user' && !c.foreign && c.squad.length < 30).map((c) => ({ c, ceil: buyerCeiling(state, c, p) })).filter((x) => TLM.canSpend(x.c, x.ceil * 0.7)).sort((a, b) => b.ceil - a.ceil);
     if (!buyers.length) return { ok: false, reason: 'Ningún club puede pagarlo ahora.' };
     const b = buyers[0], price = roundMoney(Math.min(b.ceil, p.marketValue) * 0.75);
-    const o = { id: nextId(state, 'offer', 'off'), playerId: pid, fromClubId: b.c.id, toClubId: clubId, amount: price, salary: p.contract.salary, years: 2, status: 'ACCEPTED', createdRound: state.currentMatchday, createdSeason: state.season, expiresRound: state.currentMatchday, history: [{ by: 'buyer', amount: price, round: state.currentMatchday, note: 'venta directa' }], source: 'ai' };
+    const o = { id: nextId(state, 'offer', 'off'), playerId: pid, fromClubId: b.c.id, toClubId: clubId, amount: price, years: 2, status: 'ACCEPTED', createdRound: state.currentMatchday, createdSeason: state.season, expiresRound: state.currentMatchday, history: [{ by: 'buyer', amount: price, round: state.currentMatchday, note: 'venta directa' }], source: 'ai' };
     state.market.offers[o.id] = o;
     return executeTransfer(state, o);
   }

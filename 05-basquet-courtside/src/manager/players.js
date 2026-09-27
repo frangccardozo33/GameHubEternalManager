@@ -45,8 +45,7 @@ export function makePlayer(rng, id, { role, tier, age, teamId = null }) {
   return p;
 }
 export function newContract(rng, p, role = null) {
-  const salary = Math.round(valueOf(p) * rng.range(0.88, 1.12) * 10) / 10;
-  return { salary: Math.max(0.5, salary), years: 1 + Math.floor(rng.range(0, 4)), role: role ?? autoRole(p), bonus: 0, clauses: { noTrade: false, rolePromise: false } };
+  return { salary: 0, years: 1 + Math.floor(rng.range(0, 4)), role: role ?? autoRole(p), bonus: 0, clauses: { noTrade: false, rolePromise: false } };
 }
 export const autoRole = p => p.ovr >= 85 ? 'star' : p.ovr >= 78 ? 'starter' : p.ovr >= 73 ? 'sixth' : p.ovr >= 66 ? 'rotation' : p.age <= 22 ? 'prospect' : 'bench';
 // Progresión anual: depende de edad, potencial y tipo de atributo (atlético vs técnico).

@@ -241,8 +241,7 @@ export class Game {
   // Al cruzar el umbral el jugador "quiere salir": otros equipos lo ofertan casi siempre en vez de la chance normal de genOffers().
   updateDiscontent(p) {
     if (p.teamId == null) { p.discontentStreak = 0; p.wantsOut = false; return; }
-    const underpaid = (p.contract?.salary ?? 0) < valueOf(p) * 0.7;
-    const unhappy = p.morale < 35 || underpaid;
+    const unhappy = p.morale < 35;
     p.discontentStreak = unhappy ? (p.discontentStreak || 0) + 1 : Math.max(0, (p.discontentStreak || 0) - 2);
     const was = p.wantsOut;
     p.wantsOut = p.discontentStreak >= 8;

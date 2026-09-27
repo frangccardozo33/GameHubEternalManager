@@ -188,8 +188,7 @@
         if (p.contract.endSeason > state.season) continue;
         const valued = p.overall >= TLM.avg(club.squad.map((x) => state.players[x].overall)) - 2 && p.age < 34;
         if (valued && hash01(club.id, p.id, state.season, 'renew') < 0.35 + pr.renew * 0.6) {
-          const demand = TLM.contractDemand(state, p, club, true);
-          if (TLM.canSpend(club, demand)) { const r = TLM.renewContract(state, club.id, p.id, demand, 2); if (r.ok) { out.push({ type: 'renew', playerId: p.id, clubId: club.id }); continue; } }
+          const r = TLM.renewContract(state, club.id, p.id, 2); if (r.ok) { out.push({ type: 'renew', playerId: p.id, clubId: club.id }); continue; }
         }
         out.push({ type: 'release', playerId: p.id, clubId: club.id });
       }

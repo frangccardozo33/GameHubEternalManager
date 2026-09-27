@@ -36,7 +36,7 @@
     if (rows && rows.length) {
       rows.forEach((e) => {
         const p = TLM.makeFromRoster(state, e, used);
-        TLM.moveToClub(state, p.id, club.id, { salary: TLM.salaryOf(p), endSeason: state.season + r.int(1, 4) });
+        TLM.moveToClub(state, p.id, club.id, { salary: 0, endSeason: state.season + r.int(1, 4) });
         p.morale = clamp(round(60 + r.gauss() * 6), 30, 90);
       });
       const cnt = (pos) => club.squad.filter((id) => state.players[id].primaryPosition === pos).length;
@@ -45,7 +45,7 @@
       const baseOvr = 40 + club.reputation * (club.foreign ? 0.59 : 0.4);
       need.forEach((pos) => {
         const p = TLM.makePlayer(state, { pos, ovr: baseOvr + r.gauss() * 3.6, age: clamp(round(26 + r.gauss() * 4), 18, 36), _used: used, nationHome: club.nation });
-        TLM.moveToClub(state, p.id, club.id, { salary: TLM.salaryOf(p), endSeason: state.season + r.int(1, 4) });
+        TLM.moveToClub(state, p.id, club.id, { salary: 0, endSeason: state.season + r.int(1, 4) });
       });
       return;
     }
@@ -57,7 +57,7 @@
       const starter = i % 2 === 0;
       const ovr = baseOvr + (starter ? 3 : -3) + r.gauss() * 3.6;
       const p = TLM.makePlayer(state, { pos, ovr, age: clamp(round(26 + r.gauss() * 4), 18, 36), _used: used, nationHome: club.nation });
-      TLM.moveToClub(state, p.id, club.id, { salary: TLM.salaryOf(p), endSeason: state.season + r.int(1, 4) });
+      TLM.moveToClub(state, p.id, club.id, { salary: 0, endSeason: state.season + r.int(1, 4) });
       p.morale = clamp(round(60 + r.gauss() * 6), 30, 90);
     });
     // Los clubes preexistentes del motor conservan los nombres de su once histórico (misma identidad, ahora con ID global).

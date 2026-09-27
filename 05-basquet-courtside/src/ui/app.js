@@ -108,20 +108,17 @@ function nextSeason() {
 function ask(text, yes, label = 'Confirmar') { modal(`<p style="font-size:13px;line-height:1.6;margin-top:0">${text}</p><div class="row"><button class="btn pri" data-act="confirm">${label}</button><button class="btn ghost" data-act="closeModal">Cancelar</button></div>`); ask.yes = yes; }
 
 // ---------- negociación ----------
-function negModal(msg = null, counter = null) {
-  const n = ui.neg, p = game.player(n.pid), renew = n.kind === 'renew', ev = game.evalOffer(p, n, renew);
-  const capWarn = '';
-  const mood = ev.status === 'accept' ? '<span class="pos">Dispuesto a firmar</span>' : ev.status === 'counter' ? '<span style="color:var(--warn)">Casi convencido: pide algo más</span>' : '<span class="neg">Muy lejos de lo que pide</span>';
+function negModal(msg = null) {
+  const n = ui.neg, p = game.player(n.pid), renew = n.kind === 'renew';
   modal(`<h3 style="margin-top:0">${renew ? 'Renovar a' : 'Ofertar a'} ${esc(p.name)}</h3><p class="muted" style="font-size:11px">${p.role} · ${p.age} años · OVR ${p.ovr} / POT ${p.pot}${renew ? ` · moral ${Math.round(p.morale)}` : ''}</p>
-    <div class="sl" style="grid-template-columns:90px 1fr 60px"><span>Salario</span><input type="range" min="0.5" max="45" step="0.1" value="${n.salary}" data-neg="salary"><output>${Number(n.salary).toFixed(1)} M€</output></div>
     <div class="sl" style="grid-template-columns:90px 1fr"><span>Años</span><select class="f" data-neg="years">${[1, 2, 3, 4, 5].map(y => `<option value="${y}"${y === n.years ? ' selected' : ''}>${y}${y === prefYears(p) ? ' (preferido)' : ''}</option>`).join('')}</select></div>
     <div class="sl" style="grid-template-columns:90px 1fr"><span>Rol</span><select class="f" data-neg="role">${Object.entries(TEAM_ROLES).map(([k, [l]]) => `<option value="${k}"${k === n.role ? ' selected' : ''}>${l}${k === autoRole(p) ? ' (esperado)' : ''}</option>`).join('')}</select></div>
-    <p style="font-size:12px;margin:12px 0">Para ese rol y duración pide <b>${ev.ask} M€</b> · ${mood}</p>${capWarn}${msg ? `<div class="hint warn">${esc(msg)}</div>` : ''}
-    <div class="row"><button class="btn pri" data-act="negSubmit">Ofrecer contrato</button>${counter ? `<button class="btn" data-act="negCounter" data-ask="${counter}">Ofrecer ${counter} M€</button>` : ''}<button class="btn ghost" data-act="closeModal">Cancelar</button></div>`);
+    ${msg ? `<div class="hint warn">${esc(msg)}</div>` : ''}
+    <div class="row"><button class="btn pri" data-act="negSubmit">${renew ? 'Renovar' : 'Fichar'}</button><button class="btn ghost" data-act="closeModal">Cancelar</button></div>`);
 }
 function negSubmit() {
-  const n = ui.neg, o = { salary: Number(n.salary), years: n.years, role: n.role }, r = n.kind === 'fa' ? game.signFreeAgent(n.pid, o) : game.renewPlayer(n.pid, o);
-  if (r.ok) { modal(''); toast(r.msg); save(); render(); } else negModal(r.msg, r.ask && r.ask <= 45 ? r.ask : null);
+  const n = ui.neg, o = { years: n.years, role: n.role }, r = n.kind === 'fa' ? game.signFreeAgent(n.pid, o) : game.renewPlayer(n.pid, o);
+  if (r.ok) { modal(''); toast(r.msg); save(); render(); } else negModal(r.msg);
 }
 
 // ---------- rotación ----------
@@ -152,9 +149,9 @@ const actions = {
   simPhase: () => ask(`Se simularán todas las jornadas hasta el final de ${game.s.phase === 'regular' ? 'la liga regular' : 'los playoffs'} usando tus tácticas actuales. ¿Continuar?`, simPhase, 'Simular'),
   closeModal: () => modal(''), confirm: () => { modal(''); ask.yes?.(); },
   leaveMatch: async () => { modal(''); busy('Simulando el resto del partido…'); await nextFrame(); const s = Match.finishInstantly(); const e = s.entry; const m = game.commit(e, s); Match.close(); busy(false); ui.pending = { mid: m.id }; save(); go('result', m.id); },
-  negOpen: d => { const p = game.player(d.id), renew = d.kind === 'renew'; ui.neg = { pid: d.id, kind: d.kind, salary: 1, years: prefYears(p), role: renew ? p.contract.role : autoRole(p) }; ui.neg.salary = game.evalOffer(p, ui.neg, renew).ask; negModal(); },
-  negSubmit, negCounter: d => { ui.neg.salary = Number(d.ask); negSubmit(); },
-  release: d => { const p = game.player(d.id), c = p.contract; ask(`¿Liberar a ${esc(p.name)}? Pagarás ${money(c.salary * 0.5)} durante ${Math.min(c.years, 3)} temporada(s) y perderás al jugador.`, () => { const r = game.releasePlayer(d.id); toast(r.msg); save(); render(); }, 'Liberar'); },
+  negOpen: d => { const p = game.player(d.id), renew = d.kind === 'renew'; ui.neg = { pid: d.id, kind: d.kind, years: prefYears(p), role: renew ? p.contract.role : autoRole(p) }; negModal(); },
+  negSubmit,
+  release: d => { const p = game.player(d.id); ask(`¿Liberar a ${esc(p.name)}? Perderás al jugador.`, () => { const r = game.releasePlayer(d.id); toast(r.msg); save(); render(); }, 'Liberar'); },
   equipCard: d => { const r = game.equipCard(game.s.userId, d.id, d.cid); toast(r.ok ? 'Carta equipada.' : r.reason); if (r.ok) { save(); keepScroll(render); } },
   unequipCard: d => { game.equipCard(game.s.userId, d.id, null); save(); keepScroll(render); },
   listCard: d => { const price = prompt('¿Por cuánto la vendés?'); if (!price) return; const r = game.listCard(game.s.userId, d.cid, +price); toast(r.ok ? 'Carta puesta en venta.' : r.reason); if (r.ok) { save(); keepScroll(render); } },
@@ -214,7 +211,7 @@ try {
         return { id: 'lbo-' + p.id, name: p.first && p.last ? `${p.first} ${p.last}` : p.name, number: p.num, pos: p.role, posName: POS_NAMES[p.role], ovr: p.ovr, age: p.age, skin: p.skin, portrait: '../' + (p.photo || PLACEHOLDER),
           team: t ? { id: t.id, name: t.name, short: t.short, primary: t.color, secondary: t.alt, crest: t.crest } : { id: 'libre', name: 'Agente libre', short: 'LIB', primary: '#5b6673', secondary: '#e8edf2' },
           nation: p.nat || window.LFONations.forPerson(p.id, t ? t.short : 'libre'), stats,
-          info: [['Altura', p.h.toFixed(2) + ' m'], ['Edad', p.age + ' años'], ['Potencial', p.pot], ['Contrato', p.contract ? p.contract.salary + ' M€ · ' + p.contract.years + ' años' : 'sin contrato']] };
+          info: [['Altura', p.h.toFixed(2) + ' m'], ['Edad', p.age + ' años'], ['Potencial', p.pot], ['Contrato', p.contract ? p.contract.years + ' años' : 'sin contrato']] };
       });
     },
   });

@@ -20,7 +20,7 @@ export function newgame({ g, ui, hasSave }) {
   const c = ui.cfg, sel = ui.newTeam ?? 0, pv = ui.preview;
   const order = pv ? [...pv.s.teams].sort((a, b) => pv.teamOvr(b) - pv.teamOvr(a)).map(t => t.id) : [];
   const cards = TEAM_POOL.slice(0, c.teams).map(([city, nick, short, color, , logo], i) => { const t = pv?.team(i), rank = order.indexOf(i) + 1;
-    return `<div class="teamcard ${i === sel ? 'sel' : ''}" data-act="pickTeam" data-id="${i}"><b>${crestDot({ crest: '../' + logo, color })}${esc(city)} ${esc(nick)}</b><small class="muted">${short}${t ? ` · OVR ${pv.teamOvr(t).toFixed(0)} · ${rank}.º de ${c.teams}` : ''}</small>${t ? `<small class="muted">Masa salarial ${pv.payroll(t).toFixed(0)} M€ · ${rank <= 2 ? '<span class="pos">Favorito</span>' : rank >= c.teams - 1 ? '<span class="neg">Proyecto</span>' : 'Competitivo'}</small>` : ''}</div>`; }).join('');
+    return `<div class="teamcard ${i === sel ? 'sel' : ''}" data-act="pickTeam" data-id="${i}"><b>${crestDot({ crest: '../' + logo, color })}${esc(city)} ${esc(nick)}</b><small class="muted">${short}${t ? ` · OVR ${pv.teamOvr(t).toFixed(0)} · ${rank}.º de ${c.teams}` : ''}</small>${t ? `<small class="muted">${rank <= 2 ? '<span class="pos">Favorito</span>' : rank >= c.teams - 1 ? '<span class="neg">Proyecto</span>' : 'Competitivo'}</small>` : ''}</div>`; }).join('');
   return `<h1>Basketball Manager<span>.</span></h1><p class="sub">Gestión de plantilla, tácticas y temporada, con partidos en 3D.</p>
   <div class="grid g21"><div class="panel"><h3>1 · Elige tu equipo <button class="btn ghost sm" data-act="regen">Regenerar liga</button></h3><div class="grid g4">${cards}</div>
     <div class="hint">La liga se genera aleatoriamente: hay favoritos y proyectos. Un OVR más alto significa una plantilla mejor; los proyectos son más difíciles pero más agradecidos.</div></div>
@@ -56,7 +56,7 @@ export function dashboard({ g, ui }) {
   }
   const skip = s.phase !== 'offseason' ? `<div class="row" style="margin-top:12px"><button class="btn ghost sm" data-act="simDay">Simular solo esta jornada (sin jugar)</button><button class="btn ghost sm" data-act="simPhase">Simular hasta el final de ${s.phase === 'regular' ? 'la liga regular' : 'los playoffs'}</button></div>` : '';
   const top = [...ps].filter(p => p.st.gp).sort((a, b) => b.st.pts / b.st.gp - a.st.pts / a.st.gp).slice(0, 4);
-  const tired = ps.filter(p => p.cond < 60).length, unhappy = ps.filter(p => p.morale < 45).length, payroll = g.payroll(u);
+  const tired = ps.filter(p => p.cond < 60).length, unhappy = ps.filter(p => p.morale < 45).length;
   const hints = [];
   const hurt = ps.filter(p => p.inj);
   if (hurt.length) hints.push(`<div class="hint warn">Lesionados: ${hurt.map(p => `${esc(p.name)} (${p.inj.games} PJ)`).join(', ')}.</div>`);
@@ -64,8 +64,7 @@ export function dashboard({ g, ui }) {
   if (unhappy) hints.push(`<div class="hint warn">${unhappy} jugador(es) con la moral baja. Revisa los minutos y su rol.</div>`);
   const wantOut = ps.filter(p => p.wantsOut);
   if (wantOut.length) hints.push(`<div class="hint bad">${wantOut.length} jugador(es) piden que los transfieran: ${wantOut.map(p => esc(p.name)).join(', ')}.</div>`);
-  if (g.fin.cash < 0) hints.push('<div class="hint warn">La caja está en negativo: no puedes fichar hasta recuperarla. Revisa gastos en Finanzas.</div>');
-  if (ps.length < LIM.min) hints.push(`<div class="hint warn">Tienes ${ps.length} jugadores: necesitas ${LIM.min} para jugar. Se fichará a mínimos automáticamente si no actúas.</div>`);
+  if (ps.length < LIM.min) hints.push(`<div class="hint warn">Tienes ${ps.length} jugadores: necesitas ${LIM.min} para jugar. Se fichará automáticamente si no actúas.</div>`);
   if (ps.length > LIM.max) hints.push(`<div class="hint warn">Plantilla de ${ps.length}: el máximo es ${LIM.max}. Al empezar la temporada se liberará a los peores.</div>`);
   if (s.phase === 'offseason' && ps.some(p => p.contract.years <= 1)) hints.push('<div class="hint warn">Hay contratos que expiran: si no los renuevas, los jugadores se marcharán al empezar la temporada.</div>');
   if (u.chem < 50) hints.push('<div class="hint">La química es baja: mantener el mismo quinteto varios partidos la mejora.</div>');
@@ -92,14 +91,14 @@ export function roster({ g, ui }) {
     { k: 'role', label: 'Pos', val: p => ROLES.indexOf(p.role), html: p => p.role }, { k: 'age', label: 'Edad', val: p => p.age, html: p => p.age },
     { k: 'ovr', label: 'OVR', val: p => p.ovr, html: p => `<b style="color:${ovrColor(p.ovr)}">${p.ovr}</b>` }, { k: 'pot', label: 'POT', val: p => p.pot, html: p => p.pot },
     { k: 'form', label: 'Forma', val: p => p.form, html: p => meter(p.form) }, { k: 'cond', label: 'Cond.', val: p => p.cond, html: p => meter(p.cond) }, { k: 'mor', label: 'Moral', val: p => p.morale, html: p => meter(p.morale) },
-    { k: 'crole', label: 'Rol', val: p => p.contract?.role ?? '', html: p => TEAM_ROLES[p.contract?.role]?.[0] ?? '-' }, { k: 'sal', label: 'Salario', val: p => p.contract?.salary ?? 0, html: p => money(p.contract?.salary ?? 0) }, { k: 'yrs', label: 'Años', val: p => p.contract?.years ?? 0, html: p => p.contract?.years ?? '-' },
+    { k: 'crole', label: 'Rol', val: p => p.contract?.role ?? '', html: p => TEAM_ROLES[p.contract?.role]?.[0] ?? '-' }, { k: 'yrs', label: 'Años', val: p => p.contract?.years ?? 0, html: p => p.contract?.years ?? '-' },
     { k: 'gp', label: 'PJ', val: p => p.st.gp, html: p => p.st.gp }, { k: 'min', label: 'MIN', val: p => pg(p.st, 'min'), html: p => fmt(pg(p.st, 'min')) }, { k: 'pts', label: 'PTS', val: p => pg(p.st, 'pts'), html: p => fmt(pg(p.st, 'pts')) }, { k: 'reb', label: 'REB', val: p => pg(p.st, 'reb'), html: p => fmt(pg(p.st, 'reb')) }, { k: 'ast', label: 'AST', val: p => pg(p.st, 'ast'), html: p => fmt(pg(p.st, 'ast')) },
   ];
   const sort = ui.sort.roster ?? { k: 'ovr', dir: 'desc' }; const sorted = { roster: sort };
   const depth = ROLES.map(r => { const l = ps.filter(p => p.role === r).sort((a, b) => b.ovr - a.ovr); return `<div class="row spread" style="padding:6px 0;border-bottom:1px solid #26343a;font-size:11px"><b>${r} <span class="muted">${POS_NAMES[r]}</span></b><span>${l.slice(0, 3).map(p => `${esc(p.name)} <b style="color:${ovrColor(p.ovr)}">${p.ovr}</b>`).join(' · ') || '<span class="neg">Sin jugadores</span>'}</span></div>`; }).join('');
   const bench = ps.filter(p => !starters.has(p.id)).sort((a, b) => b.ovr - a.ovr).slice(0, 5), depthScore = bench.reduce((a, p) => a + p.ovr, 0) / Math.max(1, bench.length);
   const avgM = ps.reduce((a, p) => a + p.morale, 0) / ps.length;
-  return `<h1>Plantilla<span>.</span></h1><p class="sub">${ps.length} jugadores · masa salarial ${money(g.payroll(u))} · ★ titular · “–” no convocado para el partido</p>
+  return `<h1>Plantilla<span>.</span></h1><p class="sub">${ps.length} jugadores · ★ titular · “–” no convocado para el partido</p>
   <div class="panel">${table(cols, ps, { sort: sorted, key: 'roster', meId: null })}</div>
   <div class="grid g3" style="margin-top:16px"><div class="panel"><h3>Profundidad por posición</h3>${depth}</div>
   <div class="panel"><h3>Química y moral</h3><div class="grid g2"><div class="kpi"><small>Química</small><b>${u.chem}</b></div><div class="kpi"><small>Moral media</small><b>${Math.round(avgM)}</b></div><div class="kpi"><small>Profundidad (banca)</small><b>${depthScore.toFixed(0)}</b></div><div class="kpi"><small>Quinteto igual</small><b>${u.streak + 1} p.</b></div></div>
@@ -137,7 +136,7 @@ export function player({ g, ui }) {
   <div style="margin:10px 0 18px">${PLAYER_TAGS(p).map(t => pill(t, 'pri')).join('')}</div>
   <div class="grid g3"><div class="panel"><h3>Atributos</h3>${radar(p.a)}${attrBars(p.a)}</div>
   <div class="grid" style="align-content:start"><div class="panel"><h3>Fortalezas</h3>${strengths}</div><div class="panel"><h3>Debilidades</h3>${weak}</div>
-    <div class="panel"><h3>Contrato</h3>${c ? `<div class="grid g2"><div class="kpi"><small>Salario</small><b>${money(c.salary)}</b></div><div class="kpi"><small>Años</small><b>${c.years}</b></div></div><p style="font-size:11px">Rol: <b>${TEAM_ROLES[c.role]?.[0] ?? '-'}</b>${c.bonus ? ` · Bonus ${money(c.bonus)}` : ''}</p><div class="row">${mine && c.years <= 1 ? `<button class="btn sm pri" data-act="negOpen" data-kind="renew" data-id="${p.id}">Renovar</button>` : ''}${mine ? `<button class="btn sm ghost" data-act="release" data-id="${p.id}">Liberar</button>` : ''}</div>` : `<p class="muted" style="font-size:11px">Sin contrato.</p>${g.s.fa.includes(p.id) ? `<button class="btn sm pri" data-act="negOpen" data-kind="fa" data-id="${p.id}">Ofertar contrato</button>` : ''}`}</div>
+    <div class="panel"><h3>Contrato</h3>${c ? `<div class="grid g2"><div class="kpi"><small>Años</small><b>${c.years}</b></div></div><p style="font-size:11px">Rol: <b>${TEAM_ROLES[c.role]?.[0] ?? '-'}</b></p><div class="row">${mine && c.years <= 1 ? `<button class="btn sm pri" data-act="negOpen" data-kind="renew" data-id="${p.id}">Renovar</button>` : ''}${mine ? `<button class="btn sm ghost" data-act="release" data-id="${p.id}">Liberar</button>` : ''}</div>` : `<p class="muted" style="font-size:11px">Sin contrato.</p>${g.s.fa.includes(p.id) ? `<button class="btn sm pri" data-act="negOpen" data-kind="fa" data-id="${p.id}">Fichar</button>` : ''}`}</div>
     ${cardsPanel(g, p)}</div>
   <div class="grid" style="align-content:start"><div class="panel"><h3>Tendencias</h3>${tend.length ? tend.map(([k, v]) => `<div class="row spread" style="padding:5px 0;border-bottom:1px solid #26343a;font-size:11px"><span>${k}</span><b>${v}</b></div>`).join('') : '<p class="muted" style="font-size:11px">Sin partidos jugados esta temporada.</p>'}</div>
     <div class="panel"><h3>Evolución</h3>${lineChart(evo.map(e => ({ s: e.s, ovr: e.ovr, pot: e.pot })))}</div>${mine ? `<div class="panel"><h3>Prioridad de balón</h3><select class="f" data-act="setUsage" data-id="${p.id}">${Object.entries(USAGE).map(([k, [l]]) => `<option value="${k}"${(g.user.usage[p.id] ?? 'normal') === k ? ' selected' : ''}>${l}</option>`).join('')}</select></div>` : ''}</div></div>
@@ -300,43 +299,40 @@ export function result({ g, ui }) {
 
 // ================= TRAMO B: contratos, mercado, scouting y draft =================
 const roleOpts = cur => Object.entries(TEAM_ROLES).map(([k, [l]]) => `<option value="${k}"${k === cur ? ' selected' : ''}>${l}</option>`).join('');
-const capBar = (g) => `<small class="muted">${g.payroll(g.user).toFixed(1)} M€ en salarios</small>`;
 
 export function contracts({ g, ui }) {
-  const u = g.user, ps = g.roster(u), off = g.s.phase === 'offseason', dead = u.dead ?? [];
+  const u = g.user, ps = g.roster(u), off = g.s.phase === 'offseason';
   const cols = [{ k: 'n', label: 'Jugador', l: true, val: p => p.name, html: p => link('player', p.id, p.name) }, { k: 'pos', label: 'Pos', val: p => ROLES.indexOf(p.role), html: p => p.role }, { k: 'age', label: 'Edad', val: p => p.age, html: p => p.age }, { k: 'ovr', label: 'OVR', val: p => p.ovr, html: p => `<b style="color:${ovrColor(p.ovr)}">${p.ovr}</b>` }, { k: 'pot', label: 'POT', val: p => p.pot, html: p => p.pot },
-    { k: 'sal', label: 'Salario', val: p => p.contract.salary, html: p => money(p.contract.salary) }, { k: 'val', label: 'Valor mercado', val: p => valueOf(p), html: p => `<span class="${valueOf(p) > p.contract.salary * 1.15 ? 'pos' : valueOf(p) < p.contract.salary * 0.85 ? 'neg' : ''}">${money(valueOf(p))}</span>` },
+    { k: 'val', label: 'Valor mercado', val: p => valueOf(p), html: p => money(valueOf(p)) },
     { k: 'yrs', label: 'Años', val: p => p.contract.years, html: p => p.contract.years <= 1 ? pill(off ? 'Expira' : 'Último año', 'warn') : p.contract.years }, { k: 'role', label: 'Rol', val: p => p.contract.role, html: p => TEAM_ROLES[p.contract.role][0] }, { k: 'mor', label: 'Moral', val: p => p.morale, html: p => meter(p.morale) },
     { k: 'act', label: '', html: p => `${p.contract.years <= 1 ? `<button class="btn sm pri" data-act="negOpen" data-kind="renew" data-id="${p.id}">Renovar</button> ` : ''}<button class="btn sm ghost" data-act="release" data-id="${p.id}">Liberar</button>` }];
   const expiring = ps.filter(p => p.contract.years <= 1).length;
-  return `<h1>Contratos<span>.</span></h1><p class="sub">Plantilla ${ps.length}/${LIM.max} (mínimo ${LIM.min})</p>
-  <div class="grid g3"><div class="panel"><h3>Masa salarial</h3>${capBar(g)}</div><div class="panel"><h3>Contratos por renovar</h3><div class="kpi"><b>${expiring}</b><small>${off ? 'expiran al empezar la temporada' : 'en su último año'}</small></div></div>
-  <div class="panel"><h3>Indemnizaciones pendientes</h3>${dead.length ? dead.map(d => `<div class="row spread" style="font-size:11px;padding:4px 0"><span>${esc(d.name)}</span><span>${money(d.amt)} · ${d.years} temp.</span></div>`).join('') : '<p class="muted" style="font-size:11px">Ninguna.</p>'}</div></div>
+  return `<h1>Contratos<span>.</span></h1><p class="sub">Plantilla ${ps.length}/${LIM.max} (mínimo ${LIM.min}) · este juego no tiene salarios ni tope salarial</p>
+  <div class="panel"><h3>Contratos por renovar</h3><div class="kpi"><b>${expiring}</b><small>${off ? 'expiran al empezar la temporada' : 'en su último año'}</small></div></div>
   <div class="panel" style="margin-top:16px">${table(cols, ps, { sort: ui.sort, key: 'contracts' })}
-  <div class="hint">Renovar solo es posible con 1 año restante. Los jugadores descontentos piden más y los que no ven cumplido su rol se enfadan. Liberar cuesta el 50 % del salario durante los años que queden (máx. 3).</div></div>`;
+  <div class="hint">Renovar solo es posible con 1 año restante. Los jugadores descontentos piden salir si su moral está baja o al club le va mal por mucho tiempo.</div></div>`;
 }
 
 export function market({ g, ui }) {
   const tab = ui.tab.market ?? 'fa', u = g.user;
-  const head = `<h1>Mercado<span>.</span></h1><p class="sub">Plantilla ${u.roster.length}/${LIM.max} · nómina ${g.payroll(u).toFixed(1)} M€</p>${tabs([['fa', 'Agentes libres'], ['trade', 'Traspasos'], ['offers', `Ofertas${(g.s.offers || []).length ? ' (' + g.s.offers.length + ')' : ''}`]], tab, 'market')}`;
+  const head = `<h1>Mercado<span>.</span></h1><p class="sub">Plantilla ${u.roster.length}/${LIM.max}</p>${tabs([['fa', 'Agentes libres'], ['trade', 'Traspasos'], ['offers', `Ofertas${(g.s.offers || []).length ? ' (' + g.s.offers.length + ')' : ''}`]], tab, 'market')}`;
   if (tab === 'offers') {
     const offs = g.s.offers || [];
-    return head + `<div class="panel"><h3>Ofertas por tus jugadores</h3>${offs.length ? offs.map(o => { const t = g.team(o.teamId), me = g.player(o.give), he = g.player(o.get); return `<div class="row spread" style="padding:9px 0;border-bottom:1px solid #26343a;font-size:11px"><span><b>${esc(t.name)}</b> ofrece a <b>${esc(he.name)}</b> (${he.role} · OVR ${he.ovr} · ${money(he.contract.salary)}) por <b>${esc(me.name)}</b> (${me.role} · OVR ${me.ovr} · ${money(me.contract.salary)})<br><span class="muted">Vence en ${Math.max(0, o.exp - g.s.day)} jornada(s)</span></span><span><button class="btn sm pri" data-act="offerYes" data-id="${o.id}">Aceptar</button> <button class="btn sm ghost" data-act="offerNo" data-id="${o.id}">Rechazar</button></span></div>`; }).join('') : '<p class="muted" style="font-size:11px">No hay ofertas por ahora. Los equipos de la IA proponen traspasos durante la temporada.</p>'}</div>`;
+    return head + `<div class="panel"><h3>Ofertas por tus jugadores</h3>${offs.length ? offs.map(o => { const t = g.team(o.teamId), me = g.player(o.give), he = g.player(o.get); return `<div class="row spread" style="padding:9px 0;border-bottom:1px solid #26343a;font-size:11px"><span><b>${esc(t.name)}</b> ofrece a <b>${esc(he.name)}</b> (${he.role} · OVR ${he.ovr}) por <b>${esc(me.name)}</b> (${me.role} · OVR ${me.ovr})<br><span class="muted">Vence en ${Math.max(0, o.exp - g.s.day)} jornada(s)</span></span><span><button class="btn sm pri" data-act="offerYes" data-id="${o.id}">Aceptar</button> <button class="btn sm ghost" data-act="offerNo" data-id="${o.id}">Rechazar</button></span></div>`; }).join('') : '<p class="muted" style="font-size:11px">No hay ofertas por ahora. Los equipos de la IA proponen traspasos durante la temporada.</p>'}</div>`;
   }
   if (tab === 'fa') {
     const pos = ui.tab.faPos ?? 'ALL', list = g.s.fa.map(id => g.player(id)).filter(p => !p.retired && (pos === 'ALL' || p.role === pos));
     const cols = [{ k: 'n', label: 'Jugador', l: true, val: p => p.name, html: p => `${link('player', p.id, p.name)} ${PLAYER_TAGS(p).slice(0, 2).map(t => pill(t)).join('')}` }, { k: 'pos', label: 'Pos', val: p => ROLES.indexOf(p.role), html: p => p.role }, { k: 'age', label: 'Edad', val: p => p.age, html: p => p.age }, { k: 'ovr', label: 'OVR', val: p => p.ovr, html: p => `<b style="color:${ovrColor(p.ovr)}">${p.ovr}</b>` }, { k: 'pot', label: 'POT', val: p => p.pot, html: p => p.pot },
-      { k: 'ask', label: 'Pide (aprox.)', val: p => g.askFor(p), html: p => `${money(g.askFor(p))} · ${prefYears(p)} a.` }, { k: 'act', label: '', html: p => `<button class="btn sm pri" data-act="negOpen" data-kind="fa" data-id="${p.id}">Ofertar</button>` }];
+      { k: 'act', label: '', html: p => `<button class="btn sm pri" data-act="negOpen" data-kind="fa" data-id="${p.id}">Fichar</button>` }];
     return head + `<div class="row" style="margin-bottom:12px">${['ALL', ...ROLES].map(r => `<button class="btn sm ${r === pos ? 'pri' : 'ghost'}" data-set="faPos:${r}">${r === 'ALL' ? 'Todos' : r}</button>`).join('')}</div>
-      <div class="panel">${table(cols, list, { sort: { fa: ui.sort.fa ?? { k: 'ovr', dir: 'desc' } }, key: 'fa' })}<div class="hint">Con la caja en negativo no puedes fichar. El precio depende del valor del jugador, del rol que le ofrezcas y de los años. Los agentes libres se muestran con sus atributos reales; solo los prospectos del draft tienen incertidumbre.</div></div>`;
+      <div class="panel">${table(cols, list, { sort: { fa: ui.sort.fa ?? { k: 'ovr', dir: 'desc' } }, key: 'fa' })}<div class="hint">Fichar es gratis: no hay salarios. Solo elegís rol y duración del contrato. Los agentes libres se muestran con sus atributos reales; solo los prospectos del draft tienen incertidumbre.</div></div>`;
   }
   const others = g.s.teams.filter(t => t.id !== u.id), T = ui.trade ??= { team: others[0].id, mine: [], theirs: [], res: null }, tm = g.team(T.team);
-  const sal = ids => ids.reduce((a, id) => a + g.player(id).contract.salary, 0), row = (p, side) => `<label class="row spread" style="padding:6px 0;border-bottom:1px solid #26343a;font-size:11px;cursor:pointer"><span><input type="checkbox" data-act="tradeToggle" data-side="${side}" data-id="${p.id}" ${T[side].includes(p.id) ? 'checked' : ''}> ${esc(p.name)} <span class="muted">${p.role} · ${p.age}a</span></span><span><b style="color:${ovrColor(p.ovr)}">${p.ovr}</b>/${p.pot} · ${money(p.contract.salary)} · ${p.contract.years}a</span></label>`;
-  const outU = sal(T.mine), inU = sal(T.theirs), after = g.payroll(u) - outU + inU;
+  const row = (p, side) => `<label class="row spread" style="padding:6px 0;border-bottom:1px solid #26343a;font-size:11px;cursor:pointer"><span><input type="checkbox" data-act="tradeToggle" data-side="${side}" data-id="${p.id}" ${T[side].includes(p.id) ? 'checked' : ''}> ${esc(p.name)} <span class="muted">${p.role} · ${p.age}a</span></span><span><b style="color:${ovrColor(p.ovr)}">${p.ovr}</b>/${p.pot} · ${p.contract.years}a</span></label>`;
   return head + `<div class="panel"><h3>Traspaso con <select class="f" data-act="tradeTeam">${others.map(t => `<option value="${t.id}"${t.id === T.team ? ' selected' : ''}>${esc(t.name)} · OVR ${g.teamOvr(t).toFixed(0)}</option>`).join('')}</select></h3>
     <div class="grid g2"><div><div class="panel-title">Tú envías</div>${g.roster(u).sort((a, b) => b.ovr - a.ovr).map(p => row(p, 'mine')).join('')}</div><div><div class="panel-title">Tú recibes</div>${g.roster(tm).sort((a, b) => b.ovr - a.ovr).map(p => row(p, 'theirs')).join('')}</div></div>
-    <div class="row spread" style="margin-top:14px"><span style="font-size:11px">Sales ${money(outU)} · entran ${money(inU)} · nómina resultante <b>${after.toFixed(1)} M€</b> · plantilla ${u.roster.length - T.mine.length + T.theirs.length}/${LIM.max}</span><button class="btn pri" data-act="tradePropose">Proponer traspaso</button></div>
-    ${T.res ? `<div class="hint ${T.res.ok ? '' : 'warn'}">${esc(T.res.msg)}</div>` : ''}<div class="hint">La IA valora edad, OVR, potencial y contrato. No cedas a su jugador franquicia sin ofrecer mucho más.</div></div>`;
+    <div class="row spread" style="margin-top:14px"><span style="font-size:11px">Plantilla resultante ${u.roster.length - T.mine.length + T.theirs.length}/${LIM.max}</span><button class="btn pri" data-act="tradePropose">Proponer traspaso</button></div>
+    ${T.res ? `<div class="hint ${T.res.ok ? '' : 'warn'}">${esc(T.res.msg)}</div>` : ''}<div class="hint">La IA valora edad, OVR y potencial. No cedas a su jugador franquicia sin ofrecer mucho más.</div></div>`;
 }
 
 export function scouting({ g, ui }) {

@@ -163,7 +163,6 @@
         p.fitness = 100; p.form = 50; p.suspension = 0; p.yellowAccum = 0; p.card.year = s.season + 1;
         if (p.injury) p.injury.matchdays = Math.max(0, p.injury.matchdays - 6), p.injury.matchdays <= 0 && (p.injury = null);
         if (p.age >= 37 || (p.age >= 34 && p.overall < 55 && !p.clubId)) { p.retired = true; if (p.clubId) TLM.moveToClub(s, p.id, null); s.market.freeAgents = s.market.freeAgents.filter((x) => x !== p.id); delete s.market.listings[p.id]; }
-        if (!p.retired) { p.salary = p.clubId ? p.contract.salary : TLM.salaryOf(p); }
       }
       // nueva generación: cantera para los clubes IA + agentes libres
       this._youthIntake();
@@ -191,8 +190,8 @@
           const pos = r.pick(TLM.SQUAD_TEMPLATE);
           const p = TLM.makePlayer(s, { pos, ovr: clamp(40 + c.reputation * 0.15 + r.gauss() * 4, 38, 62), age: r.int(17, 19), _used: used, nationHome: c.nation });
           p.potential = clamp(p.overall + r.int(12, 30), p.overall, 90);
-          TLM.recalc(p); p.salary = TLM.salaryOf(p);
-          TLM.moveToClub(s, p.id, c.id, { salary: p.salary, endSeason: s.season + 3 });
+          TLM.recalc(p);
+          TLM.moveToClub(s, p.id, c.id, { salary: 0, endSeason: s.season + 3 });
         }
         while (c.squad.length > 27) { const w = c.squad.map((id) => s.players[id]).sort((a, b) => (a.overall + a.potential * 0.3) - (b.overall + b.potential * 0.3))[0]; TLM.moveToClub(s, w.id, null); s.market.freeAgents.push(w.id); }
       }
