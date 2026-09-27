@@ -46,8 +46,15 @@ export class ChatDO extends DurableObject {
     return out;
   }
 
+  // Anuncio de sistema al chat global (usado por el casino para las victorias grandes): no requiere WebSocket propio.
+  async announce(text) {
+    const text2 = str(String(text || ''), MAX_TEXT); if (!text2) return;
+    this.broadcast({ t: 'msg', id: 'sys' + Date.now() + Math.random().toString(36).slice(2, 8), ch: 'global', from: { id: 'bot:casino', name: 'Aurum Casino', avatar: 'classic' }, kind: 'text', text: text2, ts: Date.now() });
+  }
+
   async fetch(req) {
     const url = new URL(req.url), path = url.pathname.slice(1);
+    if (path === 'announce' && req.method === 'POST') { const { text } = await req.json().catch(() => ({})); await this.announce(text); return json({ ok: true }); }
     if (path !== 'ws') return json({ error: 'not-found' }, 404);
     if (req.headers.get('upgrade') !== 'websocket') return json({ error: 'ws' }, 426);
     const uid = req.headers.get('x-uid'), name = req.headers.get('x-name') || 'Jugador';

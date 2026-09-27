@@ -1,6 +1,7 @@
 import { LeagueDO } from './league-do.js';
 import { ChatDO } from './chat-do.js';
-export { LeagueDO, ChatDO };
+import { CasinoDO } from './casino-do.js';
+export { LeagueDO, ChatDO, CasinoDO };
 
 const enc = new TextEncoder();
 const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -94,11 +95,16 @@ export default {
     }
     if (!uid) return json({ error: 'no-session' }, 401);
 
-    if (url.pathname === '/api/chat/ws') {
+    if (url.pathname === '/api/casino/leaderboard' && req.method === 'GET') {
+      const stub = env.CASINO.get(env.CASINO.idFromName('global'));
+      return stub.fetch('https://do/leaderboard');
+    }
+    if (url.pathname === '/api/chat/ws' || url.pathname === '/api/casino/ws') {
       if (req.headers.get('upgrade') !== 'websocket') return json({ error: 'ws' }, 426);
       if (!(env.APP_ORIGIN || '').split(',').map((x) => x.trim()).includes(req.headers.get('origin'))) return json({ error: 'origin' }, 403);
       const u = await env.DB.prepare('SELECT name FROM users WHERE id=?').bind(uid).first();
-      const stub = env.CHAT.get(env.CHAT.idFromName('global'));
+      const binding = url.pathname === '/api/chat/ws' ? env.CHAT : env.CASINO;
+      const stub = binding.get(binding.idFromName('global'));
       const h = new Headers(req.headers); h.set('x-uid', uid); h.set('x-name', (u && u.name) || 'Jugador');
       return stub.fetch(new Request('https://do/ws', { method: 'GET', headers: h }));
     }

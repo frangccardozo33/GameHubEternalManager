@@ -14,6 +14,10 @@ class_name = "LeagueDO"
 name = "CHAT"
 class_name = "ChatDO"
 
+[[durable_objects.bindings]]
+name = "CASINO"
+class_name = "CasinoDO"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["LeagueDO"]
@@ -21,6 +25,10 @@ new_sqlite_classes = ["LeagueDO"]
 [[migrations]]
 tag = "v2"
 new_sqlite_classes = ["ChatDO"]
+
+[[migrations]]
+tag = "v3"
+new_sqlite_classes = ["CasinoDO"]
 
 [[d1_databases]]
 binding = "DB"
