@@ -24,7 +24,7 @@ export class LeagueDO extends DurableObject {
     this.mod = MODS[this.meta.module];
     const keys = [...Array(this.meta.chunks)].map((_, i) => 'lg' + i), m = await s.get(keys);
     this.league = this.mod.load(keys.map((k) => m.get(k)).join(''));
-    if (this.mod.setHumans) this.mod.setHumans(this.league, Object.keys(this.meta.clubs || {}));
+    if (this.mod.setHumans) this.mod.setHumans(this.league, Object.keys(this.meta.clubs || {}), this.meta.clubs || {});
   }
   async save() {
     const txt = this.mod.serialize(this.league), n = Math.ceil(txt.length / CHUNK), o = {};
@@ -90,6 +90,12 @@ export class LeagueDO extends DurableObject {
   async tick() {
     if (!this.league) return;
     const now = Date.now();
+    if (this.mod.tickWorld) { // módulos sin partidos (música): el mundo avanza solo con el reloj real
+      const w = this.mod.tickWorld(this.league, now, this.meta);
+      if (w.changed) { this.meta.rev = (this.meta.rev || 0) + 1; await this.save(); }
+      const next = this.mod.nextWorldAt(this.league, now, this.meta); if (next) await this.ctx.storage.setAlarm(next);
+      return;
+    }
     this.ensureLive(now);
     const rd = this.mod.round(this.league);
     if (rd && rd.type === 'draft' && this.mod.tickLeague) { // draft online: sin partidos, turnos con reloj
@@ -130,6 +136,7 @@ export class LeagueDO extends DurableObject {
   async reschedule() {
     if (!this.league) return;
     const now = Date.now(), r = this.mod.round(this.league);
+    if (this.mod.nextWorldAt) { const next = this.mod.nextWorldAt(this.league, now, this.meta); if (next) await this.ctx.storage.setAlarm(next); return; }
     if (!r) return;
     const c = this.cur(), openAt = c ? c.openAt : this.plannedStart();
     await this.ctx.storage.setAlarm(this.live.size || now >= openAt ? now + ALARM_LIVE_MS : openAt);
@@ -143,6 +150,7 @@ export class LeagueDO extends DurableObject {
   }
   async fetch(req) {
     await this.ready;
+    if (this.league && this.mod.tickWorld) await this.tick();   // mundo que corre solo (música): se pone al día en cada pedido
     const url = new URL(req.url), path = url.pathname.slice(1);
     const uid = req.headers.get('x-uid'), club = req.headers.get('x-club') || '';
     if (path === 'init' && req.method === 'POST') {
@@ -160,7 +168,7 @@ export class LeagueDO extends DurableObject {
     if (path === 'state') return json(this.publicState());
     if (path === 'humans' && req.method === 'POST') {
       this.meta.clubs = await req.json();
-      if (this.mod.setHumans) { this.mod.setHumans(this.league, Object.keys(this.meta.clubs)); this.meta.rev = (this.meta.rev || 0) + 1; await this.save(); } else await this.saveMeta();
+      if (this.mod.setHumans) { this.mod.setHumans(this.league, Object.keys(this.meta.clubs), this.meta.clubs); this.meta.rev = (this.meta.rev || 0) + 1; await this.save(); } else await this.saveMeta();
       return json({ ok: true });
     }
     // ---- gestión del club (mercado, plantel, tácticas previas): el cliente trabaja sobre una copia y manda órdenes que el servidor valida y aplica

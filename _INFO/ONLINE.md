@@ -34,6 +34,9 @@ Hora de Argentina (UTC-3). Una jornada por día; los partidos de la jornada van 
 
 Copas, playoffs y torneos usan el mismo horario: cada ronda es una jornada más (si un día toca copa, la liga se corre al día siguiente). En fútbol todas las rondas de La Cupidité se juegan en vivo. El once/plan/estrategia de un DT se cierra cuando se abre la transmisión de *su* partido. Prueba: `node server/tools/schedule-check.mjs`.
 
+## Música (Nocturne Records) — mundo que corre solo
+Sin partidos ni jornadas: cada DT dirige un **sello** en un mundo compartido (hasta 16). El servidor pasa los días solo: **1 día de juego = 1 hora real**, temporada de **100 días** (≈ 4 días y 4 horas), desde la fecha de inicio de la liga. No hay pausa ni botón de pasar el día. Todos los sellos y los NPC de la industria compiten en el mismo chart; los temas de los demás aparecen en tu chart, y hay una pantalla **Ranking de sellos** (streams, ingresos, top 100). Las decisiones (filtraciones, dramas, remix) ya no frenan el reloj: tienen 3 días de juego y, si no respondés, decide tu equipo con la opción por defecto. La lógica es la del juego original (`server/src/vendor/musica-core.js`, generado con `node server/tools/build-musica.mjs`); la página es `02-musica/musica-online.html` (`python -X utf8 02-musica/gen-online.py`). Prueba: `node server/tools/musica-check.mjs`.
+
 ## Regenerar lo generado
 | Qué | Comando |
 |---|---|
