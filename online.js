@@ -4,7 +4,7 @@
   const MODS = { futbol: 'Fútbol (LFO)', mma: 'Lucha (LLO)', basquet: 'Básquet (LBO)', nfl: 'NFL (LGO)', carreras: 'Carreras (LRO)' };
   let me = null, leagues = [], msg = '', busy = false, cur = null, st = null, poll = null;
   const LIVE = { nfl: '06-nfl-gridiron/dist-live/live.html', basquet: '05-basquet-courtside/courtside-live.html', futbol: '01-futbol/fulbo-live.html', mma: '04-mma/mma-live.html', carreras: '07-carreras-apex/lro-live.html' };
-  const MANAGE = { futbol: '01-futbol/fulbo.html', basquet: '05-basquet-courtside/courtside-manager.html', nfl: '06-nfl-gridiron/dist-mgr/mgr.html' };
+  const MANAGE = { futbol: '01-futbol/fulbo.html', basquet: '05-basquet-courtside/courtside-manager.html', nfl: '06-nfl-gridiron/dist-mgr/mgr.html', carreras: '07-carreras-apex/lro-manager.html' };
   const READY = ['nfl', 'basquet', 'futbol', 'mma', 'carreras'];
 
   const $ = (id) => document.getElementById(id);

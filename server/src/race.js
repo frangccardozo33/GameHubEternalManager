@@ -2,6 +2,7 @@
 // carrera en vivo por "lockstep" con el motor de engine.js empaquetado por server/tools/build-race.mjs. Una fecha = una carrera.
 import { makeRace } from './vendor/race-core.js';
 import { Lockstep, cleanAction, snapOf, LEAD_STEPS } from '../../07-carreras-apex/online/lockstep.mjs';
+import { setHumans, exportState, command, afterRound } from './race-manage.js';
 
 const hex = (n) => '#' + (n >>> 0).toString(16).padStart(6, '0');
 const pub = (t) => ({ id: String(t.id), name: t.name, short: t.name.split(' ')[0].slice(0, 3).toUpperCase(), city: '', mascot: t.name, color: hex(t.color), dark: hex(t.color), crest: t.logo ? 'assets/logos/racing/' + t.logo : '' });
@@ -65,7 +66,7 @@ export const carreras = {
   id: 'carreras',
   create(seed) {
     const career = data().newCareer(); career.teams.forEach((t) => { t.isPlayer = false; t.parts = null; });
-    return { v: 1, seed, career, done: [], last: null };
+    return { v: 1, seed, career, done: [], last: null, humans: [], tradeProps: [] };
   },
   load: (json) => JSON.parse(json),
   serialize: (g) => JSON.stringify(g),
@@ -81,7 +82,7 @@ export const carreras = {
       matches: [{ id: 'race' + c.roundIndex, home: ids[0], away: ids[1], entrants: ids, title: `${tr.name} · ${c.teams.length} equipos`, played: !!fin, score: fin ? [0, 0] : null, summary: fin ? 'Ganó ' + g.last.order[0].driver : null, type: 'race' }] };
   },
   finishRound(g) {
-    const c = g.career;
+    const c = g.career; afterRound(g);
     if (g.last) g.done.push({ id: 'race' + g.last.round, week: g.last.round + 1, home: g.last.order[0].team, away: g.last.order[1].team, score: [1, 2], text: `${g.last.track}: 1º ${g.last.order[0].driver}, 2º ${g.last.order[1].driver}, 3º ${g.last.order[2].driver}` });
     g.done = g.done.slice(-40);
     c.roundIndex++;
@@ -90,4 +91,5 @@ export const carreras = {
   },
   results: (g) => g.done.slice(-40),
   makeLive: (g, matchId, startAt, extras, now) => new RaceLive(g, matchId, startAt, extras, now),
+  setHumans, exportState, command,
 };

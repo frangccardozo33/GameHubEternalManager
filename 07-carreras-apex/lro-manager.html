@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>LRO · Gestión del equipo</title>
+<script src="../assets/online/mgr-lib.js"></script></head>
+<body>
+<script>
+// Gestión online del equipo (carreras): estrategia de carrera, pilotos, mercado de pilotos y traspasos entre DT.
+const E = EMMgr, esc = E.esc, LABELS = ['Velocidad punta', 'Aceleración', 'Frenada', 'Paso por curva', 'Control', 'Agresividad', 'Consistencia', 'Adelantamiento'];
+const money = (n) => '$' + Math.round(n).toLocaleString('es');
+const OPTS = { pace: [['push', 'Push'], ['standard', 'Normal'], ['conserve', 'Conservar']], tyres: [['push', 'Push'], ['standard', 'Normal'], ['save', 'Cuidar']], overtake: [['attack', 'Atacar'], ['standard', 'Normal'], ['defend', 'Defender']], fuel: [['push', 'Push'], ['standard', 'Normal'], ['save', 'Ahorrar']] };
+const NAMES = { pace: 'Ritmo', tyres: 'Neumáticos', overtake: 'Adelantamientos', fuel: 'Combustible' };
+const portrait = (d) => d.photo ? `<img src="../${esc(d.photo)}" alt="">` : '';
+const driverCard = (d, extra) => `<div class="item">${portrait(d)}<b>${esc(d.name)}</b> <span class="tag">${esc(d.nationality)}</span><div class="muted">${d.age} años · ${esc(d.personality)} · Rating <b>${d.rating}</b></div>
+  <div class="muted" style="clear:both;margin-top:6px">Punta ${Math.round(d.stats[0] * 100)} · Curva ${Math.round(d.stats[3] * 100)} · Agr. ${Math.round(d.stats[5] * 100)} · Reg. ${Math.round(d.stats[6] * 100)} · Salario ${money(d.salary)}</div>${extra || ''}</div>`;
+window.stratSend = () => {
+  const q = (id) => document.getElementById(id).value, s = { compound: q('sCompound'), pitLap: +q('sPit'), cmds: {} };
+  for (const k of Object.keys(OPTS)) s.cmds[k] = q('s_' + k);
+  E.cmd('strat', [], { strat: s });
+};
+E.boot('LRO · Gestión del equipo', (s, ui) => {
+  const me = s.team, st = me.strat, others = s.teams.filter((t) => t.human && t.id !== me.id), tgt = others.find((t) => String(t.id) === ui.tradeTeam) || others[0];
+  const props = s.tradeProps.filter((t) => t.to === me.id);
+  return `<h1>${esc(me.name)}</h1><div class="muted">${esc(s.round ? s.round.label : 'Sin fecha')} · Puntos ${me.points} · Victorias ${me.wins} · Podios ${me.podiums} · Presupuesto <b>${money(s.credits)}</b></div>
+  <div class="card"><h2>Estrategia de carrera</h2><div class="row">
+    <label>Neumático inicial <select id="sCompound" onchange="stratSend()">${[['S', 'Blando'], ['M', 'Medio'], ['H', 'Duro']].map(([v, l]) => `<option value="${v}" ${st.compound === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+    <label>Parada en la vuelta <input id="sPit" type="number" min="2" max="${s.laps - 2}" value="${st.pitLap}" onchange="stratSend()" style="width:64px"> de ${s.laps}</label></div>
+    <div class="row" style="margin-top:8px">${Object.keys(OPTS).map((k) => `<label>${NAMES[k]} <select id="s_${k}" onchange="stratSend()">${OPTS[k].map(([v, l]) => `<option value="${v}" ${st.cmds[k] === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>`).join('')}</div>
+    <p class="muted">Es tu plan de salida. Durante la carrera podés cambiar el ritmo, los neumáticos, las paradas y los adelantamientos desde la transmisión. Se cierra 5 minutos antes.</p></div>
+  <div class="card"><h2>Tus pilotos</h2><div class="grid">${s.drivers.map((d) => driverCard(d, `<div style="margin-top:6px"><button class="b ${d.id === me.activeDriverId ? 'g' : 'o'}" data-cmd="setActive" data-args='[${d.id}]'>${d.id === me.activeDriverId ? 'Titular ✔' : 'Poner de titular'}</button>
+      <button class="b r" data-cmd="releaseDriver" data-args='[${d.id}]' ${s.drivers.length <= 1 ? 'disabled' : ''}>Liberar</button></div>
+      <div class="muted" style="margin-top:6px">Enfoque de entrenamiento <select data-cmd-change="setFocus" data-args='[${d.id}]'>${LABELS.map((l, i) => `<option value="${i}" ${d.focus === i ? 'selected' : ''}>${l}</option>`).join('')}</select></div>`)).join('')}</div></div>
+  <div class="card"><h2>Mercado de pilotos</h2><p class="muted">La firma cuesta el 15 % del valor del piloto. Con dos pilotos en el equipo hay que liberar uno primero.</p><div class="grid">${s.market.map((d) => driverCard(d, `<div class="muted">Valor ${money(d.marketValue)} · firma ${money(d.marketValue * 0.15)}</div><button class="b g" data-cmd="signDriver" data-args='[${d.id}]' ${s.drivers.length >= 2 ? 'disabled' : ''}>Fichar</button>`)).join('') || '<p class="muted">No hay pilotos libres.</p>'}</div></div>
+  <div class="card"><h2>Traspasos con otros DT</h2>${others.length ? `<div class="row"><label>Equipo <select data-ui="tradeTeam">${others.map((t) => `<option value="${t.id}" ${tgt && t.id === tgt.id ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</select></label>
+    <label>Doy <select id="tGive">${s.drivers.map((d) => `<option value="${d.id}">${esc(d.name)} (${d.rating})</option>`).join('')}</select></label>
+    <label>Recibo <select id="tGet">${tgt.drivers.map((d) => `<option value="${d.id}">${esc(d.name)} (${d.rating})</option>`).join('')}</select></label>
+    <button class="b" onclick="E.cmd('tradePropose',[${tgt.id},+document.getElementById('tGive').value,+document.getElementById('tGet').value])">Proponer</button></div>` : '<p class="muted">Todavía no hay otros DT humanos en la liga.</p>'}
+    ${props.map((p) => `<div class="item" style="margin-top:8px"><b>${esc(s.teams.find((t) => t.id === p.from).name)}</b> ofrece a <b>${esc(p.giveName)}</b> por <b>${esc(p.getName)}</b>
+      <button class="b g" data-cmd="tradeAnswer" data-args='[${p.id},true]'>Aceptar</button><button class="b r" data-cmd="tradeAnswer" data-args='[${p.id},false]'>Rechazar</button></div>`).join('')}</div>
+  <div class="card"><h2>Campeonato</h2><table><tr><th>#</th><th>Equipo</th><th>Pts</th><th>Vict</th><th>Pod</th></tr>${[...s.teams].sort((a, b) => b.points - a.points || b.wins - a.wins).map((t, i) => `<tr ${t.id === me.id ? 'class="on"' : ''}><td>${i + 1}</td><td>${esc(t.name)}${t.human ? ' <span class="tag">DT</span>' : ''}</td><td>${t.points}</td><td>${t.wins}</td><td>${t.podiums}</td></tr>`).join('')}</table></div>`;
+});
+</script>
+</body></html>
