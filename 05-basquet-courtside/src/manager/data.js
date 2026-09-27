@@ -13,6 +13,22 @@ const W = {
 export const OVR_W = Object.fromEntries(Object.entries(W).map(([k, v]) => { const t = v.reduce((a, b) => a + b, 0); return [k, v.map(x => x / t)]; }));
 export const POS_NAMES = { PG: 'Base', SG: 'Escolta', SF: 'Alero', PF: 'Ala-pívot', C: 'Pívot' };
 export const TEAM_ROLES = { star: ['Estrella', 0.78], starter: ['Titular', 0.68], sixth: ['Sexto hombre', 0.5], rotation: ['Rotación', 0.32], bench: ['Reserva', 0.1], prospect: ['Prospecto', 0.05] };
+// Cartas de jugador: 2 bases cosméticas (libres, ilimitadas) + 10 especiales (mismo catálogo/lógica que fútbol,
+// traducido a básquet). Las especiales no se compran: salen como drop de partidos brillantes (ver rollCardDrop en
+// game.js), son instancias con dueño propio (el equipo) y usos limitados; cada `logic` es un efecto de juego real.
+export const EDITIONS = [
+  { id: 'callejera', name: 'Cancha Callejera', stars: 3 }, { id: 'bronce', name: 'Bronce', stars: 3 },
+  { id: 'plata', name: 'Plata', stars: 4, special: true, uses: 20, logic: 'boost', boost: 2 },
+  { id: 'oro', name: 'Oro de la Cancha', stars: 4, special: true, uses: 20, logic: 'boost', boost: 3 },
+  { id: 'idolo', name: 'Ídolo de la Ciudad', stars: 4, special: true, uses: 20, logic: 'immune' },
+  { id: 'debut', name: 'Primera Convocatoria', stars: 4, special: true, uses: 20, logic: 'xp' },
+  { id: 'rivalidad', name: 'Noche de Rivalidad', stars: 5, special: true, uses: 5, logic: 'derby', boost: 6 },
+  { id: 'apertura', name: 'Apertura de Temporada', stars: 5, special: true, uses: 5, logic: 'opener', boost: 6 },
+  { id: 'capitan', name: 'Capitán Eterno', stars: 5, special: true, uses: 5, logic: 'consistency' },
+  { id: 'anillo', name: 'El Anillo', stars: 5, special: true, uses: 5, logic: 'cup', boost: 6 },
+  { id: 'archivo', name: 'Leyenda del Archivo', stars: 4, special: true, uses: 20, logic: 'veteran' },
+  { id: 'leyenda', name: 'Última Leyenda', stars: 5, special: true, uses: 5, logic: 'legend', boost: 5 },
+];
 export const USAGE = { low: ['Bajo', 0.85], normal: ['Normal', 1], high: ['Alto', 1.15], star: ['Referente', 1.3] };
 export const TEAM_POOL = CLUBS.slice(0, 12).map(c => [c.bkt.city, c.bkt.nick, c.bkt.short, c.color, '#e9edf0', c.logo]);
 export const FIRST = 'Daniel Marcus Julian Andre Nico Luis Iker Tomas Ethan Malik Samuel Hugo Diego Kevin Ryan Omar Felix Mateo Jonas Ivan Leo Adrian Bruno Caleb Dario Elias Gabriel Isaac Jamal Kai Lucas Marco Noah Oscar Pablo Rafael Sergio Theo Victor Xavier Yusuf Zane Anton Bastian Cyrus Emil Fabian Gael Hector'.split(' ');

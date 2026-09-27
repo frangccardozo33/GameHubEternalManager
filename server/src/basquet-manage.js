@@ -108,6 +108,11 @@ const OPS = {
     withUser(g, t.from, () => g.executeTrade(t.to, t.mine, t.theirs)); g.repairLineup(B); g.ensureLineup(A);
     return { ok: true, msg: 'Traspaso completado' };
   },
+  // cartas especiales: se ganan jugando, se pueden vender por separado del jugador (ver game.js)
+  equipCard: (g, i, a) => g.equipCard(i, str(a[0], 20), a[1] ? str(a[1], 20) : null),
+  listCard: (g, i, a) => g.listCard(i, str(a[0], 20), num(a[1], 1, 1e9)),
+  unlistCard: (g, i, a) => g.unlistCard(i, str(a[0], 20)),
+  buyCard: (g, i, a) => g.buyCard(i, str(a[0], 20)),
 };
 
 export function command(g, club, body, ctx) {

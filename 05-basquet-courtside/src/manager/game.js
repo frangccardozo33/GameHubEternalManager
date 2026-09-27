@@ -1,7 +1,7 @@
 import { Random, clamp, defaultTactics, DEFAULT_RULES } from '../simulation/model.js';
 import { MatchSimulator } from '../simulation/match.js';
-import { ROLES, TEAM_POOL, TEAM_ROLES, USAGE } from './data.js';
-import { makePlayer, makeFromRoster, reserveNames, RBYID, newContract, valueOf, progress, NEW_STATS, autoRole } from './players.js';
+import { ROLES, TEAM_POOL, TEAM_ROLES, USAGE, EDITIONS } from './data.js';
+import { makePlayer, makeFromRoster, reserveNames, RBYID, newContract, valueOf, progress, NEW_STATS, autoRole, ovrOf } from './players.js';
 import { ROSTER } from './roster-data.js';
 import { eff } from './stats.js';
 import { install, LIM } from './market.js';
@@ -37,7 +37,8 @@ export class Game {
   // ---------- creación ----------
   static create(cfgIn = {}, userId = 0, seed = Date.now() % 1e9) {
     const cfg = { ...DEFAULT_CFG, ...cfgIn }; cfg.teams = clamp(cfg.teams - (cfg.teams % 2), 4, TEAM_POOL.length);
-    const g = new Game({ v: 1, rosterV: ROSTER.version, cfg, season: 1, phase: 'regular', day: 0, userId, teams: [], players: {}, fa: [], schedule: [], po: null, matches: {}, inbox: [], history: [], rng: seed, nid: { p: 1, e: 1, m: 1, n: 1 }, lastReport: null, prospects: [], scoutPts: 6, off: null });
+    const g = new Game({ v: 1, rosterV: ROSTER.version, cfg, season: 1, phase: 'regular', day: 0, userId, teams: [], players: {}, fa: [], schedule: [], po: null, matches: {}, inbox: [], history: [], rng: seed, nid: { p: 1, e: 1, m: 1, n: 1 }, lastReport: null, prospects: [], scoutPts: 6, off: null,
+      specialCards: {}, cardListings: {}, cardSeq: 0 });
     for (let i = 0; i < cfg.teams; i++) g.createTeam(i);
     g.s.pool = ROSTER.players.filter(e => !(e.t >= 0 && e.t < cfg.teams)).map(e => e.id);   // reserva: el resto del roster (agentes libres, draft y reposición)
     g.s.teams.forEach((t, i) => { t.isUser = i === userId; });
@@ -180,6 +181,7 @@ export class Game {
     const homeWin = e.hs > e.as, conseq = [], cup = !!e.cup;
     const box = r.teams.map((t, side) => t.players.filter(p => p.pid).map(p => ({ pid: p.pid, name: p.name, num: p.number, role: p.role, gs: p.starter ? 1 : 0, min: +p.minutes.toFixed(2), pts: p.points, reb: p.rebounds, oreb: p.oreb, ast: p.assists, stl: p.steals, blk: p.blocks, tov: p.turnovers, pf: p.fouls, fgm: p.fgm, fga: p.fga, tpm: p.tpm, tpa: p.tpa, ftm: p.ftm, fta: p.fta, pm: p.pm })));
     const teamIds = [e.home, e.away];
+    this.primeCardContext(e, po);
     r.teams.forEach((t, side) => {
       const team = this.team(teamIds[side]), won = side === 0 ? homeWin : !homeWin;
       for (const line of box[side]) {
@@ -189,10 +191,17 @@ export class Game {
           for (const k of ['pts', 'reb', 'oreb', 'ast', 'stl', 'blk', 'tov', 'pf', 'fgm', 'fga', 'tpm', 'tpa', 'ftm', 'fta', 'pm']) st[k] += line[k];
           const p1 = t.players.find(x => x.pid === line.pid); st.rim += p1.rimM; st.rima += p1.rimA; }
         }
-        if (line.min > 0 && share >= 0.12) { const perMin = eff(line) / Math.max(line.min, 0.5), exp = EFF_REF * (0.7 + p.ovr / 270); d.form = clamp(Math.round((perMin - exp) * 9), -6, 6); }
+        const cb = this.cardBoostBits(p);
+        if (line.min > 0 && share >= 0.12) {
+          const perMin = eff(line) / Math.max(line.min, 0.5), exp = EFF_REF * (0.7 + p.ovr / 270);
+          d.form = clamp(Math.round((perMin - exp) * 9), -6, 6);
+          const noise = (this.rng.next() - 0.5) * 0.8 * cb.noiseMul;
+          line.rating = clamp(Math.round((6 + (perMin / exp - 1) * 5 + (won ? 0.3 : -0.3) + noise) * 10) / 10, 1, 10);
+          this.gainMatchXP(p, line.rating); this.rollCardDrop(p, line.rating); this.consumeCardUse(p);
+        }
         d.cond = -Math.round(38 * share);
         const exp = TEAM_ROLES[p.contract?.role ?? autoRole(p)][1];
-        d.morale = (won ? 2 : -2) * (po ? 1.5 : 1) + (share < exp * 0.5 && exp >= 0.3 ? -2 : share >= exp ? 1 : 0);
+        d.morale = (won ? 2 : (cb.immune ? 0 : -2)) * (po ? 1.5 : 1) + (share < exp * 0.5 && exp >= 0.3 ? -2 : share >= exp ? 1 : 0);
         p.form = clamp(p.form + d.form, 20, 100); p.cond = clamp(p.cond + d.cond, 25, 100); p.morale = clamp(Math.round(p.morale + d.morale), 10, 100);
         this.rollInjury(p, share, po, team.isUser);
         line.d = d;
@@ -238,6 +247,92 @@ export class Game {
     const was = p.wantsOut;
     p.wantsOut = p.discontentStreak >= 8;
     if (p.wantsOut && !was && p.teamId === this.s.userId) this.news('Descontento', `${p.name} está descontento y pide que lo transfieran.`, 'trade');
+  }
+  // ---------- cartas especiales (mismo catálogo/lógica que fútbol, ver data.js EDITIONS) ----------
+  primeCardContext(e, po) {
+    const table = this.standings(), rank = {}; table.forEach((r, i) => (rank[r.id] = i));
+    const derby = rank[e.home] != null && rank[e.away] != null && Math.abs(rank[e.home] - rank[e.away]) <= 2;
+    const ctx = { derby, opener: this.s.day === 0 && !po, cup: po };
+    for (const tid of [e.home, e.away]) for (const p of this.roster(this.team(tid))) p._cardCtx = ctx;
+  }
+  rollCardDrop(p, rating) {
+    if (p.teamId == null || rating < 8.7) return null;
+    if (this.rng.next() >= (rating - 8.7) * 0.35) return null;
+    const pool = EDITIONS.filter((e) => e.special), totalW = pool.reduce((a, e) => a + (e.stars >= 5 ? 1 : 4), 0);
+    let r = this.rng.next() * totalW, ed = pool[0];
+    for (const e of pool) { const w = e.stars >= 5 ? 1 : 4; if (r < w) { ed = e; break; } r -= w; }
+    const id = 'card_' + (++this.s.cardSeq);
+    const card = { id, editionId: ed.id, playerId: p.id, ownerTeamId: p.teamId, usesLeft: ed.uses, retired: false };
+    this.s.specialCards[id] = card;
+    if (p.teamId === this.s.userId) this.news('Carta especial', `¡${p.name} se ganó la carta «${ed.name}»!`, 'card');
+    return card;
+  }
+  clubCards(teamId) { return Object.values(this.s.specialCards).filter((c) => c.ownerTeamId === teamId && !c.retired); }
+  cardsOf(pid) { return Object.values(this.s.specialCards).filter((c) => c.playerId === pid && !c.retired); }
+  equipCard(teamId, pid, cardId) {
+    const p = this.player(pid); if (!p || p.teamId !== teamId) return { ok: false, reason: 'No es jugador de tu equipo.' };
+    if (!cardId) { this.unequipCard(p); return { ok: true }; }
+    const card = this.s.specialCards[cardId];
+    if (!card || card.retired) return { ok: false, reason: 'Carta inexistente.' };
+    if (card.ownerTeamId !== teamId) return { ok: false, reason: 'Esa carta no es de tu equipo.' };
+    if (card.playerId !== pid) return { ok: false, reason: 'Esa carta es de otro jugador: necesitás tenerlo también en tu plantilla.' };
+    const ed = EDITIONS.find((e) => e.id === card.editionId);
+    p.equippedCardId = cardId; p.equippedCardLogic = ed.logic; p.equippedCardBoost = ed.boost || 0;
+    return { ok: true };
+  }
+  unequipCard(p) { p.equippedCardId = null; p.equippedCardLogic = null; p.equippedCardBoost = 0; }
+  consumeCardUse(p) {
+    if (!p.equippedCardId) return;
+    const card = this.s.specialCards[p.equippedCardId]; if (!card) { p.equippedCardId = null; return; }
+    if (card.usesLeft == null) return;
+    card.usesLeft--;
+    if (card.usesLeft <= 0) { card.retired = true; if (p.teamId === this.s.userId) this.news('Carta agotada', `Se agotaron los usos de la carta de ${p.name}.`, 'card'); this.unequipCard(p); }
+  }
+  listCard(teamId, cardId, price) {
+    const card = this.s.specialCards[cardId];
+    if (!card || card.retired || card.ownerTeamId !== teamId) return { ok: false, reason: 'No es tu carta.' };
+    const p = this.player(card.playerId); if (p && p.equippedCardId === cardId) return { ok: false, reason: 'Desequipala antes de vender.' };
+    this.s.cardListings[cardId] = Math.max(1, Math.round(price));
+    return { ok: true };
+  }
+  unlistCard(teamId, cardId) { const card = this.s.specialCards[cardId]; if (!card || card.ownerTeamId !== teamId) return { ok: false, reason: 'No es tu carta.' }; delete this.s.cardListings[cardId]; return { ok: true }; }
+  buyCard(teamId, cardId) {
+    const card = this.s.specialCards[cardId], price = this.s.cardListings[cardId];
+    if (!card || card.retired || price == null) return { ok: false, reason: 'Esa carta no está en venta.' };
+    if (teamId === this.s.userId && this.fin.cash < price) return { ok: false, reason: 'Saldo insuficiente.' };
+    card.ownerTeamId = teamId; delete this.s.cardListings[cardId];
+    const p = this.player(card.playerId); if (p && p.equippedCardId === cardId) this.unequipCard(p);
+    return { ok: true };
+  }
+  cardBoostBits(p) {
+    const none = { flat: 0, noiseMul: 1, xpMul: 1, immune: false };
+    if (!p.equippedCardLogic) return none;
+    const ctx = p._cardCtx || {};
+    switch (p.equippedCardLogic) {
+      case 'boost': return { ...none, flat: p.equippedCardBoost || 0 };
+      case 'legend': return { flat: p.equippedCardBoost || 0, noiseMul: 0.7, xpMul: 1.5, immune: true };
+      case 'derby': return { ...none, flat: ctx.derby ? (p.equippedCardBoost || 0) : 0 };
+      case 'opener': return { ...none, flat: ctx.opener ? (p.equippedCardBoost || 0) : 0 };
+      case 'cup': return { ...none, flat: ctx.cup ? (p.equippedCardBoost || 0) : 0 };
+      case 'consistency': return { ...none, noiseMul: 0.3 };
+      case 'immune': return { ...none, immune: true };
+      case 'xp': return { ...none, xpMul: 2 };
+      case 'veteran': { const games = (p.st?.gp || 0) + (p.stpo?.gp || 0); return { ...none, flat: Math.min(6, Math.floor(games / 40)) }; }
+      default: return none;
+    }
+  }
+  gainMatchXP(p, rating) {
+    const xpMul = this.cardBoostBits(p).xpMul, gain = Math.max(0, Math.round((rating - 5.5) * 3)) * xpMul;
+    if (!gain) return;
+    p.xp = (p.xp || 0) + gain;
+    while (p.xp >= 60) {
+      p.xp -= 60;
+      const ageF = p.age <= 21 ? 1.4 : p.age <= 25 ? 1 : p.age <= 29 ? 0.5 : 0.15, room = p.pot - p.ovr;
+      if (this.rng.next() < (room > 0 ? 0.5 : 0.12) * ageF) {
+        const keys = Object.keys(p.a), k = this.rng.pick(keys);
+        if (p.a[k] < 97) { p.a[k]++; p.ovr = ovrOf(p.a, p.role); }
+      }
+    }
   }
   healInjuries() {
     for (const p of Object.values(this.s.players)) {
