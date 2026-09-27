@@ -44,15 +44,17 @@ export function cleanAction(m, side, msg) {
 // Foto COMPLETA del estado del motor (grafo de objetos simples, con referencias compartidas y ciclos) para corregir a un cliente
 // que se desvió del servidor. Se recorre por claves ordenadas; los objetos no simples (modelos 3D, DOM, funciones) se omiten.
 const SKIP = new Set(['onEvent', 'onTlmSwap', 'running']);
-const plainObj = (v) => { const pr = Object.getPrototypeOf(v); return pr === Object.prototype || pr === null || Array.isArray(v); };
-export function snapOf(m) {
+const NOT_DATA = new Set(['Set', 'Map', 'WeakMap', 'WeakSet', 'Promise', 'Date', 'RegExp']);
+// cls=true: también las instancias de clases propias del motor (p. ej. los peleadores de MMA); nunca colecciones, DOM ni objetos 3D
+const plainObj = (v, cls) => { const pr = Object.getPrototypeOf(v); return pr === Object.prototype || pr === null || Array.isArray(v) || (!!cls && !NOT_DATA.has(v.constructor && v.constructor.name) && !v.nodeType && !v.isObject3D); };
+export function snapOf(m, cls = false) {
   const ids = new Map(); let n = 0;
   const walk = (v, root) => {
     if (typeof v === 'function' || typeof v === 'symbol' || typeof v === 'undefined') return undefined;
     if (typeof v === 'number') return Number.isFinite(v) ? v : { $n: String(v) };
     if (v === null || typeof v !== 'object') return v;
     if (ArrayBuffer.isView(v) && !(v instanceof DataView)) return { $t: v.constructor.name, d: Array.from(v) };
-    if (!root && !plainObj(v)) return undefined;
+    if (!root && !plainObj(v, cls)) return undefined;
     if (ids.has(v)) return { $r: ids.get(v) };
     const id = n++; ids.set(v, id);
     if (Array.isArray(v)) return { $i: id, a: v.map((x) => { const w = walk(x); return w === undefined ? { $s: 1 } : w; }) };
@@ -63,7 +65,7 @@ export function snapOf(m) {
   return walk(m, true);
 }
 const num = (x) => (x && x.$n !== undefined ? Number(x.$n) : x);
-export function applySnap(m, snap, diffs) {
+export function applySnap(m, snap, diffs, cls = false) {
   const map = new Map(), refs = [];
   const fix = (live, sn, path) => { // devuelve el valor que debe quedar en la posición
     if (sn === null || typeof sn !== 'object') { if (diffs && live !== sn && diffs.length < 40) diffs.push(path + ': ' + live + ' -> ' + sn); return sn; }
@@ -72,7 +74,7 @@ export function applySnap(m, snap, diffs) {
     if (sn.$t !== undefined) { const C = globalThis[sn.$t]; if (live && live.constructor === C && live.length === sn.d.length) { live.set(sn.d); return live; } return C.from(sn.d); }
     if (sn.$r !== undefined) return { $$ref: sn.$r };
     const isArr = sn.a !== undefined;
-    let t = live && typeof live === 'object' && (Array.isArray(live) === isArr) && (live === m || plainObj(live)) ? live : (isArr ? [] : {});
+    let t = live && typeof live === 'object' && (Array.isArray(live) === isArr) && (live === m || plainObj(live, cls)) ? live : (isArr ? [] : {});
     if (diffs && t !== live && diffs.length < 40) diffs.push(path + ': objeto distinto');
     map.set(sn.$i, t);
     if (isArr) {

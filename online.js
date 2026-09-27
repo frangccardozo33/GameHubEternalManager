@@ -3,8 +3,8 @@
   const DEF = 'http://localhost:8787';
   const MODS = { futbol: 'Fútbol (LFO)', mma: 'Lucha (LLO)', basquet: 'Básquet (LBO)', nfl: 'NFL (LGO)', carreras: 'Carreras (LRO)' };
   let me = null, leagues = [], msg = '', busy = false, cur = null, st = null, poll = null;
-  const LIVE = { nfl: '06-nfl-gridiron/dist-live/live.html', basquet: '05-basquet-courtside/courtside-live.html', futbol: '01-futbol/fulbo-live.html' };
-  const READY = ['nfl', 'basquet', 'futbol'];
+  const LIVE = { nfl: '06-nfl-gridiron/dist-live/live.html', basquet: '05-basquet-courtside/courtside-live.html', futbol: '01-futbol/fulbo-live.html', mma: '04-mma/mma-live.html' };
+  const READY = ['nfl', 'basquet', 'futbol', 'mma'];
 
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
