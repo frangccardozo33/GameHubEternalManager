@@ -10,9 +10,17 @@ APP_ORIGIN = "http://localhost:8080"
 name = "LEAGUE"
 class_name = "LeagueDO"
 
+[[durable_objects.bindings]]
+name = "CHAT"
+class_name = "ChatDO"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["LeagueDO"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["ChatDO"]
 
 [[d1_databases]]
 binding = "DB"

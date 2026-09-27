@@ -8,10 +8,11 @@
  *   EMChat.sendText(channel, text) / EMChat.sendSticker(channel, stickerId)
  *   EMChat.onChange(fn)                // fn() cuando cambia algo (mensajes, no leídos, presencia)
  *
- * TRANSPORTE. No hay servidor: por defecto los mensajes viajan entre pestañas del mismo navegador (BroadcastChannel),
- * o sea que abrir el hub en dos pestañas ya da dos "jugadores" reales. Para conectarlo a un servidor propio:
- *   EMChat.useWebSocket("wss://tu-servidor/chat")     // o localStorage["em.chat.ws"] = "wss://…"
- * El servidor sólo tiene que reenviar a todos los clientes (o por sala) los paquetes JSON que llegan, tal cual.
+ * TRANSPORTE. Si hay sesión online (cuenta en la pestaña "Online" del hub), online.js conecta automáticamente
+ * este chat al servidor Cloudflare compartido (server/src/chat-do.js, WebSocket en /api/chat/ws): ahí sí ven los
+ * mismos mensajes jugadores en dispositivos distintos, con la identidad validada por el servidor (no se puede
+ * mandar un mensaje con el nombre de otro). Sin sesión online, los mensajes viajan sólo entre pestañas del mismo
+ * navegador (BroadcastChannel), como demo. Para apuntar a otro servidor a mano: EMChat.useWebSocket("wss://…").
  * Paquetes: {t:"msg", id, ch:"global"|"room"|"dm", room?, to?, from:{id,name,avatar}, kind:"text"|"sticker", text?, sticker?, ts}
  *           {t:"presence", from:{id,name,avatar}, room, ts}
  *

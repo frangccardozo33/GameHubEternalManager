@@ -1,5 +1,6 @@
 import { LeagueDO } from './league-do.js';
-export { LeagueDO };
+import { ChatDO } from './chat-do.js';
+export { LeagueDO, ChatDO };
 
 const enc = new TextEncoder();
 const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -92,6 +93,15 @@ export default {
       return u ? json({ uid, name: u.name }) : json({ error: 'no-session' }, 401);
     }
     if (!uid) return json({ error: 'no-session' }, 401);
+
+    if (url.pathname === '/api/chat/ws') {
+      if (req.headers.get('upgrade') !== 'websocket') return json({ error: 'ws' }, 426);
+      if (!(env.APP_ORIGIN || '').split(',').map((x) => x.trim()).includes(req.headers.get('origin'))) return json({ error: 'origin' }, 403);
+      const u = await env.DB.prepare('SELECT name FROM users WHERE id=?').bind(uid).first();
+      const stub = env.CHAT.get(env.CHAT.idFromName('global'));
+      const h = new Headers(req.headers); h.set('x-uid', uid); h.set('x-name', (u && u.name) || 'Jugador');
+      return stub.fetch(new Request('https://do/ws', { method: 'GET', headers: h }));
+    }
 
     if (url.pathname === '/api/leagues' && req.method === 'GET') {
       const { results } = await env.DB.prepare('SELECT l.id,l.module,l.code,l.owner,m.club FROM leagues l JOIN memberships m ON m.league=l.id WHERE m.user=? ORDER BY l.created DESC').bind(uid).all();

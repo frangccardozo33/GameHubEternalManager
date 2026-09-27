@@ -18,10 +18,14 @@
     return d;
   }
 
+  function syncChat() { if (window.EMChat) EMChat.useWebSocket(me ? base().replace(/^http/, 'ws') + '/api/chat/ws' : null); }
   async function load() {
     try { me = await api('/api/me'); leagues = (await api('/api/leagues')).leagues; msg = ''; }
     catch (e) { me = null; msg = e.status === 401 ? '' : 'No se pudo conectar con el servidor online (' + base() + ').'; }
+    syncChat();
   }
+  // Chequeo silencioso al cargar el hub: si ya hay sesión, conecta el chat global sin esperar a que se abra la pestaña Online.
+  async function boot() { try { me = await api('/api/me'); syncChat(); } catch {} }
 
   function view() {
     const root = $('page-online'); if (!root) return;
@@ -127,5 +131,5 @@
     document.body.append(ov);
   }
 
-  window.EMOnline = { render, api, get me() { return me; }, openLeague };
+  window.EMOnline = { render, api, get me() { return me; }, openLeague, syncChat, boot };
 })();

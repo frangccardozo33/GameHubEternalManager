@@ -249,7 +249,7 @@ function chatSync(){if(!window.EMChat)return;const id=activePage,f=MODULES[id]&&
 function chatLayout(){const onChat=activePage==='chat',fab=$('chatFab'),dr=$('chatDrawer');if(!chatPageView&&onChat){chatPageView=EMChat.mount($('chatPage'),{});}
 fab.hidden=onChat;if(onChat)dr.hidden=true;const fs=document.fullscreenElement;const host=fs||document.body;if(fab.parentNode!==host){host.appendChild(fab);host.appendChild(dr);}const se=EMChat.streamEl;if(se.parentNode!==host)host.appendChild(se);chatBadges();}
 function chatBadges(){const n=EMChat.unread(),b1=$('chatNavBadge'),b2=$('chatFabBadge');for(const b of [b1,b2]){b.hidden=!n;b.textContent=n>99?'99+':n;}}
-if(window.EMChat){EMChat.init({profile:()=>({name:state.name,avatar:state.avatar}),openDrawer:()=>{const dr=$('chatDrawer');if(dr.hidden)$('chatFab').click();},onStickerPlay:on=>{if(typeof bgMusic!=='undefined')bgMusic.duck(on);}});EMChat.onChange(chatBadges);
+if(window.EMChat){EMChat.init({profile:()=>({name:(window.EMOnline&&EMOnline.me&&EMOnline.me.name)||state.name,avatar:state.avatar}),openDrawer:()=>{const dr=$('chatDrawer');if(dr.hidden)$('chatFab').click();},onStickerPlay:on=>{if(typeof bgMusic!=='undefined')bgMusic.duck(on);}});EMChat.onChange(chatBadges);if(window.EMOnline)EMOnline.boot();
 $('chatDrawerX').onclick=()=>{$('chatDrawer').hidden=true;};
 $('chatFab').onclick=()=>{const dr=$('chatDrawer');dr.hidden=!dr.hidden;if(!dr.hidden){if(!chatDrawerView)chatDrawerView=EMChat.mount(dr,{compact:true});else chatDrawerView.refresh();}};
 document.addEventListener('fullscreenchange',chatLayout);
