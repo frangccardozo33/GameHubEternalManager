@@ -10,6 +10,7 @@ const engine = () => (Engine ||= makeEngine(globalThis));
 const teamOf = (c, id) => c.state.clubs[id];
 const pub = (cl) => ({ id: cl.id, name: cl.name, short: cl.shortName, city: '', mascot: cl.name, color: cl.primaryColor, dark: cl.secondaryColor, crest: cl.crest });
 const leagueIds = (c) => c.comp.teams.map((t) => t.id || t);
+const claimableIds = (c) => leagueIds(c).filter((id) => !TLM.isClubBlocked(teamOf(c, id).name));
 
 class FootballLive {
   constructor(c, matchId, startAt, extras = {}, now = startAt) {
@@ -66,7 +67,7 @@ export const futbol = {
   create(seed) { const c = TLM.Career.create({ seed }); for (const cl of Object.values(c.state.clubs)) cl.controlledBy = 'ai'; c.state.onlineSeason0 = c.state.season; c.state.onlineLive = true; return c; },
   load: (json) => TLM.Career.fromJSON(json),
   serialize: (c) => c.toJSON(),
-  clubs: leagueIds,
+  clubs: claimableIds,
   teams: (c) => leagueIds(c).map((id) => pub(teamOf(c, id))),
   standings: (c) => c.table().map((r) => ({ id: r.clubId, rank: r.pos, w: r.won, l: r.lost, t: r.drawn, diff: r.gd })),
   round(c) {

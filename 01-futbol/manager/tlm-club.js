@@ -104,7 +104,9 @@
       comp.teams.push(club.id); comp.leagueSize = comp.teams.length;
       state.currentClubId = club.id;
     } else {
-      const pick = opts.takeClub != null ? Object.values(state.clubs)[opts.takeClub] : Object.values(state.clubs).sort((a, b) => a.reputation - b.reputation)[Math.floor(Object.keys(state.clubs).length / 2)];
+      const eligible = Object.values(state.clubs).filter((cl) => !TLM.isClubBlocked(cl.name));
+      const wanted = opts.takeClub != null ? Object.values(state.clubs)[opts.takeClub] : null;
+      const pick = (wanted && !TLM.isClubBlocked(wanted.name)) ? wanted : eligible.sort((a, b) => a.reputation - b.reputation)[Math.floor(eligible.length / 2)];
       pick.controlledBy = 'user'; state.currentClubId = pick.id;
     }
     // agentes libres + jugadores en venta

@@ -195,6 +195,11 @@ import './football-shim.js';
   'use strict';
   const TLM = (g.TLM = g.TLM || {});
 
+  // Clubes que no se pueden elegir para dirigir (ni en carrera local ni online): quedan siempre bajo control de la IA.
+  const BLOCKED_CLUB_NAMES = ['Al-Sahar', 'Olympique de Iberia', 'Sportivo Calcio di Kaigam'];
+  TLM.BLOCKED_CLUB_NAMES = BLOCKED_CLUB_NAMES;
+  TLM.isClubBlocked = (name) => BLOCKED_CLUB_NAMES.includes(name);
+
   // ---- Posiciones (mismas siglas que el álbum: collection.js POS) ----
   const POSITIONS = ['POR', 'LI', 'DFC', 'LD', 'MCD', 'MC', 'MP', 'MI', 'MD', 'EI', 'ED', 'DC'];
   const ROLE_OF = { POR: 'GK', LI: 'DEF', DFC: 'DEF', LD: 'DEF', MCD: 'MID', MC: 'MID', MP: 'MID', MI: 'MID', MD: 'MID', EI: 'FWD', ED: 'FWD', DC: 'FWD' };
@@ -971,7 +976,9 @@ import './football-shim.js';
       comp.teams.push(club.id); comp.leagueSize = comp.teams.length;
       state.currentClubId = club.id;
     } else {
-      const pick = opts.takeClub != null ? Object.values(state.clubs)[opts.takeClub] : Object.values(state.clubs).sort((a, b) => a.reputation - b.reputation)[Math.floor(Object.keys(state.clubs).length / 2)];
+      const eligible = Object.values(state.clubs).filter((cl) => !TLM.isClubBlocked(cl.name));
+      const wanted = opts.takeClub != null ? Object.values(state.clubs)[opts.takeClub] : null;
+      const pick = (wanted && !TLM.isClubBlocked(wanted.name)) ? wanted : eligible.sort((a, b) => a.reputation - b.reputation)[Math.floor(eligible.length / 2)];
       pick.controlledBy = 'user'; state.currentClubId = pick.id;
     }
     // agentes libres + jugadores en venta

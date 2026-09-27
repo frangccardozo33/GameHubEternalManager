@@ -5,6 +5,11 @@
   'use strict';
   const TLM = (g.TLM = g.TLM || {});
 
+  // Clubes que no se pueden elegir para dirigir (ni en carrera local ni online): quedan siempre bajo control de la IA.
+  const BLOCKED_CLUB_NAMES = ['Al-Sahar', 'Olympique de Iberia', 'Sportivo Calcio di Kaigam'];
+  TLM.BLOCKED_CLUB_NAMES = BLOCKED_CLUB_NAMES;
+  TLM.isClubBlocked = (name) => BLOCKED_CLUB_NAMES.includes(name);
+
   // ---- Posiciones (mismas siglas que el álbum: collection.js POS) ----
   const POSITIONS = ['POR', 'LI', 'DFC', 'LD', 'MCD', 'MC', 'MP', 'MI', 'MD', 'EI', 'ED', 'DC'];
   const ROLE_OF = { POR: 'GK', LI: 'DEF', DFC: 'DEF', LD: 'DEF', MCD: 'MID', MC: 'MID', MP: 'MID', MI: 'MID', MD: 'MID', EI: 'FWD', ED: 'FWD', DC: 'FWD' };
