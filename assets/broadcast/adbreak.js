@@ -57,7 +57,7 @@
   }
   function play(o) {
     o = o || {};
-    const mount = o.mount || document.body, maxSec = o.maxSec || 60, skipAfter = o.skipAfter == null ? 5 : o.skipAfter;
+    const mount = o.mount || document.body, maxSec = o.maxSec || 60, skipAfter = o.skipAfter == null ? (g.EM_ONLINE ? 1e5 : 5) : o.skipAfter; // online: sin botón SALTAR
     if (g.__lfoAdActive) return { end() {}, ads: [] }; // una sola tanda a la vez
     let finished = false;
     const done = () => { if (finished) return; finished = true; g.__lfoAdActive = false; try { o.onDone && o.onDone(); } catch (e) { console.error(e); } };
@@ -103,6 +103,6 @@
     load();
     return { end, ads };
   }
-  const enabled = () => { try { return localStorage.getItem('lfo.ads') !== 'off'; } catch (e) { return true; } };
+  const enabled = () => { if (g.EM_ONLINE) return true; try { return localStorage.getItem('lfo.ads') !== 'off'; } catch (e) { return true; } };
   g.LFOAds = { play, choose, list, enabled };
 })(window);

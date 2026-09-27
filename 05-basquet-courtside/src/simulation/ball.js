@@ -1,3 +1,4 @@
+import { DM } from '../../../assets/common/dmath.mjs'; // Math determinista: el partido en vivo online debe dar lo mismo en el servidor y en todos los navegadores
 import { COURT, TUNING, clamp, distance, normalize, segmentDistance } from './model.js';
 const GRAVITY = 9.81;
 
@@ -5,32 +6,32 @@ export class DribbleSystem {
   update(sim, dt) {
     const b = sim.ball, p = b.owner;
     if (!p || b.mode !== 'held') return;
-    const speed = Math.hypot(p.vx, p.vz);
-    const before = Math.floor(p.dribblePhase);
+    const speed = DM.hypot(p.vx, p.vz);
+    const before = DM.floor(p.dribblePhase);
     p.dribblePhase += dt * (1.6 + speed * 0.14);
     const phase = p.dribblePhase % 1;
     const nearest = sim.teams[1 - p.team].active.reduce((a, q) => distance(p, a) < distance(p, q) ? a : q);
     if (distance(p, nearest) < 1.4 && p.action !== 'crossover') {
-      const side = (nearest.x - p.x) * Math.cos(p.facing) - (nearest.z - p.z) * Math.sin(p.facing);
+      const side = (nearest.x - p.x) * DM.cos(p.facing) - (nearest.z - p.z) * DM.sin(p.facing);
       p.hand = side > 0 ? -1 : 1;
     }
     const side = p.hand * 0.38;
-    b.x = p.x + Math.cos(p.facing) * side + Math.sin(p.facing) * 0.26;
-    b.z = p.z - Math.sin(p.facing) * side + Math.cos(p.facing) * 0.26;
+    b.x = p.x + DM.cos(p.facing) * side + DM.sin(p.facing) * 0.26;
+    b.z = p.z - DM.sin(p.facing) * side + DM.cos(p.facing) * 0.26;
     // A gravity-shaped bounce travels independently between floor and controlling hand.
-    b.y = 0.13 + 1.04 * Math.pow(Math.abs(phase * 2 - 1), 0.7);
+    b.y = 0.13 + 1.04 * DM.pow(DM.abs(phase * 2 - 1), 0.7);
     if (sim.pendingAction) {
       const a = sim.pendingAction;
       const progress = 1 - a.remaining / a.duration;
       b.y = a.type === 'shot' ? 1.45 + progress * 0.95 : 1.35;
-      b.x = p.x + Math.sin(p.facing) * 0.34; b.z = p.z + Math.cos(p.facing) * 0.34;
-    } else if (Math.floor(p.dribblePhase) !== before) sim.emitAudio('bounce', p);
+      b.x = p.x + DM.sin(p.facing) * 0.34; b.z = p.z + DM.cos(p.facing) * 0.34;
+    } else if (DM.floor(p.dribblePhase) !== before) sim.emitAudio('bounce', p);
   }
 }
 
 export class PassingSystem {
   prepare(sim, from, to) {
-    const lane = Math.min(...sim.teams[1 - from.team].active.map(q => segmentDistance(q, from, to)));
+    const lane = DM.min(...sim.teams[1 - from.team].active.map(q => segmentDistance(q, from, to)));
     const d = distance(from, to);
     const type = lane < 0.9 ? (d > 7 ? 'overhead' : 'bounce') : (from.heldTime < 1.3 ? 'quick' : 'chest');
     from.animate('pass', 0.55);
@@ -40,8 +41,8 @@ export class PassingSystem {
     const { from, to, passType } = action, b = sim.ball;
     const d = distance(from, to), duration = clamp(d / (passType === 'quick' ? 15 : 12), 0.28, 1.5);
     const accuracy = (from.ratings.passing + from.ratings.vision) / 200 * (0.7 + from.energy * 0.3);
-    const pressure = Math.min(...sim.teams[1 - from.team].active.map(q => distance(q, from)));
-    const bad = sim.random.next() < (1 - accuracy) * 0.14 + Math.max(0, 1.2 - pressure) * 0.035 + Math.max(0, d - 13) * 0.007;
+    const pressure = DM.min(...sim.teams[1 - from.team].active.map(q => distance(q, from)));
+    const bad = sim.random.next() < (1 - accuracy) * 0.14 + DM.max(0, 1.2 - pressure) * 0.035 + DM.max(0, d - 13) * 0.007;
     const spread = bad ? 2.2 : 0.12;
     const target = { x: to.x + to.vx * duration * 0.55 + sim.random.range(-spread, spread), z: to.z + to.vz * duration * 0.55 + sim.random.range(-spread, spread) };
     b.owner = null; b.mode = 'pass'; b.y = passType === 'overhead' ? 2.15 : 1.35;
@@ -59,9 +60,9 @@ export class PassingSystem {
     const t = clamp(f.elapsed / f.duration, 0, 1);
     b.x = f.start.x + (f.target.x - f.start.x) * t; b.z = f.start.z + (f.target.z - f.start.z) * t;
     if (f.type === 'bounce') {
-      b.y = t < 0.58 ? 1.35 - 1.22 * (t / 0.58) ** 1.4 : 0.13 + 1.17 * (t - 0.58) / 0.42;
+      b.y = t < 0.58 ? 1.35 - 1.22 * DM.pow(t / 0.58, 1.4) : 0.13 + 1.17 * (t - 0.58) / 0.42;
       if (t >= 0.58 && !f.bounced) { sim.emitAudio('bounce'); f.bounced = true; }
-    } else b.y = f.start.y + (1.4 - f.start.y) * t + Math.sin(t * Math.PI) * (f.type === 'overhead' ? 1.05 : 0.2);
+    } else b.y = f.start.y + (1.4 - f.start.y) * t + DM.sin(t * DM.PI) * (f.type === 'overhead' ? 1.05 : 0.2);
     const dtac = sim.teams[1 - f.team].tactics, grab = (1 + 0.008 * (dtac.aggression - 50)) * (1 + 0.003 * (dtac.pressure - 50));
     for (const defender of sim.teams[1 - f.team].active) {
       if (t > 0.12 && t < 0.94 && distance(defender, b) < 0.65 && b.y < defender.height + 0.4 && sim.random.next() < dt * TUNING.intercept * grab * (3 + defender.ratings.defense / 20)) {
@@ -90,7 +91,7 @@ export class PassingSystem {
 export class ShootingSystem {
   isThree(sim, p) {
     const x = p.x * sim.direction(p.team);
-    return (x > 9.4 && Math.abs(p.z) >= 6.6) || distance(p, { x: sim.direction(p.team) * COURT.hoopX, z: 0 }) >= 6.75;
+    return (x > 9.4 && DM.abs(p.z) >= 6.6) || distance(p, { x: sim.direction(p.team) * COURT.hoopX, z: 0 }) >= 6.75;
   }
   quality(sim, p) {
     const d = distance(p, { x: sim.direction(p.team) * COURT.hoopX, z: 0 });
@@ -100,8 +101,8 @@ export class ShootingSystem {
     const contest = clamp((2 - space) / 2, 0, 1) * (d < 3 ? defender.ratings.interiorDefense : defender.ratings.defense) / 100;
     const rating = d < 2.8 ? p.ratings.finishing : three ? p.ratings.three : p.ratings.two;
     const base = d < 2.8 ? 0.78 : three ? 0.42 : 0.53;
-    const movement = Math.hypot(p.vx, p.vz);
-    return clamp(base + (rating - 78) * 0.006 + (p.ratings.shooting - 75) * 0.0015 - contest * 0.2 - Math.max(0, d - 7) * 0.05
+    const movement = DM.hypot(p.vx, p.vz);
+    return clamp(base + (rating - 78) * 0.006 + (p.ratings.shooting - 75) * 0.0015 - contest * 0.2 - DM.max(0, d - 7) * 0.05
       - (1 - p.energy) * 0.16 - (d > 3 ? movement * 0.013 : 0) + (p.catchQuality - 1) * 0.3 - (sim.shotClock < 2 ? 0.07 : 0), 0.06, 0.91);
   }
   prepare(sim, p, freeThrow = false) {
@@ -110,7 +111,7 @@ export class ShootingSystem {
     const dunk = !freeThrow && d < 1.7 && p.ratings.physical > 80 && p.energy > 0.65;
     const type = freeThrow ? 'freeThrow' : dunk ? 'dunk' : d < 2.8 ? 'layup' : 'shoot';
     p.animate(type, type === 'shoot' ? 1.1 : 0.95);
-    p.facing = Math.atan2(sim.direction(p.team) * COURT.hoopX - p.x, -p.z);
+    p.facing = DM.atan2(sim.direction(p.team) * COURT.hoopX - p.x, -p.z);
     const duration = type === 'dunk' ? 0.36 : 0.46;
     sim.pendingAction = { type: 'shot', from: p, shotType: type, remaining: duration, duration, freeThrow };
     if (!freeThrow) {
@@ -131,9 +132,9 @@ export class ShootingSystem {
     }
     const quality = action.freeThrow ? clamp(0.73 + (p.ratings.shooting - 75) * 0.006, 0.5, 0.92) : this.quality(sim, p);
     const accurate = sim.random.next() < quality;
-    const angle = sim.random.range(0, Math.PI * 2);
+    const angle = sim.random.range(0, DM.PI * 2);
     const miss = accurate ? sim.random.range(0, 0.075) : sim.random.range(0.38, 0.85);
-    const target = { x: hoop.x + Math.cos(angle) * miss, z: Math.sin(angle) * miss };
+    const target = { x: hoop.x + DM.cos(angle) * miss, z: DM.sin(angle) * miss };
     b.owner = null; b.mode = 'shot'; b.x = p.x; b.z = p.z;
     b.y = action.shotType === 'dunk' ? 3.5 : action.shotType === 'layup' ? 2.75 : 2.45;
     const flightTime = action.shotType === 'dunk' ? 0.33 : action.shotType === 'layup' ? 0.75 : 1.12 + d * 0.033;
@@ -158,7 +159,7 @@ export class BallPhysics {
   update(sim, dt) {
     const b = sim.ball;
     // Substeps avoid tunnelling through rim, glass and floor at accelerated playback.
-    const steps = Math.ceil(dt / (1 / 120));
+    const steps = DM.ceil(dt / (1 / 120));
     for (let i = 0; i < steps; i++) {
       if (!['shot', 'loose', 'scored'].includes(b.mode)) return;
       this.integrate(sim, dt / steps);
@@ -170,20 +171,20 @@ export class BallPhysics {
     if (b.flight) b.flight.elapsed += dt;
     if (b.mode === 'shot') {
       const f = b.flight, dir = sim.direction(f.team), hoopX = dir * COURT.hoopX;
-      const horizontal = Math.hypot(b.x - hoopX, b.z);
+      const horizontal = DM.hypot(b.x - hoopX, b.z);
       if (!f.resolved && old.y >= COURT.rimY && b.y < COURT.rimY && b.vy < 0) {
         const t = (old.y - COURT.rimY) / (old.y - b.y);
         const crossX = old.x + (b.x - old.x) * t, crossZ = old.z + (b.z - old.z) * t;
-        if (Math.hypot(crossX - hoopX, crossZ) < COURT.rimRadius - COURT.ballRadius * 0.45) {
+        if (DM.hypot(crossX - hoopX, crossZ) < COURT.rimRadius - COURT.ballRadius * 0.45) {
           sim.score(f); b.mode = 'scored'; b.vx *= 0.2; b.vz *= 0.2; return;
         }
       }
       // Torus collision: closest point on the horizontal rim circle.
-      if (horizontal > 0.01 && Math.abs(b.y - COURT.rimY) < 0.17) {
+      if (horizontal > 0.01 && DM.abs(b.y - COURT.rimY) < 0.17) {
         const rimX = hoopX + (b.x - hoopX) / horizontal * COURT.rimRadius;
         const rimZ = b.z / horizontal * COURT.rimRadius;
         const nx = b.x - rimX, ny = b.y - COURT.rimY, nz = b.z - rimZ;
-        const length = Math.hypot(nx, ny, nz), radius = COURT.ballRadius + 0.018;
+        const length = DM.hypot(nx, ny, nz), radius = COURT.ballRadius + 0.018;
         if (length < radius && length > 0.001) {
           const dot = (b.vx * nx + b.vy * ny + b.vz * nz) / length;
           if (dot < 0) {
@@ -195,7 +196,7 @@ export class BallPhysics {
         }
       }
       const boardX = dir * 12.95;
-      if (Math.abs(b.x - boardX) < COURT.ballRadius && Math.abs(b.z) < 0.95 && b.y > 2.95 && b.y < 4.1 && b.vx * dir > 0) {
+      if (DM.abs(b.x - boardX) < COURT.ballRadius && DM.abs(b.z) < 0.95 && b.y > 2.95 && b.y < 4.1 && b.vx * dir > 0) {
         b.x = boardX - dir * COURT.ballRadius; b.vx *= -0.68;
         f.board = true; sim.emitAudio('board'); sim.metrics.board = (sim.metrics.board || 0) + 1;
       }
@@ -204,12 +205,12 @@ export class BallPhysics {
       }
     }
     if (b.y < COURT.ballRadius) {
-      b.y = COURT.ballRadius; b.vy = Math.abs(b.vy) * 0.62; b.vx *= 0.76; b.vz *= 0.76;
+      b.y = COURT.ballRadius; b.vy = DM.abs(b.vy) * 0.62; b.vx *= 0.76; b.vz *= 0.76;
       if (b.vy > 0.7) sim.emitAudio('bounce');
     }
     if (b.mode === 'loose') {
       b.looseTime += dt;
-      if (Math.abs(b.x) > 14.1 || Math.abs(b.z) > 7.6) sim.outOfBounds();
+      if (DM.abs(b.x) > 14.1 || DM.abs(b.z) > 7.6) sim.outOfBounds();
     }
   }
 }
@@ -218,7 +219,7 @@ export class ReboundSystem {
   update(sim, dt) {
     const b = sim.ball;
     if (!['shot', 'loose'].includes(b.mode)) return;
-    const fallTime = Math.max(0, (b.vy + Math.sqrt(b.vy * b.vy + 2 * GRAVITY * Math.max(0, b.y - 1.7))) / GRAVITY);
+    const fallTime = DM.max(0, (b.vy + DM.sqrt(b.vy * b.vy + 2 * GRAVITY * DM.max(0, b.y - 1.7))) / GRAVITY);
     const predicted = { x: clamp(b.x + b.vx * fallTime * 0.7, -13.2, 13.2), z: clamp(b.z + b.vz * fallTime * 0.7, -6.8, 6.8) };
     // Only the two best-positioned players on each team crash; others maintain floor balance.
     for (const team of sim.teams) {
@@ -237,11 +238,10 @@ export class ReboundSystem {
     }
     if (b.mode !== 'loose' || b.looseTime < 0.12) return;
     const candidates = sim.players.filter(p => distance(p, b) < 0.8 && b.y < p.height + 0.6 && b.vy < 2);
-    candidates.sort((a, c) => {
-      const value = p => distance(p, b) * 2 - p.ratings.rebounding / 160 - p.energy * 0.35 + sim.random.next() * 0.12;
-      return value(a) - value(c);
-    });
-    const winner = candidates[0];
+    // Las tiradas del azar se hacen una vez por candidato y en orden fijo: un comparador con azar dentro haría un número de sorteos
+    // distinto según la implementación de sort de cada motor de JS (rompe el partido en vivo online).
+    const scored = candidates.map(p => ({ p, v: distance(p, b) * 2 - p.ratings.rebounding / 160 - p.energy * 0.35 + sim.random.next() * 0.12 })).sort((a, c) => a.v - c.v);
+    const winner = scored[0] && scored[0].p;
     if (winner) {
       const shot = b.flight?.shooter ? b.flight : null;
       const offense = shot && shot.team === winner.team;

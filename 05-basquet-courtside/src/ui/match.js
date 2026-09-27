@@ -42,6 +42,7 @@ const ORIGINAL_CREST = crests.map(c => ({ html: c.innerHTML, cls: c.className })
 const settings = { duration: 180, shotClock: 24, homeStyle: 'PACE & SPACE', awayStyle: 'PICK & ROLL', seed: 41 };
 const audio = new MatchAudio();
 let sim = null, view = null, replay = new ReplayBuffer(), mode = 'exhibition', career = null, isOpen = false;
+let liveDrv = null; // online: conductor por lockstep (ver src/online/client.js)
 let paused = false, speed = 1, accumulator = 0, dialogPaused = false, lastFrame = performance.now(), started = false;
 let lastFeedId = -1, lastShotCount = -1, lastPanelUpdate = 0, toastTimer = 0, lastCoach = 0;
 
@@ -134,7 +135,7 @@ function renderCoach() {
 els.coach.addEventListener('change', event => {
   if (!career) return; const el = event.target, side = career.userSide, t = sim.teams[side];
   if (el.dataset.sub !== undefined && el.value) { const r = sim.substitute(side, el.dataset.sub, el.value); toast(r === 'queued' ? 'Cambio programado para el próximo balón parado' : r === 'done' ? 'Cambio realizado' : 'Cambio no válido'); renderCoach(); }
-  else if (el.dataset.plan) { t.plan[el.dataset.plan] = el.value || null; }
+  else if (el.dataset.plan) { if (liveDrv) liveDrv.plan(side, el.dataset.plan, el.value || null); else t.plan[el.dataset.plan] = el.value || null; }
   else if (el.dataset.usage) { sim.setUsage(side, el.dataset.usage, USAGE[el.value][1]); }
   else if (el.dataset.mark !== undefined) { sim.setAssignment(side, el.dataset.mark, el.value); toast(el.value === '' ? 'Marca automática' : 'Asignación defensiva aplicada'); }
 });
@@ -280,6 +281,20 @@ export const Match = {
     els.settingsButton.hidden = true; els.skip.hidden = false; els.coachTab.hidden = false; els.eyebrow.textContent = eyebrow; els.title.innerHTML = `${esc(title)}<span>.</span>`; els.sub.textContent = sub;
     selectTab('match'); show(true); attach(s, [homeName, awayName]); renderCoach(); return true;
   },
+  // Transmisión online: el conductor (liveDrv) avanza el partido con el reloj del servidor; la previa y los anuncios corren solos.
+  openLive({ sim: s, drv, homeName, awayName, userSide, title, sub, eyebrow, skipPre = false, skipHalf = false }) {
+    if (!ensureView()) return false; mode = 'career'; liveDrv = drv; career = { userSide: userSide < 0 ? 0 : userSide, onFinish() {}, onSaveBase: null }; els.loading.hidden = true;
+    els.settingsButton.hidden = true; els.skip.hidden = true; els.coachTab.hidden = userSide < 0; els.eyebrow.textContent = eyebrow; els.title.innerHTML = `${esc(title)}<span>.</span>`; els.sub.textContent = sub;
+    selectTab('match'); show(true); attach(s, [homeName, awayName]); if (userSide >= 0) renderCoach();
+    introShown = skipPre; halfShown = skipHalf;
+    if (bc && !bc._ads) { // previa: presentación -> estudio -> tanda de video; el entretiempo ya trae la suya
+      bc._ads = 1; const st = bc.studio.bind(bc);
+      bc.studio = c => { if (c && c.kind === 'pre' && !c._ad) { const d0 = c.onDone; c = { ...c, _ad: 1, onDone() { try { if (window.EM && EM.opt) EM.opt.ads = true; if (window.EM && EM.ads) EM.ads.videoBreak(d0, { maxSec: 40 }); else d0 && d0(); } catch (e) { d0 && d0(); } } }; } return st(c); };
+    }
+    if (!introShown && bc) { introShown = true; showIntro(() => drv.preShowDone()); } else drv.preShowDone();
+    return true;
+  },
+  toast,
   close() { show(false); if (audio.enabled) audio.toggle().then(() => { els.audio.innerHTML = ICONS.soundOff; els.audio.classList.remove('active'); }); },
   finishInstantly() { if (sim && sim.phase !== 'finished') { sim.simulateToEnd(1 / 20); } return sim; },
 };
@@ -290,6 +305,7 @@ function frame(now) {
   const dt = Math.min(0.1, (now - lastFrame) / 1000); lastFrame = now;
   try {
     if (replay.active) { const f = replay.step(dt); if (f) view.update(sim, dt, f); else view.update(sim, dt); }
+    else if (liveDrv) { liveDrv.pump(now, () => replay.record(sim, STEP)); view.update(sim, dt); }
     else {
       if (!paused && sim.phase !== 'ready' && sim.phase !== 'finished') { accumulator += dt * speed; let n = 0; while (accumulator >= STEP && n < MAX_STEPS_PER_FRAME) { sim.step(STEP); replay.record(sim, STEP); accumulator -= STEP; n++; } if (accumulator >= STEP) accumulator = 0; }
       view.update(sim, dt);
@@ -300,6 +316,7 @@ function frame(now) {
 
 // ---------- eventos ----------
 function togglePlay() {
+  if (liveDrv) return; // en vivo no se pausa ni se inicia a mano
   if (replay.active) { replay.active = false; return; }
   if (sim.phase === 'ready') { const go = () => { sim.start(); started = true; paused = false; }; if (bc && !introShown) { introShown = true; showIntro(go); } else go(); }
   else if (sim.phase === 'finished') { if (mode === 'career') career.onFinish(sim); else { settings.seed = 1 + Math.floor(Math.random() * 999999); els.form.elements.seed.value = settings.seed; attach(createExhibition()); setExhibitionChrome(); sim.start(); } }

@@ -1,3 +1,4 @@
+import { DM } from '../../../assets/common/dmath.mjs'; // Math determinista: el partido en vivo online debe dar lo mismo en el servidor y en todos los navegadores
 import { COURT, clamp, lerp, distance, normalize, segmentDistance } from './model.js';
 
 export class OffensiveAI {
@@ -20,7 +21,7 @@ export class OffensiveAI {
       const nearest = defense.reduce((a, b) => distance(p, a) < distance(p, b) ? a : b);
       const away = normalize(p.x - nearest.x, p.z - nearest.z);
       const phase = sim.time * 0.5 + p.index * 1.8;
-      const target = { x: x + Math.sin(phase) * 0.5 + away.x * 0.35, z: z + Math.cos(phase) * 0.45 + away.z * 0.4 };
+      const target = { x: x + DM.sin(phase) * 0.5 + away.x * 0.35, z: z + DM.cos(phase) * 0.45 + away.z * 0.4 };
       p.state = 'spacing'; p.decision = 'Ocupar espacio libre';
       if (transition && p !== owner) {
         target.x = dir * (p.ratings.speed > 77 ? 11.1 : 6.5);
@@ -28,7 +29,7 @@ export class OffensiveAI {
         p.state = 'sprint'; p.decision = 'Correr carril de transición';
       }
       if (p.id === possession.cutter && elapsed > 3.5 && elapsed < 9 && !transition) {
-        target.x = dir * 11.5; target.z = Math.sin(elapsed * 0.6) * 1.7;
+        target.x = dir * 11.5; target.z = DM.sin(elapsed * 0.6) * 1.7;
         p.state = 'cut'; p.decision = 'Corte por espalda de defensa';
       }
       if (p.id === possession.screener && owner && p !== owner && !transition) {
@@ -43,7 +44,7 @@ export class OffensiveAI {
           }
         } else if (screenAge < 5.5) {
           const pop = possession.play === 'pickPop';
-          target.x = dir * (pop ? 5.6 : 11.7); target.z = pop ? (owner.z > 0 ? -4.6 : 4.6) : -Math.sign(owner.z || 1) * 1.2;
+          target.x = dir * (pop ? 5.6 : 11.7); target.z = pop ? (owner.z > 0 ? -4.6 : 4.6) : -DM.sign(owner.z || 1) * 1.2;
           p.state = pop ? 'spacing' : 'cut'; p.decision = pop ? 'Abrirse tras pantalla' : 'Continuar hacia el aro';
         }
       }
@@ -63,7 +64,7 @@ export class OffensiveAI {
           p.state = 'drive'; p.decision = 'Atacar intervalo';
         } else {
           target.x = p.x + dir * 0.14;
-          target.z = p.z + Math.sin(sim.time * 1.5 + p.index) * 0.55;
+          target.z = p.z + DM.sin(sim.time * 1.5 + p.index) * 0.55;
           p.state = 'dribble'; p.decision = 'Leer defensa';
           if (possession.screenSet && sim.time - possession.screenStarted < 2) {
             target.x = p.x + dir * 1.5; target.z = p.z + possession.side * 1.8;
@@ -73,7 +74,7 @@ export class OffensiveAI {
         if (p.action === 'shoot' || p.action === 'freeThrow') { target.x = p.x; target.z = p.z; }
         if (p.cooldown <= 0 && !sim.pendingAction && sim.ball.mode === 'held' && p.heldTime > 0.35) {
           this.decide(sim, p, defense, hoop, elapsed, advance, transition);
-          p.cooldown = sim.random.range(0.42, 0.85) * (1.25 - p.ratings.decisions / 250) / Math.max(0.65, p.energy) * (1 - (sim.teams[p.team].profile.tempo - 0.5) * 0.5);
+          p.cooldown = sim.random.range(0.42, 0.85) * (1.25 - p.ratings.decisions / 250) / DM.max(0.65, p.energy) * (1 - (sim.teams[p.team].profile.tempo - 0.5) * 0.5);
         }
       }
       p.target = { x: clamp(target.x, -13.1, 13.1), z: clamp(target.z, -6.7, 6.7) };
@@ -82,23 +83,23 @@ export class OffensiveAI {
 
   decide(sim, p, defense, hoop, elapsed, advance, transition) {
     const team = sim.teams[p.team], pos = sim.possession;
-    const d = distance(p, hoop), closest = Math.min(...defense.map(q => distance(p, q)));
+    const d = distance(p, hoop), closest = DM.min(...defense.map(q => distance(p, q)));
     const shot = sim.shooting.quality(sim, p);
     const window = 8 + (team.profile.tempo - 0.5) * 6, hurry = clamp((window - sim.shotClock) / window, 0, 1);
     const prof = team.profile, tempo = prof.tempo, readyAfter = 5 - (tempo - 0.5) * 6.3, pace = 1 - (tempo - 0.5) * 0.4;
     const ready = elapsed > readyAfter || (transition && d < 4) || p.catchQuality > 1;
     const teammates = team.active.filter(q => q !== p);
     const options = teammates.map(q => {
-      const open = Math.min(...defense.map(r => distance(q, r)));
-      const lane = Math.min(...defense.map(r => segmentDistance(r, p, q)));
+      const open = DM.min(...defense.map(r => distance(q, r)));
+      const lane = DM.min(...defense.map(r => segmentDistance(r, p, q)));
       const progress = (q.x - p.x) * sim.direction(p.team);
-      let value = open * 0.22 + Math.min(lane, 2) * 0.3 + sim.shooting.quality(sim, q) * 0.8 + (sim.usageOf(q) - 1) * 1.1;
-      value -= Math.max(0, distance(p, q) - 12) * 0.15;
+      let value = open * 0.22 + DM.min(lane, 2) * 0.3 + sim.shooting.quality(sim, q) * 0.8 + (sim.usageOf(q) - 1) * 1.1;
+      value -= DM.max(0, distance(p, q) - 12) * 0.15;
       if (transition) value += progress * 0.15;
       if (q.id === pos.postPlayer && pos.play === 'post') value += 0.65;
       if (q.id === pos.screener && pos.screenSet) value += 0.75;
       if (q.state === 'cut' && open > 1) value += 0.65;
-      if (sim.time < p.driveUntil && Math.abs(q.z) > 4.5 && closest < 1.8) value += 1.1;
+      if (sim.time < p.driveUntil && DM.abs(q.z) > 4.5 && closest < 1.8) value += 1.1;
       if (pos.lastPasser === q.id && sim.time - pos.lastPassTime < 2.5) value -= 1;
       return { q, value, lane, open };
     }).sort((a, b) => b.value - a.value);
@@ -106,7 +107,7 @@ export class OffensiveAI {
     const zoneMult = d > 6.75 ? prof.three : d < 2.8 ? prof.rim : prof.mid;
     const shootValue = (shot * 1.5 + hurry * 0.9 + (p.heldTime < 1.4 ? 0.16 : 0)) * zoneMult * sim.usageOf(p);
     const passValue = best.value * 0.7 * team.profile.pass + (closest < 1 ? 0.35 : 0);
-    const rimLane = Math.min(...defense.filter(q => (q.x - p.x) * sim.direction(p.team) > 0.4).map(q => segmentDistance(q, p, hoop)), 4);
+    const rimLane = DM.min(...defense.filter(q => (q.x - p.x) * sim.direction(p.team) > 0.4).map(q => segmentDistance(q, p, hoop)), 4);
     const driveValue = (p.ratings.handling / 130 + rimLane * 0.22 + (closest > 1.5 ? 0.2 : 0)) * team.profile.drive * prof.rim * p.energy;
     const noise = () => sim.random.range(-0.15, 0.15);
     if (!advance && ready && (sim.shotClock < 1.8 || (d < 2.8 && p.heldTime > 0.45) || (shootValue + noise() > passValue && shootValue > driveValue && elapsed > readyAfter + 1))) {
@@ -205,10 +206,10 @@ export class MovementSystem {
   update(sim, dt) {
     const players = sim.players;
     for (const p of players) {
-      p.cooldown = Math.max(0, p.cooldown - dt); p.contact = Math.max(0, p.contact - dt * 2);
-      if (p.actionTime > 0) p.actionTime = Math.max(0, p.actionTime - dt); else p.action = null;
+      p.cooldown = DM.max(0, p.cooldown - dt); p.contact = DM.max(0, p.contact - dt * 2);
+      if (p.actionTime > 0) p.actionTime = DM.max(0, p.actionTime - dt); else p.action = null;
       let dx = p.target.x - p.x, dz = p.target.z - p.z;
-      const targetDistance = Math.hypot(dx, dz);
+      const targetDistance = DM.hypot(dx, dz);
       const forward = normalize(dx, dz);
       let desiredX = forward.x, desiredZ = forward.z;
       // Predictive separation steers before contact; hard separation below is a safety net.
@@ -216,7 +217,7 @@ export class MovementSystem {
         if (other === p) continue;
         const px = p.x + p.vx * 0.15 - other.x - other.vx * 0.15;
         const pz = p.z + p.vz * 0.15 - other.z - other.vz * 0.15;
-        const d = Math.hypot(px, pz);
+        const d = DM.hypot(px, pz);
         const radius = p.team === other.team ? 1.35 : 0.8;
         if (d < radius && d > 0.01) {
           const strength = (radius - d) / radius;
@@ -232,17 +233,17 @@ export class MovementSystem {
       if (p.action === 'shoot' || p.action === 'freeThrow') maxSpeed = 0;
       if (p.state === 'screen' && targetDistance < 0.6) maxSpeed *= 0.1;
       if (p.stuck > 0) { p.stuck -= dt; maxSpeed *= 0.3; }
-      const speed = Math.min(maxSpeed, targetDistance * 3.8);
+      const speed = DM.min(maxSpeed, targetDistance * 3.8);
       const acc = (7 + p.ratings.acceleration * 0.075) * dt;
       const dv = normalize(heading.x * speed - p.vx, heading.z * speed - p.vz);
-      const change = Math.min(acc, Math.hypot(heading.x * speed - p.vx, heading.z * speed - p.vz));
+      const change = DM.min(acc, DM.hypot(heading.x * speed - p.vx, heading.z * speed - p.vz));
       p.vx += dv.x * change; p.vz += dv.z * change;
       p.x = clamp(p.x + p.vx * dt, -13.35, 13.35); p.z = clamp(p.z + p.vz * dt, -7.05, 7.05);
       const focus = defensive ? sim.ball : (sim.ball.owner === p && speed < 1 ? { x: sim.direction(p.team) * COURT.hoopX, z: 0 } : { x: p.x + p.vx, z: p.z + p.vz });
       if (distance(focus, p) > 0.1) {
-        const angle = Math.atan2(focus.x - p.x, focus.z - p.z);
-        const delta = Math.atan2(Math.sin(angle - p.facing), Math.cos(angle - p.facing));
-        p.facing += delta * Math.min(1, dt * (defensive ? 9 : 7));
+        const angle = DM.atan2(focus.x - p.x, focus.z - p.z);
+        const delta = DM.atan2(DM.sin(angle - p.facing), DM.cos(angle - p.facing));
+        p.facing += delta * DM.min(1, dt * (defensive ? 9 : 7));
       }
     }
     for (let iteration = 0; iteration < 2; iteration++) {
@@ -262,9 +263,9 @@ export class MovementSystem {
 export class StaminaSystem {
   update(sim, dt) {
     for (const team of sim.teams) for (const p of team.roster) {
-      if (!p.active) p.energy = Math.min(1, p.energy + dt * 0.0038);
+      if (!p.active) p.energy = DM.min(1, p.energy + dt * 0.0038);
       else {
-        const effort = Math.hypot(p.vx, p.vz) / 6, tac = sim.teams[p.team].tactics;
+        const effort = DM.hypot(p.vx, p.vz) / 6, tac = sim.teams[p.team].tactics;
         const load = (1 + 0.005 * (tac.pressure - 50) * (['defense', 'help', 'closeout'].includes(p.state) ? 1 : 0)) * (1 + 0.003 * (tac.tempo - 50));
         p.energy = clamp(p.energy - dt * (0.00018 + effort * 0.0015) * (1.35 - p.ratings.stamina / 200) * load, 0.25, 1);
         p.minutes += dt / 60;
@@ -276,7 +277,7 @@ export class StaminaSystem {
 export class SubstitutionSystem {
   choose(sim, team, out) {
     const limit = sim.rules.foulLimit, gm = sim.rules.periods * sim.rules.periodSeconds / 60;
-    const score = q => q.energy * 3 - Math.abs(q.height - out.height) + (q.targetMin != null ? (q.targetMin - q.minutes) / gm * 4 : 0);
+    const score = q => q.energy * 3 - DM.abs(q.height - out.height) + (q.targetMin != null ? (q.targetMin - q.minutes) / gm * 4 : 0);
     return team.roster.filter(q => !q.active && q.fouls < limit).sort((a, b) => score(b) - score(a))[0];
   }
   swap(sim, team, p, sub, text) {

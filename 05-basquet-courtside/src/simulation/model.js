@@ -1,3 +1,4 @@
+import { DM } from '../../../assets/common/dmath.mjs'; // Math determinista: el partido en vivo online debe dar lo mismo en el servidor y en todos los navegadores
 import { CLUBS } from '../../../assets/common/clubs.mjs';
 // World units are metres; time is seconds. X is court length, Z court width.
 export const COURT = { halfLength: 14, halfWidth: 7.5, hoopX: 12.425, rimY: 3.05, rimRadius: 0.23, ballRadius: 0.12 };
@@ -21,10 +22,10 @@ export const defaultTactics = () => ({
 });
 export const defaultPlan = () => ({ closer: null, foulPolicy: 'normal', staminaPolicy: 'normal' });
 export const textOn = hex => { const n = parseInt(hex.slice(1), 16), l = ((n >> 16) * 0.299 + ((n >> 8) & 255) * 0.587 + (n & 255) * 0.114); return l > 150 ? '#17252b' : '#fff5e6'; };
-export const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
+export const clamp = (n, lo, hi) => DM.max(lo, DM.min(hi, n));
 export const lerp = (a, b, t) => a + (b - a) * t;
-export const distance = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
-export const normalize = (x, z) => { const d = Math.hypot(x, z) || 1; return { x: x / d, z: z / d }; };
+export const distance = (a, b) => DM.hypot(a.x - b.x, a.z - b.z);
+export const normalize = (x, z) => { const d = DM.hypot(x, z) || 1; return { x: x / d, z: z / d }; };
 export function segmentDistance(p, a, b) {
   const dx = b.x - a.x, dz = b.z - a.z;
   const t = clamp(((p.x - a.x) * dx + (p.z - a.z) * dz) / (dx * dx + dz * dz || 1), 0, 1);
@@ -32,9 +33,9 @@ export function segmentDistance(p, a, b) {
 }
 export class Random {
   constructor(seed = 41) { this.state = seed >>> 0; }
-  next() { let t = this.state += 0x6D2B79F5; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }
+  next() { let t = this.state += 0x6D2B79F5; t = DM.imul(t ^ t >>> 15, t | 1); t ^= t + DM.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }
   range(a, b) { return lerp(a, b, this.next()); }
-  pick(items) { return items[Math.floor(this.next() * items.length)]; }
+  pick(items) { return items[DM.floor(this.next() * items.length)]; }
 }
 export const NAMES = [
   ['D. Vega', 'M. Brooks', 'J. Silva', 'A. Carter', 'N. Okafor', 'L. Reed', 'I. Martín', 'T. Young'],
@@ -89,12 +90,12 @@ export class Team {
   buildProfile() {
     const s = STYLES[this.style] || STYLES.BALANCED, t = this.tactics, k = v => 1 + (v - 50) * 0.012;
     const inside = (t.inside - 50) / 50, aggr = (t.aggression - 50) / 50, plays = [...s.plays];
-    const roll = Math.round((t.pickRoll - 50) / 25), skew = Math.round(inside * 2);
-    for (let i = 0; i < Math.abs(roll); i++) {
+    const roll = DM.round((t.pickRoll - 50) / 25), skew = DM.round(inside * 2);
+    for (let i = 0; i < DM.abs(roll); i++) {
       if (roll > 0) plays.push('pickRoll', 'pickPop');
       else for (const type of ['pickRoll', 'pickPop']) { const at = plays.indexOf(type); if (at >= 0 && plays.length > 2) plays.splice(at, 1); }
     }
-    for (let i = 0; i < Math.abs(skew); i++) plays.push(...(skew > 0 ? ['post', 'drive'] : ['motion', 'pickPop']));
+    for (let i = 0; i < DM.abs(skew); i++) plays.push(...(skew > 0 ? ['post', 'drive'] : ['motion', 'pickPop']));
     return {
       pace: s.pace * (1 + (t.tempo - 50) * 0.0072), three: s.three * k(t.shotThree) * (1 - 0.25 * inside), rim: k(t.shotRim) * (1 + 0.2 * inside), mid: k(t.shotMid),
       drive: s.drive * (1 + 0.25 * aggr) * (1 + 0.12 * inside), pass: s.pass * (1 + (t.ballMovement - 50) * 0.005), plays,

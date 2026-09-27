@@ -1,3 +1,4 @@
+import { DM } from '../../../assets/common/dmath.mjs'; // Math determinista: el partido en vivo online debe dar lo mismo en el servidor y en todos los navegadores
 import { DEFAULT_RULES, COURT, STYLES, Random, Team, Ball, PLAY_NAMES, clamp, distance } from './model.js';
 import { OffensiveAI, DefensiveAI, MovementSystem, StaminaSystem, SubstitutionSystem } from './ai.js';
 import { DribbleSystem, PassingSystem, ShootingSystem, BallPhysics, ReboundSystem } from './ball.js';
@@ -37,7 +38,7 @@ export class MatchSimulator {
   }
   assignAllMarks() { this.assignMarks(1, 0); this.assignMarks(0, 1); }
   isClutch() {
-    const last = this.period >= this.rules.periods, margin = Math.abs(this.teams[0].score - this.teams[1].score);
+    const last = this.period >= this.rules.periods, margin = DM.abs(this.teams[0].score - this.teams[1].score);
     return last && this.clock <= this.rules.periodSeconds * 0.3 && margin <= 8;
   }
   usageOf(p) { return p.usage * (p.id === this.teams[p.team].plan.closer && this.isClutch() ? 1.25 : 1); }
@@ -66,7 +67,7 @@ export class MatchSimulator {
   }
   get players() { return [...this.teams[0].active, ...this.teams[1].active]; }
   findPlayer(id) { return this.teams.flatMap(t => t.roster).find(p => p.id === id); }
-  direction(team) { return (team === 0 ? 1 : -1) * (this.period > Math.ceil(this.rules.periods / 2) ? -1 : 1); }
+  direction(team) { return (team === 0 ? 1 : -1) * (this.period > DM.ceil(this.rules.periods / 2) ? -1 : 1); }
   start() { if (this.phase === 'ready') { this.phase = 'live'; this.record('start', 'Salto inicial · comienza el partido'); } }
   record(type, text, player = null, visible = true) {
     this.metrics[type] = (this.metrics[type] || 0) + 1;
@@ -140,7 +141,7 @@ export class MatchSimulator {
   inbound() {
     const d = this.dead, p = d.inbounder;
     this.phase = 'live'; this.newPossession(d.team, p, false);
-    if (d.keepClock) this.shotClock = Math.max(this.rules.offensiveReset, d.savedClock);
+    if (d.keepClock) this.shotClock = DM.max(this.rules.offensiveReset, d.savedClock);
     this.passing.prepare(this, p, d.receiver); this.dead = null;
     this.record('inbound', 'Saque', p, false);
   }
@@ -157,7 +158,7 @@ export class MatchSimulator {
       if (shot.points === 3) { p.stats.tpm++; team.stats.tpm++; }
       if (shot.type === 'layup' || shot.type === 'dunk') p.stats.rimM++;
       if (shot.transition) team.stats.fastBreakPoints += shot.points;
-      if (Math.abs(shot.origin.x) > 8.2 && Math.abs(shot.origin.z) < 2.5) team.stats.paintPoints += shot.points;
+      if (DM.abs(shot.origin.x) > 8.2 && DM.abs(shot.origin.z) < 2.5) team.stats.paintPoints += shot.points;
       const passer = this.findPlayer(this.possession.lastPasser);
       if (passer && passer !== p && this.time - this.possession.lastPassTime < 4) { passer.stats.assists++; team.stats.assists++; }
     }
@@ -187,9 +188,9 @@ export class MatchSimulator {
   setupFreeThrow() {
     const f = this.freeThrows, p = f.shooter, dir = this.direction(p.team);
     this.giveBall(p); p.x = dir * 8.15; p.z = 0; p.vx = p.vz = 0;
-    p.target = { x: p.x, z: 0 }; p.facing = Math.atan2(dir, 0);
+    p.target = { x: p.x, z: 0 }; p.facing = DM.atan2(dir, 0);
     this.players.filter(q => q !== p).forEach((q, i) => {
-      q.target = { x: dir * (10.6 - Math.floor(i / 2) * 1.1), z: i % 2 ? -2.8 : 2.8 };
+      q.target = { x: dir * (10.6 - DM.floor(i / 2) * 1.1), z: i % 2 ? -2.8 : 2.8 };
       q.state = 'walk';
     });
     f.shooting = false; f.resolved = false;
@@ -229,7 +230,7 @@ export class MatchSimulator {
     if (this.phase === 'live' && (this.possession.team !== teamId || !this.ball.owner)) return false;
     team.timeouts--; this.record('timeout', `${team.name} · tiempo muerto`); this.emitAudio('whistle');
     this.deadBall(teamId, 8, 'timeout', true);
-    this.teams.forEach(t => t.roster.forEach(p => p.energy = Math.min(1, p.energy + 0.06)));
+    this.teams.forEach(t => t.roster.forEach(p => p.energy = DM.min(1, p.energy + 0.06)));
     return true;
   }
   finishPeriod() {
@@ -258,7 +259,7 @@ export class MatchSimulator {
       this.intervalTimer -= dt;
       if (this.intervalTimer <= 0) {
         this.period++; this.periodScores.push([0, 0]); this.clock = this.period > this.rules.periods ? this.rules.overtimeSeconds : this.rules.periodSeconds;
-        this.teams.forEach(t => { t.fouls = 0; t.roster.forEach(p => p.energy = Math.min(1, p.energy + 0.08)); });
+        this.teams.forEach(t => { t.fouls = 0; t.roster.forEach(p => p.energy = DM.min(1, p.energy + 0.08)); });
         this.substitutions.update(this, true);
         const team = this.alternating; this.alternating = 1 - this.alternating;
         this.arrange(team); this.newPossession(team, this.teams[team].active[0], false); this.phase = 'live';
@@ -273,8 +274,8 @@ export class MatchSimulator {
       if (this.dead.timer <= 0) this.inbound();
       return;
     }
-    this.clock = Math.max(0, this.clock - dt);
-    if (this.ball.mode !== 'shot') this.shotClock = Math.max(0, this.shotClock - dt);
+    this.clock = DM.max(0, this.clock - dt);
+    if (this.ball.mode !== 'shot') this.shotClock = DM.max(0, this.shotClock - dt);
     if (this.shotClock <= 0 && this.ball.mode !== 'shot') {
       this.teams[this.possession.team].stats.turnovers++;
       if (this.ball.owner) this.ball.owner.stats.turnovers++;

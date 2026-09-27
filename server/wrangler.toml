@@ -1,0 +1,22 @@
+name = "eternal-manager-online"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+
+[vars]
+# Origenes del juego permitidos (separados por coma)
+APP_ORIGIN = "http://localhost:8080"
+
+[[durable_objects.bindings]]
+name = "LEAGUE"
+class_name = "LeagueDO"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["LeagueDO"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "eternal-manager"
+database_id = "local-dev"
+
+# Secret (wrangler secret put SESSION_SECRET): cadena larga aleatoria

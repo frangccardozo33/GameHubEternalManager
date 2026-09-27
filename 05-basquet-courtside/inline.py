@@ -1,6 +1,6 @@
 import re, sys, pathlib
-dist = pathlib.Path('dist')
-html = (dist / 'index.html').read_text()
+dist = pathlib.Path(sys.argv[2] if len(sys.argv) > 2 else 'dist')
+html = (dist / (sys.argv[3] if len(sys.argv) > 3 else 'index.html')).read_text()
 def css(m):
     return '<style>' + (dist / m.group(1).lstrip('/')).read_text() + '</style>'
 def js(m):

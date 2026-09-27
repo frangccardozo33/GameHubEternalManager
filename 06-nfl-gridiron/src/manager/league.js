@@ -79,10 +79,10 @@ export class League {
 
   // ---------- matches
   seedFor(fx) { return (this.data.seed * 31 + this.data.year * 97 + hash(fx.id)) >>> 0; }
-  buildMatch(fx, { userGameplan = null } = {}) {
+  buildMatch(fx, { userGameplan = null, gameplans = null } = {}) {
     const d = this.data, home = d.teams[fx.home], away = d.teams[fx.away];
     const providers = [new LineupProvider(this, home.id), new LineupProvider(this, away.id)];
-    const gpFor = (t, o) => t.id === d.userTeam ? clone(userGameplan || t.gameplan) : matchupGameplan(this, t, o);
+    const gpFor = (t, o) => gameplans?.[t.id] ? clone(gameplans[t.id]) : t.id === d.userTeam ? clone(userGameplan || t.gameplan) : matchupGameplan(this, t, o);
     const gps = [gpFor(home, away), gpFor(away, home)];
     const teams = [home, away].map((t, i) => ({ id: t.id, name: t.name, short: t.short, crest: t.crest, city: t.city, mascot: t.mascot, color: t.color, dark: t.dark, style: t.style, defense: t.defense, gameplan: gps[i], roster: providers[i], discipline: providers[i].discipline }));
     const rec = new GameRecorder(this, home.id, away.id);
