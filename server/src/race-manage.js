@@ -1,6 +1,7 @@
 // Gestión del equipo por el DT humano de un campeonato online de carreras (LRO): estrategia de carrera, pilotos (titular, entrenamiento),
 // mercado de pilotos y traspasos entre DT. El cliente es una página liviana (07-carreras-apex/lro-manager.html) que recibe una vista del
 // equipo (exportState) y manda órdenes que se validan acá.
+import { equipCard, listCard, unlistCard, buyCard, EDITIONS, cardsOf } from './race-cards.js';
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
 const num = (v, lo, hi) => { v = +v; if (!Number.isFinite(v)) throw new Error('Número inválido'); return Math.min(hi, Math.max(lo, v)); };
@@ -19,18 +20,21 @@ export function setHumans(g, ids, names = {}) {
   for (const t of g.career.teams) if (!g.humans.includes(t.id)) { delete t.strat; t.humanName = null; }
 }
 
-const drv = (d) => ({ id: d.id, name: d.name, short: d.short, number: d.number, nationality: d.nationality, age: d.age, personality: d.personality, rating: d.rating, salary: d.salary, marketValue: d.marketValue, stats: d.stats, photo: d.photo || null, focus: d.focus == null ? null : d.focus, teamId: d.teamId });
+const drv = (g, d) => ({ id: d.id, name: d.name, short: d.short, number: d.number, nationality: d.nationality, age: d.age, personality: d.personality, rating: d.rating, salary: d.salary, marketValue: d.marketValue, stats: d.stats, photo: d.photo || null, focus: d.focus == null ? null : d.focus, teamId: d.teamId,
+  xp: d.xp || 0, equippedCardId: d.equippedCardId || null, equippedCardLogic: d.equippedCardLogic || null,
+  cards: cardsOf(g, d.id).map((c) => ({ id: c.id, editionId: c.editionId, name: EDITIONS.find((e) => e.id === c.editionId)?.name, uses: EDITIONS.find((e) => e.id === c.editionId)?.uses, usesLeft: c.usesLeft, ownerTeamId: c.ownerTeamId })) });
 // Vista del equipo para su DT (no es el estado completo del juego: el cliente es una página liviana).
 export function exportState(g, club) {
   const c = g.career, me = team(g, +club), r = c.calendar[c.roundIndex];
   return JSON.stringify({
     module: 'carreras', me: me.id, laps: LAPS, credits: me.credits,
     team: { id: me.id, name: me.name, color: me.color, logo: me.logo, points: me.points, wins: me.wins, podiums: me.podiums, activeDriverId: me.activeDriverId, driverIds: me.driverIds, strat: me.strat || defaultStrat() },
-    drivers: me.driverIds.map((i) => drv(driver(g, i))),
-    market: c.driversPool.filter((d) => d.teamId === null).sort((a, b) => b.rating - a.rating).slice(0, 80).map(drv),
-    teams: c.teams.map((t) => ({ id: t.id, name: t.name, color: t.color, points: t.points, wins: t.wins, podiums: t.podiums, human: (g.humans || []).includes(t.id), humanName: t.humanName || null, drivers: t.driverIds.map((i) => { const d = driver(g, i); return drv(d); }) })),
+    drivers: me.driverIds.map((i) => drv(g, driver(g, i))),
+    market: c.driversPool.filter((d) => d.teamId === null).sort((a, b) => b.rating - a.rating).slice(0, 80).map((d) => drv(g, d)),
+    teams: c.teams.map((t) => ({ id: t.id, name: t.name, color: t.color, points: t.points, wins: t.wins, podiums: t.podiums, human: (g.humans || []).includes(t.id), humanName: t.humanName || null, drivers: t.driverIds.map((i) => drv(g, driver(g, i))) })),
     round: r ? { label: `Fecha ${r.round}`, trackId: r.trackId } : null, myMatch: r ? 'race' + c.roundIndex : null,
     tradeProps: (g.tradeProps || []).filter((t) => t.from === me.id || t.to === me.id),
+    cardListings: Object.entries(g.cardListings || {}).map(([id, price]) => { const card = g.specialCards[id], d = card && driver(g, card.driverId), owner = card && c.teams.find((t) => t.id === card.ownerTeamId); return card && d ? { id, price, driverName: d.name, editionName: EDITIONS.find((e) => e.id === card.editionId)?.name, ownerTeamId: card.ownerTeamId, ownerName: owner && owner.name } : null; }).filter(Boolean),
   });
 }
 
@@ -76,6 +80,11 @@ const OPS = {
     if (A.activeDriverId === p.give) A.activeDriverId = p.get; if (B.activeDriverId === p.get) B.activeDriverId = p.give;
     return { ok: true, msg: 'Traspaso completado.' };
   },
+  // cartas especiales: se ganan corriendo, se pueden vender por separado del piloto (ver race-cards.js)
+  equipCard: (g, t, a) => equipCard(g, t.id, +a[0], a[1] || null),
+  listCard: (g, t, a) => listCard(g, t.id, a[0], num(a[1], 1, 1e9)),
+  unlistCard: (g, t, a) => unlistCard(g, t.id, a[0]),
+  buyCard: (g, t, a) => buyCard(g, t.id, a[0]),
 };
 
 export function command(g, club, body, ctx) {

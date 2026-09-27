@@ -3,6 +3,7 @@
 import { makeRace } from './vendor/race-core.js';
 import { Lockstep, cleanAction, snapOf, LEAD_STEPS } from '../../07-carreras-apex/online/lockstep.mjs';
 import { setHumans, exportState, command, afterRound } from './race-manage.js';
+import { fixCards, boostedStats, primeCardContext, raceRating, gainMatchXP, rollCardDrop, consumeCardUse, clubCards, cardsOf, equipCard, listCard, unlistCard, buyCard } from './race-cards.js';
 
 const hex = (n) => '#' + (n >>> 0).toString(16).padStart(6, '0');
 const pub = (t) => ({ id: String(t.id), name: t.name, short: t.name.split(' ')[0].slice(0, 3).toUpperCase(), city: '', mascot: t.name, color: hex(t.color), dark: hex(t.color), crest: t.logo ? 'assets/logos/racing/' + t.logo : '' });
@@ -14,6 +15,7 @@ class RaceLive {
     this.g = g; this.startAt = startAt;
     this.cfg = extras.cfg || { seed: (((g.seed * 2654435761 + g.career.roundIndex * 40503) >>> 0) % 1e9) + 1 };
     const career = JSON.parse(JSON.stringify(g.career)); this.round = career.roundIndex;
+    for (const d of career.driversPool) if (d.equippedCardLogic) d.stats = boostedStats(d);
     this.R = makeRace(career);
     this.R.seedRng(this.cfg.seed); this.R.setSimT(0); this.R.qualify(); this.R.beginRace();
     this.ls = new Lockstep(this.R, startAt, extras.actions || []);
@@ -55,6 +57,13 @@ class RaceLive {
       const team = c.teams.find((t) => t.id === car.team.id), p = pts[i] || 0;
       team.points += p; if (i === 0) team.wins++; if (i < 3) team.podiums++; if (car.dnf) team.dnfs++; if (pole && car.id === pole.id) team.poles++;
       c.championship.driverPoints[car.driver.id] = (c.championship.driverPoints[car.driver.id] || 0) + p;
+      // rating de carrera (1-10) -> XP y drop de cartas especiales, para el piloto real del campeonato (no el clon de la sim)
+      const d = g.career.driversPool.find((x) => x.id === car.driver.id);
+      if (d) {
+        d.careerRaces = (d.careerRaces || 0) + 1;
+        const rating = raceRating(car.dnf, i, s.order.length);
+        gainMatchXP(d, rating); rollCardDrop(g, d, rating); consumeCardUse(g, d);
+      }
     });
     const r = c.calendar[this.round]; r.completed = true; r.result = order.slice(0, 3).map((o) => o.driver);
     g.last = { round: this.round, order, track: trackOf(c).name };
@@ -66,9 +75,11 @@ export const carreras = {
   id: 'carreras',
   create(seed) {
     const career = data().newCareer(); career.teams.forEach((t) => { t.isPlayer = false; t.parts = null; });
-    return { v: 1, seed, career, done: [], last: null, humans: [], tradeProps: [] };
+    const g = { v: 1, seed, career, done: [], last: null, humans: [], tradeProps: [] };
+    fixCards(g); primeCardContext(g);
+    return g;
   },
-  load: (json) => JSON.parse(json),
+  load: (json) => { const g = JSON.parse(json); fixCards(g); return g; },
   serialize: (g) => JSON.stringify(g),
   clubs: (g) => g.career.teams.map((t) => String(t.id)),
   teams: (g) => g.career.teams.map(pub),
@@ -88,8 +99,16 @@ export const carreras = {
     c.roundIndex++;
     if (c.roundIndex >= c.calendar.length) { c.roundIndex = 0; c.season++; c.calendar.forEach((r) => { r.completed = false; r.result = null; }); c.teams.forEach((t) => { t.points = 0; }); c.championship.driverPoints = {}; }
     g.last = null;
+    primeCardContext(g);
   },
   results: (g) => g.done.slice(-40),
   makeLive: (g, matchId, startAt, extras, now) => new RaceLive(g, matchId, startAt, extras, now),
   setHumans, exportState, command,
+  // cartas especiales (drop por carrera, dueño = equipo, uso limitado, mercado propio)
+  clubCards: (g, teamId) => clubCards(g, teamId),
+  cardsOf: (g, did) => cardsOf(g, did),
+  equipCard: (g, teamId, did, cardId) => equipCard(g, teamId, did, cardId),
+  listCard: (g, teamId, cardId, price) => listCard(g, teamId, cardId, price),
+  unlistCard: (g, teamId, cardId) => unlistCard(g, teamId, cardId),
+  buyCard: (g, teamId, cardId) => buyCard(g, teamId, cardId),
 };
