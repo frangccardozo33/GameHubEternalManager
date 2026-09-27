@@ -2,9 +2,9 @@
 // La lógica de cada deporte vive en un adaptador (nfl.js, basquet.js, ...; ver mods.js) con una interfaz común.
 import { DurableObject } from 'cloudflare:workers';
 import { MODS } from './mods.js';
+import { PRE_MS, POST_MS, slotOf, firstDay, orderMatches } from './schedule.js';
 
 const CHUNK = 400000;
-const OPEN_BEFORE_MS = 5 * 60e3; // la transmisión se abre 5 min antes (intro, estudio y anuncios en el cliente)
 const TICK_MS = 100;             // frecuencia de envío a los espectadores
 const ALARM_LIVE_MS = 1000;      // avance del partido cuando no hay nadie mirando
 const json = (o, status = 200) => Response.json(o, { status });
@@ -36,37 +36,51 @@ export class LeagueDO extends DurableObject {
   }
   async saveMeta() { await this.ctx.storage.put('meta', this.meta); }
 
-  // ---------- calendario
-  roundStart() { return Math.max(this.meta.firstKickoff + (this.meta.rounds || 0) * this.meta.everyMs, this.meta.notBefore || 0); }
+  // ---------- calendario (ver schedule.js): una jornada por día, a la hora del módulo; los partidos de la jornada van en cola, uno atrás del otro
+  preMs() { return this.meta.preMs ?? PRE_MS[this.meta.module] ?? 200e3; }
+  plannedStart() {
+    const m = this.meta, r = m.rounds || 0;
+    m.day0 ??= firstDay(m.module, m.firstKickoff);
+    const base = m.fast ? m.firstKickoff + r * m.everyMs : slotOf(m.module, m.day0 + r);
+    return Math.max(base, m.notBefore || 0);
+  }
+  // cola de la jornada actual: primero los partidos entre dos DT humanos, después DT contra IA, al final IA contra IA
+  plan() {
+    const m = this.meta, r = this.mod.round(this.league); if (!r) return null;
+    if (!m.q || m.q.round !== (m.rounds || 0)) { m.q = { round: m.rounds || 0, order: orderMatches(r.matches, Object.keys(m.clubs || {})), idx: 0, openAt: this.plannedStart() }; this.metaDirty = true; }
+    return m.q;
+  }
+  cur() {
+    const q = this.meta.q; if (!q || q.round !== (this.meta.rounds || 0)) return null;
+    const id = q.order[q.idx]; return id ? { id, openAt: q.openAt, kickoff: q.openAt + this.preMs() } : null;
+  }
+  roundStart() { const q = this.meta.q; return q && q.round === (this.meta.rounds || 0) ? q.openAt : this.plannedStart(); }   // apertura de la transmisión del partido en curso (o del primero de la jornada)
   status(m, now) {
     if (m.played) return 'final';
-    const st = this.roundStart(), lv = this.live.get(m.id);
-    if (lv && lv.finished) return 'final';
-    if (now >= st) return 'live';
-    return now >= st - OPEN_BEFORE_MS ? 'open' : 'scheduled';
+    const lv = this.live.get(m.id); if (lv && lv.finished) return 'final';
+    const c = this.cur(); if (c && c.id === m.id) return now >= c.kickoff ? 'live' : now >= c.openAt ? 'open' : 'scheduled';
+    return 'queued';
   }
   publicState(now = Date.now()) {
-    const mod = this.mod, r = mod.round(this.league), st = r ? this.roundStart() : null;
+    const mod = this.mod, r = mod.round(this.league), q = r ? this.plan() : null, c = this.cur(), st = r ? this.roundStart() : null;
     return {
       module: this.meta.module, year: r?.year ?? null, phase: r?.phase ?? null, week: this.meta.rounds || 0, label: r?.label || null, startAt: st, now,
       teams: mod.teams(this.league), clubs: this.meta.clubs || {},
-      matches: r ? r.matches.map((f) => ({ ...f, startAt: st, status: this.status(f, now), hud: this.live.get(f.id)?.hud() || null, viewers: [...this.socks.values()].filter((a) => a.match === f.id).length })) : [],
+      matches: r ? r.matches.map((f) => ({ ...f, startAt: c && c.id === f.id ? c.kickoff : null, openAt: c && c.id === f.id ? c.openAt : null, order: q ? q.order.indexOf(f.id) + 1 || null : null, status: this.status(f, now), hud: this.live.get(f.id)?.hud() || null, viewers: [...this.socks.values()].filter((a) => a.match === f.id).length })) : [],
       results: mod.results(this.league), standings: mod.standings(this.league),
     };
   }
 
-  // ---------- ciclo de vida de partidos
+  // ---------- ciclo de vida de partidos: solo el partido en curso tiene motor; al terminar se abre la transmisión del siguiente
   ensureLive(now) {
     const r = this.mod.round(this.league); if (!r) return;
-    const st = this.roundStart();
-    if (now < st - OPEN_BEFORE_MS) return;
-    for (const f of r.matches) {
-      if (f.played || this.live.has(f.id)) continue;
-      const saved = (this.meta.live ||= {})[f.id] || {};
-      const lv = this.mod.makeLive(this.league, f.id, st, { ...saved, gameplans: this.meta.gameplans || {} }, now);
-      this.live.set(f.id, lv);
-      this.meta.live[f.id] = lv.persist(); this.metaDirty = true;
-    }
+    const q = this.plan(); if (!q) return;
+    while (q.idx < q.order.length && r.matches.find((f) => f.id === q.order[q.idx])?.played) { q.idx++; this.metaDirty = true; }   // ya jugado (p. ej. tras un reinicio)
+    const c = this.cur(); if (!c || this.live.has(c.id) || now < c.openAt) return;
+    const saved = (this.meta.live ||= {})[c.id] || {};
+    const lv = this.mod.makeLive(this.league, c.id, c.kickoff, { ...saved, gameplans: this.meta.gameplans || {} }, now);
+    this.live.set(c.id, lv);
+    this.meta.live[c.id] = lv.persist(); this.metaDirty = true;
   }
   socketsOf(matchId) { return [...this.socks].filter(([, a]) => a.match === matchId); }
   send(ws, msg) { try { ws.send(typeof msg === 'string' ? msg : JSON.stringify(msg)); } catch { this.socks.delete(ws); } }
@@ -81,7 +95,7 @@ export class LeagueDO extends DurableObject {
     if (rd && rd.type === 'draft' && this.mod.tickLeague) { // draft online: sin partidos, turnos con reloj
       if (now >= this.roundStart()) {
         const t = this.mod.tickLeague(this.league, now); let dirty = t.changed;
-        if (t.done) { this.mod.finishRound(this.league); this.meta.rounds = (this.meta.rounds || 0) + 1; this.meta.notBefore = Date.now() + 60e3; dirty = true; }
+        if (t.done) { this.mod.finishRound(this.league); this.meta.rounds = (this.meta.rounds || 0) + 1; this.meta.notBefore = Date.now() + POST_MS; dirty = true; }
         if (dirty) { this.meta.rev = (this.meta.rev || 0) + 1; await this.save(); }
       }
       await this.reschedule(); return;
@@ -99,11 +113,13 @@ export class LeagueDO extends DurableObject {
     }
     if (committed) {
       this.meta.rev = (this.meta.rev || 0) + 1;
-      const r = this.mod.round(this.league);
+      const q = this.meta.q, r = this.mod.round(this.league);
+      if (q) { q.idx++; q.openAt = Date.now() + POST_MS; }   // apenas termina, empieza la transmisión del siguiente
       if (r && r.matches.every((f) => f.played)) {
         this.mod.finishRound(this.league);
         this.meta.rounds = (this.meta.rounds || 0) + 1;
-        this.meta.notBefore = Date.now() + 60e3;
+        this.meta.notBefore = Date.now() + POST_MS;
+        this.meta.q = null;
       }
       await this.save();
     } else if (this.metaDirty) { this.metaDirty = false; await this.saveMeta(); }
@@ -115,7 +131,7 @@ export class LeagueDO extends DurableObject {
     if (!this.league) return;
     const now = Date.now(), r = this.mod.round(this.league);
     if (!r) return;
-    const openAt = this.roundStart() - OPEN_BEFORE_MS;
+    const c = this.cur(), openAt = c ? c.openAt : this.plannedStart();
     await this.ctx.storage.setAlarm(this.live.size || now >= openAt ? now + ALARM_LIVE_MS : openAt);
   }
   async alarm() { await this.ready; await this.tick(); }
@@ -123,7 +139,7 @@ export class LeagueDO extends DurableObject {
   // ---------- HTTP / WebSocket
   hello(matchId, club, now) {
     const r = this.mod.round(this.league), f = r?.matches.find((x) => x.id === matchId), lv = this.live.get(matchId);
-    return { type: 'hello', teams: null, ...(lv ? lv.hello(club) : {}), startAt: this.roundStart(), now, status: f ? this.status(f, now) : 'final', fixtureType: r?.type, label: r?.label };
+    return { type: 'hello', teams: null, ...(lv ? lv.hello(club) : {}), startAt: (this.cur() && this.cur().id === matchId) ? this.cur().kickoff : null, now, status: f ? this.status(f, now) : 'final', fixtureType: r?.type, label: r?.label };
   }
   async fetch(req) {
     await this.ready;
@@ -135,7 +151,7 @@ export class LeagueDO extends DurableObject {
       if (!MODS[b.module]) return json({ error: 'módulo no disponible' }, 400);
       this.mod = MODS[b.module];
       this.league = this.mod.create((Math.random() * 9e5 | 0) + 1);
-      this.meta = { module: b.module, firstKickoff: +b.firstKickoff, everyMs: Math.max(60e3, +b.everyMs || 864e5), rounds: 0, gameplans: {}, live: {}, clubs: {}, chunks: 0 };
+      this.meta = { module: b.module, firstKickoff: +b.firstKickoff, everyMs: Math.max(1e3, +b.everyMs || 864e5), fast: !!b.fast, preMs: b.preMs || undefined, day0: firstDay(b.module, +b.firstKickoff), rounds: 0, gameplans: {}, live: {}, clubs: {}, chunks: 0 };
       await this.save(); await this.reschedule();
       return json({ ok: true, clubs: this.mod.clubs(this.league) });
     }

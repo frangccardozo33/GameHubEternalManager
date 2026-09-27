@@ -63,7 +63,7 @@ class FootballLive {
 
 export const futbol = {
   id: 'futbol',
-  create(seed) { const c = TLM.Career.create({ seed }); for (const cl of Object.values(c.state.clubs)) cl.controlledBy = 'ai'; c.state.onlineSeason0 = c.state.season; return c; },
+  create(seed) { const c = TLM.Career.create({ seed }); for (const cl of Object.values(c.state.clubs)) cl.controlledBy = 'ai'; c.state.onlineSeason0 = c.state.season; c.state.onlineLive = true; return c; },
   load: (json) => TLM.Career.fromJSON(json),
   serialize: (c) => c.toJSON(),
   clubs: leagueIds,

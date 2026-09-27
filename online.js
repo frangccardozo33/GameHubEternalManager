@@ -44,11 +44,11 @@
       root.innerHTML = head + `<div class="settings-grid">
         <section class="panel"><div class="panel-title"><svg class="ico"><use href="#i-crown"/></svg> Mis ligas — ${esc(me.name)}</div><div class="panel-body">${rows}${err}<button class="gloss small" id="onLogout">Cerrar sesión</button>${server}</div></section>
         <section class="panel"><div class="panel-title"><svg class="ico"><use href="#i-bolt"/></svg> Crear o unirse</div><div class="panel-body">
-          <form id="onCreate"><div class="inline-form"><select id="onMod">${Object.entries(MODS).map(([k, v]) => `<option value="${k}"${READY.includes(k) ? '' : ' disabled'}>${v}${READY.includes(k) ? '' : ' (pronto)'}</option>`).join('')}</select></div><label class="field" for="onWhen">PRIMER PARTIDO</label><input id="onWhen" type="datetime-local" required><label class="field" for="onEvery">CADA CUÁNTO (MINUTOS)</label><input id="onEvery" type="number" min="30" value="1440" required><div class="modal-actions"><button class="gloss small green">Crear liga</button></div></form>
+          <form id="onCreate"><div class="inline-form"><select id="onMod">${Object.entries(MODS).map(([k, v]) => `<option value="${k}"${READY.includes(k) ? '' : ' disabled'}>${v}${READY.includes(k) ? '' : ' (pronto)'}</option>`).join('')}</select></div><label class="field" for="onWhen">DESDE CUÁNDO</label><input id="onWhen" type="datetime-local" required><p style="font-size:10px">Una jornada por día, uno atrás del otro (hora de Argentina): fútbol L–V 12:20 y S–D 18:00 · NFL 13:00 · básquet 15:00 · MMA 17:00 · carreras 19:00. Copas y playoffs, a los mismos horarios.</p><div class="modal-actions"><button class="gloss small green">Crear liga</button></div></form>
           <form id="onJoin" class="inline-form"><input id="onCode" maxlength="6" placeholder="Código de liga" required style="text-transform:uppercase"><button class="gloss small">Unirme</button></form>
           <p style="font-size:10px">Al crear una liga recibís un código para compartir con tus amigos.</p></div></section></div>`;
       $('onLogout').onclick = async () => { try { await api('/auth/logout', {}); } catch {} me = null; leagues = []; view(); };
-      $('onCreate').onsubmit = (e) => { e.preventDefault(); act(() => api('/api/leagues', { module: $('onMod').value, firstKickoff: new Date($('onWhen').value).getTime(), everyMin: +$('onEvery').value })); };
+      $('onCreate').onsubmit = (e) => { e.preventDefault(); act(() => api('/api/leagues', { module: $('onMod').value, firstKickoff: new Date($('onWhen').value).getTime(), fast: new URLSearchParams(location.search).has('fast') ? 1 : 0, preMs: +new URLSearchParams(location.search).get('preMs') || undefined, everyMin: +new URLSearchParams(location.search).get('every') || undefined })); };
       $('onJoin').onsubmit = (e) => { e.preventDefault(); act(() => api('/api/leagues/join', { code: $('onCode').value })); };
       root.querySelectorAll('[data-open]').forEach((b) => (b.onclick = () => openLeague(b.dataset.open, b.dataset.mod)));
     }
@@ -74,7 +74,7 @@
 
   const fmt = (ms) => new Date(ms).toLocaleString('es-AR', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
   const cd = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); return (s >= 3600 ? Math.floor(s / 3600) + 'h ' : '') + Math.floor(s / 60) % 60 + 'm ' + (s % 60) + 's'; };
-  const LBL = { scheduled: 'PROGRAMADO', open: 'TRANSMISIÓN ABIERTA', live: 'EN VIVO', final: 'FINAL' };
+  const LBL = { queued: 'EN COLA', scheduled: 'PROGRAMADO', open: 'TRANSMISIÓN ABIERTA', live: 'EN VIVO', final: 'FINAL' };
 
   async function openLeague(id, mod) {
     cur = { id, mod }; st = null; stopPoll(); await refresh(); poll = setInterval(refresh, 4000);

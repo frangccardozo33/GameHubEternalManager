@@ -43,7 +43,7 @@ while (guard++ < 200) {
   s.onlineRes = s.onlineRes || {};
   // igual que el DO: se prepara la jornada y se guarda el resultado de cada partido
   g.prepareRound();
-  for (const f of rd.matches) { const fx = s.fixtures[f.id]; if (f.played) continue; for (const id of [fx.homeId, fx.awayId]) { const cl = s.clubs[id]; if (cl.controlledBy === 'user') { if (cl.lineupMode === 'auto') TLM.autoLineup(s, cl); TLM.repairLineup(s, cl); } } s.onlineRes[f.id] = TLM.simulateMatch(s, fx); }
+  for (const f of rd.matches) { const fx = s.fixtures[f.id]; if (f.played) continue; for (const id of [fx.homeId, fx.awayId]) { const cl = s.clubs[id]; if (cl.controlledBy === 'user') { if (cl.lineupMode === 'auto') TLM.autoLineup(s, cl); TLM.repairLineup(s, cl); } } if (fx.cup) { const cfg = TLM.buildMatchConfig(s, fx); if (!cfg || !cfg.home || !cfg.away) console.log('FALLA cfg de copa', f.id); } s.onlineRes[f.id] = TLM.simulateMatch(s, fx); }
   F.finishRound(g); rounds++;
   if (rounds % 10 === 0) console.log('  jornada', rounds, rd.label);
 }

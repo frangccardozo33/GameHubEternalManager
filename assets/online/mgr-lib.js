@@ -38,7 +38,7 @@
     const now = Date.now() + meta.skew, st = meta.startAt, span = bar.querySelector('span');
     const fmt = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); return (h ? h + ' h ' : '') + m + ' min ' + (s % 60) + ' s'; };
     if (!st) span.textContent = 'La liga terminó.';
-    else { const left = st - now; span.textContent = left > 0 ? `Próximo evento: ${new Date(st).toLocaleString()} · faltan ${fmt(left)}${left < 300e3 ? ' · la transmisión está abierta' : ' · la estrategia y los pilotos se cierran 5 min antes'}` : 'Evento en curso'; }
+    else { const left = st - now; span.textContent = left > 0 ? `Próxima jornada: ${new Date(st).toLocaleString()} · faltan ${fmt(left)}${left < 300e3 ? ' · la transmisión está abierta' : ' · la estrategia y los pilotos se cierran cuando se abre la transmisión de tu partido'}` : 'Evento en curso'; }
   }
   function boot(title, render) {
     renderFn = render;

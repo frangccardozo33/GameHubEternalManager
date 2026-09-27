@@ -105,14 +105,14 @@ export default {
       return json({ id: l.id, module: l.module });
     }
     if (url.pathname === '/api/leagues' && req.method === 'POST') {
-      const { module, firstKickoff, everyMin } = await req.json().catch(() => ({}));
+      const { module, firstKickoff, everyMin, fast, preMs } = await req.json().catch(() => ({}));
       if (!['nfl', 'basquet', 'futbol', 'mma', 'carreras'].includes(module)) return json({ error: 'Ese modulo todavia no esta disponible online' }, 400);
       // el modulo se pasa al Durable Object en init
       const t0 = Number(firstKickoff) || Date.now() + 10 * 60e3;
       const id = crypto.randomUUID(), code = id.slice(0, 6).toUpperCase();
       await env.DB.prepare('INSERT INTO leagues (id,module,code,owner,created) VALUES (?,?,?,?,?)').bind(id, module, code, uid, Date.now()).run();
       await env.DB.prepare('INSERT INTO memberships (league,user,club) VALUES (?,?,?)').bind(id, uid, null).run();
-      const r = await env.LEAGUE.get(env.LEAGUE.idFromName(id)).fetch('https://do/init', { method: 'POST', body: JSON.stringify({ module, firstKickoff: t0, everyMs: Math.max(1, Number(everyMin) || 1440) * 60e3 }) });
+      const r = await env.LEAGUE.get(env.LEAGUE.idFromName(id)).fetch('https://do/init', { method: 'POST', body: JSON.stringify({ module, firstKickoff: t0, everyMs: Math.max(1, Number(everyMin) || 1440) * 60e3, fast: !!fast && String(env.APP_ORIGIN || '').startsWith('http://localhost'), preMs: fast ? Number(preMs) || undefined : undefined }) });
       if (!r.ok) return json({ error: 'No se pudo crear la liga' }, 500);
       return json({ id, code });
     }

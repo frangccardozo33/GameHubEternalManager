@@ -104,7 +104,7 @@ function bar() {
     const g = G(); if (!g) return; const now = Date.now() + skew, off = g.s.off, span = b.querySelector('span');
     if (off && off.stage === 'draft') { const pk = off.picks[off.pos]; const mine = pk && pk.teamId === me; span.textContent = pk ? `DRAFT · pick #${pk.n} (${g.team(pk.teamId).short})${mine ? ' · ¡ES TU TURNO!' : ''} · ${mine ? 'te quedan ' + fmt(90e3 - (now - (off.pickAt || now))) : 'esperando'}` : 'Draft terminado'; }
     else if (!startAt) span.textContent = 'La liga terminó.';
-    else { const left = startAt - now; span.textContent = left > 0 ? `Próximo partido: ${new Date(startAt).toLocaleString()} · faltan ${fmt(left)}${left < 300e3 ? ' · la transmisión está abierta' : ' · la rotación y las tácticas se cierran 5 min antes'}` : 'Partido en curso'; }
+    else { const left = startAt - now; span.textContent = left > 0 ? `Próxima jornada: ${new Date(startAt).toLocaleString()} · faltan ${fmt(left)}${left < 300e3 ? ' · la transmisión está abierta' : ' · la rotación y las tácticas se cierran cuando se abre la transmisión de tu partido'}` : 'Partido en curso'; }
     const props = (g.s.tradeProps || []).filter((t) => t.to === me);
     tr.innerHTML = props.length ? '<b>Propuestas de traspaso</b>' + props.map((t) => `<div>${g.team(t.from).short} ofrece ${t.mine.map((i) => g.player(i).name).join(', ') || '—'} por ${t.theirs.map((i) => g.player(i).name).join(', ') || '—'} <button data-tp="${t.id}" data-y="1">Aceptar</button><button class="no" data-tp="${t.id}" data-y="0">Rechazar</button></div>`).join('') : '';
   }, 1000);

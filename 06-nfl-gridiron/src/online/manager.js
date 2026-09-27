@@ -92,7 +92,7 @@ function bar() {
     const now = Date.now() + skew, dr = lg.data.draft, span = b.querySelector('span');
     if (dr && !dr.done) { const cur = lg.draftCurrent(), mine = cur && cur.teamId === me; span.textContent = cur ? `DRAFT · ronda ${cur.round} pick ${cur.n} (${lg.team(cur.teamId).short})${mine ? ' · ¡ES TU TURNO! · te quedan ' + fmt(90e3 - (now - (dr.pickAt || now))) : ' · esperando'}` : 'Draft terminado'; }
     else if (!startAt) span.textContent = 'La liga terminó.';
-    else { const left = startAt - now; span.textContent = left > 0 ? `Próximo partido: ${new Date(startAt).toLocaleString()} · faltan ${fmt(left)}${left < 300e3 ? ' · la transmisión está abierta' : ' · el plan y el depth chart se cierran 5 min antes'}` : 'Partido en curso'; }
+    else { const left = startAt - now; span.textContent = left > 0 ? `Próxima jornada: ${new Date(startAt).toLocaleString()} · faltan ${fmt(left)}${left < 300e3 ? ' · la transmisión está abierta' : ' · el plan y el depth chart se cierran cuando se abre la transmisión de tu partido'}` : 'Partido en curso'; }
     const props = (lg.data.tradeProps || []).filter((t) => t.to === me);
     tr.innerHTML = props.length ? '<b>Propuestas de traspaso</b>' + props.map((t) => `<div>${lg.team(t.from).short} ofrece ${t.giveA.map(name).join(', ') || '—'} por ${t.giveB.map(name).join(', ') || '—'} <button data-tp="${t.id}" data-y="1">Aceptar</button><button class="no" data-tp="${t.id}" data-y="0">Rechazar</button></div>`).join('') : '';
   }, 1000);

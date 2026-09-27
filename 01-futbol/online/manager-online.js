@@ -77,7 +77,7 @@
     const now = Date.now() + skew, st = startAt;
     if (!st) { banner.querySelector('span').textContent = 'Sin partidos programados.'; return; }
     const left = st - now, fmt = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); return (h ? h + ' h ' : '') + m + ' min ' + (s % 60) + ' s'; };
-    banner.querySelector('span').textContent = left > 0 ? `Próximo partido: ${new Date(st).toLocaleString()} · faltan ${fmt(left)}` + (left < 5 * 60e3 ? ' · la transmisión está abierta' : ' · el once y las tácticas se cierran 5 min antes') : 'Partido en curso';
+    banner.querySelector('span').textContent = left > 0 ? `Próxima jornada: ${new Date(st).toLocaleString()} · faltan ${fmt(left)}` + (left < 5 * 60e3 ? ' · la transmisión está abierta' : ' · el once y las tácticas se cierran cuando se abre la transmisión de tu partido') : 'Partido en curso';
   }
   function watchMine() {
     const f = UI.career.userFixture(); if (!f) return toast('No hay partido programado para tu club.');

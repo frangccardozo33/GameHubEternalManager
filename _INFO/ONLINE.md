@@ -21,6 +21,19 @@ Hub → **Online** → registrarse → crear liga (módulo, primer partido, cada
   - Carreras (`07-carreras-apex/lro-manager.html`, `race-manage.js`): estrategia de salida (neumático, parada, ritmo…), pilotos, mercado de pilotos, traspasos.
   - El once/plan/estrategia se cierra cuando se abre la transmisión (5 min antes); después solo valen los controles en vivo.
 
+## Calendario (`server/src/schedule.js`)
+Hora de Argentina (UTC-3). Una jornada por día; los partidos de la jornada van **uno atrás del otro**: se abre la transmisión, se juega y, 45 s después de terminar, se abre la del siguiente. Orden: 2 DT humanos → 1 DT humano contra la IA → IA contra IA.
+
+| Módulo | Abre la transmisión del primer partido |
+|---|---|
+| Fútbol | lunes a viernes 12:20 · sábado y domingo 18:00 |
+| NFL | todos los días 13:00 |
+| Básquet | todos los días 15:00 |
+| MMA | todos los días 17:00 |
+| Carreras | todos los días 19:00 |
+
+Copas, playoffs y torneos usan el mismo horario: cada ronda es una jornada más (si un día toca copa, la liga se corre al día siguiente). En fútbol todas las rondas de La Cupidité se juegan en vivo. El once/plan/estrategia de un DT se cierra cuando se abre la transmisión de *su* partido. Prueba: `node server/tools/schedule-check.mjs`.
+
 ## Regenerar lo generado
 | Qué | Comando |
 |---|---|
