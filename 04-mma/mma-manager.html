@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>LLO · Gestión de la cuadra</title>
+<script src="../assets/online/mgr-lib.js"></script></head>
+<body>
+<script>
+// Gestión online de la cuadra (MMA): táctica de cada peleador, campamento, mercado de peleadores y traspasos entre DT.
+const E = EMMgr, esc = E.esc;
+const money = (n) => '$' + Math.round(n).toLocaleString('es');
+const DIV = { fly: 'Mosca', bantam: 'Gallo', feather: 'Pluma', light: 'Ligero', welter: 'Wélter', middle: 'Mediano', lightheavy: 'Semipesado', heavy: 'Pesado' };
+const STYLE = { pressure: 'Presión', counter: 'Contragolpe', wrestler: 'Wrestler', grappler: 'Grappler' };
+const ATTR = { accuracy: 'Precisión', defense: 'Defensa', power: 'Potencia', speed: 'Velocidad', wrestling: 'Wrestling', grappling: 'Grappling', cardio: 'Cardio', initiative: 'Iniciativa', intelligence: 'Inteligencia', chin: 'Resistencia' };
+const SL = [['pace', 'Ritmo'], ['distance', 'Distancia'], ['takedowns', 'Derribos'], ['aggression', 'Agresividad'], ['conservation', 'Conservación']];
+const opt = (list, cur) => list.map(([v, l]) => `<option value="${v}" ${v === cur ? 'selected' : ''}>${l}</option>`).join('');
+window.saveTac = (fid) => {
+  const q = (n) => document.getElementById(n + '_' + fid).value, t = { focus: q('focus'), target: q('target') };
+  for (const [k] of SL) t[k] = +q(k);
+  E.cmd('tactics', [fid, t]);
+};
+const face = (f) => f.photo ? `<img src="../${esc(f.photo)}" alt="">` : '';
+const card = (f, extra) => `<div class="item">${face(f)}<b>${esc(f.name)}</b> <span class="tag">${esc(f.country)}</span><div class="muted">“${esc(f.nickname)}” · ${f.age} años · ${DIV[f.division] || f.division} · ${STYLE[f.style] || f.style}</div>
+  <div class="muted">Rating <b>${f.rating}</b> · Pot. ${f.potential} · Récord ${f.record.wins}-${f.record.losses}-${f.record.draws} · Condición ${f.condition}% · Moral ${f.morale}</div>
+  <div class="muted" style="clear:both;margin-top:4px">${Object.entries(ATTR).map(([k, l]) => `${l} ${Math.round(f.attributes[k])}`).join(' · ')}</div>${extra || ''}</div>`;
+E.boot('LLO · Gestión de la cuadra', (s, ui) => {
+  const me = s.stable, others = s.stables.filter((t) => t.human && t.id !== me.id), tgt = others.find((t) => t.id === ui.tradeTeam) || others[0];
+  const props = s.tradeProps.filter((t) => t.to === me.id);
+  return `<h1>${esc(me.name)}</h1><div class="muted">${esc(s.event || 'Sin cartelera')} · Récord ${me.w}-${me.l} · Caja <b>${money(me.money)}</b> · Peleadores ${s.fighters.length}/${s.maxRoster}</div>
+  <div class="card"><h2>Tus peleas de esta cartelera</h2>${s.myBouts.length ? s.myBouts.map((b) => `<div class="item" style="margin:6px 0"><b>${esc(b.a)}</b> vs <b>${esc(b.b)}</b> ${b.played ? '<span class="tag">terminada</span>' : ''}</div>`).join('') : '<p class="muted">Ninguno de tus peleadores pelea en esta cartelera.</p>'}
+    <p class="muted">La táctica y el campamento se cierran 5 minutos antes. Durante la pelea das las órdenes desde la transmisión.</p></div>
+  <div class="card"><h2>Tus peleadores</h2><div class="grid">${s.fighters.map((f) => card(f, `<div style="margin-top:8px"><b>Táctica de pelea</b>
+    <div class="row"><label>Enfoque <select id="focus_${f.id}">${opt([['balanced', 'Equilibrado'], ['boxing', 'Boxeo / striking'], ['wrestling', 'Wrestling'], ['grappling', 'Grappling']], f.tactics.focus)}</select></label>
+    <label>Objetivo <select id="target_${f.id}">${opt([['mixed', 'Variar zonas'], ['head', 'Cabeza'], ['body', 'Cuerpo'], ['leg', 'Piernas']], f.tactics.target)}</select></label></div>
+    ${SL.map(([k, l]) => `<div class="row"><span style="width:110px">${l}</span><input id="${k}_${f.id}" type="range" min="0" max="100" value="${Math.round(f.tactics[k])}" oninput="this.nextElementSibling.textContent=this.value"><output>${Math.round(f.tactics[k])}</output></div>`).join('')}
+    <button class="b g" onclick="saveTac('${f.id}')">Guardar táctica</button></div>
+    <div style="margin-top:6px"><b>Campamento</b> <select data-cmd-change="program" data-args='["${f.id}"]'><option value="">Sin campamento</option>${Object.entries(s.programs).map(([k, p]) => `<option value="${k}" ${f.program === k ? 'selected' : ''}>${esc(p.name)} (${money(p.cost)})</option>`).join('')}</select>
+    <button class="b r" data-cmd="releaseFighter" data-args='["${f.id}"]' ${s.fighters.length <= 2 ? 'disabled' : ''}>Liberar</button></div>`)).join('')}</div></div>
+  <div class="card"><h2>Mercado de peleadores</h2><p class="muted">Agentes libres y prospectos. La firma se paga al contado. Una cuadra tiene entre 2 y ${s.maxRoster} peleadores.</p><div class="grid">${s.market.slice(0, 40).map((f) => card(f, `<div class="muted">Firma ${money(f.fee)}</div><button class="b g" data-cmd="signFighter" data-args='["${f.id}"]' ${s.fighters.length >= s.maxRoster || s.stable.money < f.fee ? 'disabled' : ''}>Fichar</button>`)).join('')}</div></div>
+  <div class="card"><h2>Traspasos con otros DT</h2>${others.length ? `<div class="row"><label>Cuadra <select data-ui="tradeTeam">${others.map((t) => `<option value="${t.id}" ${tgt && t.id === tgt.id ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</select></label>
+    <label>Doy <select id="tGive">${s.fighters.map((f) => `<option value="${f.id}">${esc(f.name)} (${f.rating})</option>`).join('')}</select></label>
+    <label>Recibo <select id="tGet">${tgt.roster.map((f) => `<option value="${f.id}">${esc(f.name)} (${f.rating} · ${DIV[f.division] || f.division})</option>`).join('')}</select></label>
+    <button class="b" onclick="E.cmd('tradePropose',['${tgt.id}',document.getElementById('tGive').value,document.getElementById('tGet').value])">Proponer</button></div>` : '<p class="muted">Todavía no hay otros DT humanos en la liga.</p>'}
+    ${props.map((p) => `<div class="item" style="margin-top:8px"><b>${esc(s.stables.find((t) => t.id === p.from).name)}</b> ofrece a <b>${esc(p.giveName)}</b> por <b>${esc(p.getName)}</b>
+      <button class="b g" data-cmd="tradeAnswer" data-args='[${p.id},true]'>Aceptar</button><button class="b r" data-cmd="tradeAnswer" data-args='[${p.id},false]'>Rechazar</button></div>`).join('')}</div>
+  <div class="card"><h2>Cuadras</h2><table><tr><th>#</th><th>Cuadra</th><th>V</th><th>D</th></tr>${[...s.stables].sort((a, b) => b.w - a.w || a.l - b.l).map((t, i) => `<tr ${t.id === me.id ? 'class="on"' : ''}><td>${i + 1}</td><td>${esc(t.name)}${t.human ? ' <span class="tag">DT</span>' : ''}</td><td>${t.w}</td><td>${t.l}</td></tr>`).join('')}</table></div>`;
+});
+</script>
+</body></html>
