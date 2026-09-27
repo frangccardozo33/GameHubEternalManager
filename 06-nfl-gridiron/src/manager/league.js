@@ -150,7 +150,7 @@ export class League {
       if (t.id === d.userTeam) {
         for (const c of changes.sort((a, b) => b.delta - a.delta).slice(0, 3)) this.news(`Entrenamiento: ${d.players[c.pid].name} sube a ${d.players[c.pid].ovr} (+${c.delta}).`, 'training', t.id);
         for (const pid of healed) this.news(`${d.players[pid].name} vuelve de su lesión.`, 'injury', t.id);
-      } else autoDepth(this, t);
+      } else if (!(d.humans || []).includes(t.id)) autoDepth(this, t);
     }
     cpuMaintain(this); generateOffers(this);
   }
@@ -218,10 +218,11 @@ export class League {
     this._draftSelect(best.p.id);
   }
   draftAdvance() {
-    const d = this.data; while (d.draft && !d.draft.done) { const cur = this.draftCurrent(); if (cur.teamId === d.userTeam) return; this._draftCpuPick(); }
+    const d = this.data; while (d.draft && !d.draft.done) { const cur = this.draftCurrent(); if (cur.teamId === d.userTeam || (d.humans || []).includes(cur.teamId)) return; this._draftCpuPick(); }
   }
   draftPick(pid) {
     const d = this.data, dr = d.draft, cur = this.draftCurrent();
+    if (this.onOp && cur && cur.teamId === d.userTeam && dr.pool.includes(pid)) this.onOp('draftPick', [pid]);
     if (!cur || cur.teamId !== d.userTeam) return { ok: false, message: 'Todavía no es tu turno.' };
     if (!dr.pool.includes(pid)) return { ok: false, message: 'Ese jugador ya no está disponible.' };
     const p = d.players[pid]; this._draftSelect(pid); return { ok: true, message: `Elegiste a ${p.name} (${p.pos}).` };

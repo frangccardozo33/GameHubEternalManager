@@ -16,7 +16,7 @@ export function insertCup(lg, calendar) {
   if (ids.length < 4) { d.cup = null; return calendar; }
   const size = ids.length >= 8 ? 8 : 4, k = Math.log2(size), names = NAMES[size];
   const seeds = ids.slice().sort((a, b) => strength(lg, d.teams[b]) - strength(lg, d.teams[a])).slice(0, size);
-  if (!seeds.includes(d.userTeam)) seeds[size - 1] = d.userTeam;
+  for (const h of [d.userTeam, ...(d.humans || [])]) if (!seeds.includes(h)) { const i = seeds.map((x, j) => j).reverse().find((j) => ![d.userTeam, ...(d.humans || [])].includes(seeds[j])); if (i != null) seeds[i] = h; }
   const L = calendar.length, slots = CUP.fractions[k].map(f => Math.max(1, Math.round(L * f)));
   d.cup = { name: CUP.name, year: d.year, size, seeds, names, done: false, champion: null, runnerUp: null };
   return pushWeeks(lg, calendar, slots, names, seeds);
@@ -36,7 +36,7 @@ function pushWeeks(lg, calendar, slots, names, seeds) {
   return out;
 }
 
-const pay = (lg, id, m, why) => { if (id !== lg.data.userTeam || !m) return; const t = lg.team(id); t.finance.cash = r1(t.finance.cash + m); syncCashToTouchline(lg, t, m); lg.news(`Premio de copa: ${why} (+${m} M$).`, 'info', id); };
+const pay = (lg, id, m, why) => { if ((id !== lg.data.userTeam && !(lg.data.humans || []).includes(id)) || !m) return; const t = lg.team(id); t.finance.cash = r1(t.finance.cash + m); syncCashToTouchline(lg, t, m); lg.news(`Premio de copa: ${why} (+${m} M$).`, 'info', id); };
 
 // Después de completar una semana de copa: ganadores, premios y armado de la ronda siguiente.
 export function advanceCup(lg, wk) {

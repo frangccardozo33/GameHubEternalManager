@@ -39,7 +39,8 @@ export function attachPlayer(league, team, p, contract) {
   if (!p.number || used.has(p.number)) for (let n = 1; n < 100; n++) if (!used.has(n)) { p.number = n; break; }
   syncDepth(league, team);
 }
-export function signFreeAgent(league, teamId, pid, offer) {
+export const signFreeAgent = (league, ...a) => hook(league, 'signFreeAgent', a, _signFreeAgent(league, ...a));
+function _signFreeAgent(league, teamId, pid, offer) {
   const team = league.data.teams[teamId], p = league.data.players[pid];
   if (!p || p.teamId) return { ok: false, message: 'El jugador ya no está disponible.' };
   const v = evaluateOffer(league, p, offer, teamId);
@@ -49,7 +50,8 @@ export function signFreeAgent(league, teamId, pid, offer) {
   league.news(`${team.name} ficha a ${p.name} (${p.pos}, ${p.ovr}) por ${offer.years} año(s).`, 'signing', team.id);
   return { ok: true, status: 'accepted', message: `${p.name} firmó con ${team.name}.` };
 }
-export function renewPlayer(league, teamId, pid, offer) {
+export const renewPlayer = (league, ...a) => hook(league, 'renewPlayer', a, _renewPlayer(league, ...a));
+function _renewPlayer(league, teamId, pid, offer) {
   const team = league.data.teams[teamId], p = league.data.players[pid];
   const v = evaluateOffer(league, p, offer, teamId); if (v.status !== 'accepted') return { ok: false, ...v };
   const c = canSign(league, team, p, offer, p); if (!c.ok) return { ok: false, status: 'blocked', message: c.reason };
@@ -58,7 +60,8 @@ export function renewPlayer(league, teamId, pid, offer) {
   return { ok: true, status: 'accepted', message: `${p.name} renovó.` };
 }
 export const deadCapFor = p => p.contract ? r1(p.contract.bonus / Math.max(1, p.contract.yearsTotal) * Math.max(0, p.contract.years)) : 0;
-export function releasePlayer(league, teamId, pid, { silent = false } = {}) {
+export const releasePlayer = (league, ...a) => hook(league, 'releasePlayer', a, _releasePlayer(league, ...a));
+function _releasePlayer(league, teamId, pid, { silent = false } = {}) {
   const team = league.data.teams[teamId], p = league.data.players[pid];
   if (!p || p.teamId !== teamId) return { ok: false, message: 'Jugador no encontrado.' };
   const dead = deadCapFor(p), saved = capHit(p);
@@ -71,6 +74,8 @@ export function releasePlayer(league, teamId, pid, { silent = false } = {}) {
   return { ok: true, dead, saved: r1(saved - dead), message: `${p.name} liberado. Dead cap: ${dead}M.` };
 }
 
+// Liga online: el cliente engancha league.onOp(nombre, args, resultado) para mandar al servidor lo que el DT hace en el mercado.
+const hook = (league, name, args, r) => { if (league.onOp && !(r && r.ok === false)) league.onOp(name, args, r); return r; };
 // ---------- Needs & trades
 const POS_W = { QB: 1.5, RB: .7, WR: 1, TE: .8, OL: 1, DL: 1.1, LB: .8, CB: 1, S: .75, K: .2, P: .15 };
 export function tradeValue(p) {
@@ -100,7 +105,9 @@ export function teamNeeds(league, teamId, averages = leagueAverages(league)) {
   }
   return out.sort((a, b) => b.need - a.need);
 }
-export function evaluateTrade(league, { teamA, teamB, giveA, giveB }) {
+// Liga online: un traspaso entre dos DT humanos se manda como propuesta (lo acepta el otro DT); para la interfaz "se acepta" hasta ahí.
+export const evaluateTrade = (league, args) => { const r = _evaluateTrade(league, args), H = league.data.humans || []; return r.ok && H.includes(args.teamA) && H.includes(args.teamB) ? { ...r, accept: true, reason: 'Se enviará como propuesta: tiene que aceptarla el otro DT.' } : r; };
+function _evaluateTrade(league, { teamA, teamB, giveA, giveB }) {
   // A is the proposing (user) team; B is the AI team.
   const d = league.data, P = d.players, A = d.teams[teamA], B = d.teams[teamB];
   if (!giveA.length && !giveB.length) return { ok: false, accept: false, reason: 'Selecciona jugadores para intercambiar.' };
@@ -117,7 +124,8 @@ export function evaluateTrade(league, { teamA, teamB, giveA, giveB }) {
   if (vA < vB * 1.08 + 1) return { ...res, ok: true, accept: false, reason: `${B.name} pide más valor (recibe ${Math.round(vA)}, entrega ${Math.round(vB)}).` };
   return { ...res, ok: true, accept: true, reason: `${B.name} acepta el traspaso.` };
 }
-export function executeTrade(league, { teamA, teamB, giveA, giveB }) {
+export const executeTrade = (league, ...a) => { if (league.onBeforeOp && league.onBeforeOp('executeTrade', a) === false) return; const r = _executeTrade(league, ...a); hook(league, 'executeTrade', a, r); return r; };
+function _executeTrade(league, { teamA, teamB, giveA, giveB }) {
   const d = league.data, P = d.players, A = d.teams[teamA], B = d.teams[teamB];
   const move = (ids, from, to) => { for (const id of ids) { from.roster = from.roster.filter(x => x !== id); for (const k of Object.keys(from.depth)) from.depth[k] = from.depth[k].filter(x => x !== id); P[id].teamId = to.id; to.roster.push(id); } };
   move(giveA, A, B); move(giveB, B, A);
@@ -130,7 +138,7 @@ export function generateOffers(league) {
   d.offers = d.offers.filter(o => o.expires >= d.week && o.year === d.year);
   if (d.offers.length >= 3) return;
   for (const t of Object.values(d.teams)) {
-    if (t.id === user.id || !rng.chance(.09) || d.offers.length >= 3) continue;
+    if (t.id === user.id || (d.humans || []).includes(t.id) || !rng.chance(.09) || d.offers.length >= 3) continue;
     const needs = teamNeeds(league, t.id, avgs).slice(0, 3);
     for (const n of needs) {
       const target = user.roster.map(id => P[id]).filter(p => p.pos === n.pos && p.ovr > n.starterAvg && !isInjured(p)).sort((a, b) => b.ovr - a.ovr)[Math.floor(rng.next() * 2)];
@@ -196,7 +204,7 @@ export function fireStaff(league, teamId, staffId, { silent = false, free = fals
 export function cpuMaintain(league) {
   const d = league.data, P = d.players;
   for (const t of Object.values(d.teams)) {
-    if (t.id === d.userTeam) continue;
+    if (t.id === d.userTeam || (d.humans || []).includes(t.id)) continue;
     for (const pos of POSITIONS) {
       let guard = 0;
       while (guard++ < 4 && t.roster.length < ROSTER_MAX) {

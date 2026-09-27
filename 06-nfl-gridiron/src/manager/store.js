@@ -1,7 +1,7 @@
 import { League } from './league.js';
 const KEY = 'gridiron-manager-v1';
 export function hasSave() { try { return !!localStorage.getItem(KEY); } catch { return false; } }
-export function save(league) { try { localStorage.setItem(KEY, league.serialize()); return true; } catch (e) { console.warn('No se pudo guardar', e); return false; } }
+export function save(league) { if (typeof window !== 'undefined' && window.EM_MGR) { window.EM_MGR.changed(league); return true; } try { localStorage.setItem(KEY, league.serialize()); return true; } catch (e) { console.warn('No se pudo guardar', e); return false; } }
 export function load() { try { const raw = localStorage.getItem(KEY); return raw ? League.load(raw) : null; } catch (e) { console.warn('Guardado ilegible', e); return null; } }
 export function wipe() { try { localStorage.removeItem(KEY); } catch {} }
 export function exportFile(league) {

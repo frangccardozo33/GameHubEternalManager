@@ -116,6 +116,7 @@ const GLOBAL = {
   },
   sort(a, el) { const u = a.ui; u.sort = u.sort?.key === el.dataset.key ? { key: el.dataset.key, dir: -u.sort.dir } : { key: el.dataset.key, dir: -1 }; a.refresh(); },
 };
+if (window.EM_MGR) window.EM_MGR.lock(GLOBAL, PAGES); // gestión online: las jornadas las maneja el servidor
 const pageHandlers = () => byId[app.route.name]?.handlers || {};
 function dispatch(kind, e) {
   const attr = kind === 'click' ? 'data-act' : kind === 'input' ? 'data-input' : 'data-change';
@@ -129,7 +130,7 @@ document.addEventListener('change', e => dispatch('change', e));
 $('modal').addEventListener('click', e => { if (e.target === $('modal')) app.closeModal(); });
 
 // ----- boot
-const loaded = store.hasSave() ? store.load() : null;
+const loaded = window.EM_MGR ? window.EM_MGR.league() : store.hasSave() ? store.load() : null;
 app.lg = loaded;
 parseHash();
 if (!location.hash) location.hash = '#/dashboard';

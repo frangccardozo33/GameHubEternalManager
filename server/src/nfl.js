@@ -5,6 +5,7 @@ import { League } from '../../06-nfl-gridiron/src/manager/league.js';
 import { FIXED_DT } from '../../06-nfl-gridiron/src/sim/match.js';
 import { makeGameplan, DEFAULT_GAMEPLAN, COVERAGE_PREFS, PACKAGES, FRONTS, RED_ZONE } from '../../06-nfl-gridiron/src/sim/gameplan.js';
 import { PLAYBOOK, DEFENSES } from '../../06-nfl-gridiron/src/sim/playbook.js';
+import { setHumans, exportState, command, draftTick, extraOffers } from './nfl-manage.js';
 
 export const STEP_MS = FIXED_DT * 1000;
 export const OPEN_BEFORE_MS = 5 * 60e3; // la transmisión se abre 5 min antes (intro, estudio y anuncios en el cliente)
@@ -140,7 +141,11 @@ export const standings = (league) => league.standings();
 
 // ---------- adaptador para el Durable Object (interfaz común de módulos) ----------
 class NflLive {
-  constructor(league, matchId, startAt, extras = {}, now = startAt) { this.m = new LiveMatch(league, matchId, startAt, extras.gameplans || {}, extras.actions || [], now); }
+  constructor(league, matchId, startAt, extras = {}, now = startAt) {
+    // los DT humanos juegan con el gameplan que dejaron en su club (la CPU arma el suyo contra el rival)
+    const gps = { ...(extras.gameplans || {}) }; for (const id of league.data.humans || []) if (league.data.teams[id] && league.data.teams[id].gameplan) gps[id] = league.data.teams[id].gameplan;
+    this.m = new LiveMatch(league, matchId, startAt, gps, extras.actions || [], now);
+  }
   get finished() { return this.m.finished; }
   get held() { return this.m.halfHold; }
   advanceTo(now) { this.m.advanceTo(now); }
@@ -168,10 +173,12 @@ export const nfl = {
   teams: teamsPublic,
   standings: (l) => standings(l),
   round(l) {
+    if (l.data.draft && !l.data.draft.done) return { label: 'Draft', year: l.data.year, phase: 'draft', type: 'draft', matches: [] };
     const wk = l.currentWeek(); if (!wk) return null;
     return { label: wk.label, year: l.data.year, phase: l.data.phase, type: wk.type, matches: wk.fixtures.map((f) => ({ id: f.id, home: f.home, away: f.away, played: f.played, score: f.score, type: f.type })) };
   },
-  finishRound(l) { l.completeWeek(); },
+  finishRound(l) { l.completeWeek(); extraOffers(l); },
   results(l) { const d = l.data; return Object.values(d.results).filter((r) => r.year === d.year).slice(-40).map((r) => ({ id: r.id, week: r.week, home: r.home, away: r.away, score: r.score, ot: r.overtime })); },
   makeLive: (l, matchId, startAt, extras, now) => new NflLive(l, matchId, startAt, extras, now),
+  setHumans, exportState, command, tickLeague: draftTick,
 };
