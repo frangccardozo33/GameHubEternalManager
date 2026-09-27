@@ -25222,6 +25222,18 @@ class $m {
     for (const [r, a] of Object.entries(t))
       ((s = this.joints)[r] ?? (s[r] = a.clone()), this.joints[r].lerp(a, e));
     const n = this.joints;
+    // esqueleto rígido: cuello, cabeza y hombros quedan a distancia fija del pecho (nunca se despegan del tronco)
+    if (n.chest && n.pelvis) {
+      const up = n.chest.clone().sub(n.pelvis).normalize(),
+        tie = (child, parent, len, bias) => {
+          if (!n[child] || !n[parent]) return;
+          const d = n[child].clone().sub(n[parent]);
+          (d.lengthSq() < 1e-6 && d.copy(up), d.normalize(), bias && d.lerp(up, bias).normalize(), n[child].copy(n[parent]).addScaledVector(d, len));
+        };
+      (tie("neck", "chest", 0.2, 0.5), tie("head", "neck", 0.16, 0.25));
+      for (const k of ["leftShoulder", "rightShoulder"]) if (n[k]) { const d = n[k].distanceTo(n.chest); d > 0.3 && n[k].copy(n.chest.clone().lerp(n[k], 0.3 / d)); }
+      if (n.abdomen) n.abdomen.copy(n.pelvis.clone().lerp(n.chest, 0.48));
+    }
     for (const r of this.parts) {
       const { mesh: a } = r;
       if (r.joint) n[r.joint] && a.position.copy(n[r.joint]);
