@@ -62,6 +62,8 @@ export function dashboard({ g, ui }) {
   if (hurt.length) hints.push(`<div class="hint warn">Lesionados: ${hurt.map(p => `${esc(p.name)} (${p.inj.games} PJ)`).join(', ')}.</div>`);
   if (tired >= 2) hints.push(`<div class="hint warn">${tired} jugadores tienen la condición por debajo de 60. Reparte minutos o baja el ritmo.</div>`);
   if (unhappy) hints.push(`<div class="hint warn">${unhappy} jugador(es) con la moral baja. Revisa los minutos y su rol.</div>`);
+  const wantOut = ps.filter(p => p.wantsOut);
+  if (wantOut.length) hints.push(`<div class="hint bad">${wantOut.length} jugador(es) piden que los transfieran: ${wantOut.map(p => esc(p.name)).join(', ')}.</div>`);
   if (g.fin.cash < 0) hints.push('<div class="hint warn">La caja está en negativo: no puedes fichar hasta recuperarla. Revisa gastos en Finanzas.</div>');
   if (ps.length < LIM.min) hints.push(`<div class="hint warn">Tienes ${ps.length} jugadores: necesitas ${LIM.min} para jugar. Se fichará a mínimos automáticamente si no actúas.</div>`);
   if (ps.length > LIM.max) hints.push(`<div class="hint warn">Plantilla de ${ps.length}: el máximo es ${LIM.max}. Al empezar la temporada se liberará a los peores.</div>`);
@@ -86,7 +88,7 @@ function miniStandings(g, st) {
 export function roster({ g, ui }) {
   const u = g.user, ps = g.roster(u), starters = new Set(u.lineup.starters), dressed = new Set([...u.lineup.starters, ...u.lineup.bench]);
   const cols = [
-    { k: 'num', label: '#', val: p => p.num, html: p => p.num }, { k: 'name', label: 'Jugador', l: true, val: p => p.name, html: p => `${starters.has(p.id) ? '★ ' : dressed.has(p.id) ? '' : '<span class="muted">– </span>'}${link('player', p.id, p.name)} ${p.inj ? pill('Lesión · ' + p.inj.games + ' PJ', 'bad') : ''}${PLAYER_TAGS(p).slice(0, 2).map(t => pill(t)).join('')}` },
+    { k: 'num', label: '#', val: p => p.num, html: p => p.num }, { k: 'name', label: 'Jugador', l: true, val: p => p.name, html: p => `${starters.has(p.id) ? '★ ' : dressed.has(p.id) ? '' : '<span class="muted">– </span>'}${link('player', p.id, p.name)} ${p.inj ? pill('Lesión · ' + p.inj.games + ' PJ', 'bad') : ''}${p.wantsOut ? pill('Quiere salir', 'bad') : ''}${PLAYER_TAGS(p).slice(0, 2).map(t => pill(t)).join('')}` },
     { k: 'role', label: 'Pos', val: p => ROLES.indexOf(p.role), html: p => p.role }, { k: 'age', label: 'Edad', val: p => p.age, html: p => p.age },
     { k: 'ovr', label: 'OVR', val: p => p.ovr, html: p => `<b style="color:${ovrColor(p.ovr)}">${p.ovr}</b>` }, { k: 'pot', label: 'POT', val: p => p.pot, html: p => p.pot },
     { k: 'form', label: 'Forma', val: p => p.form, html: p => meter(p.form) }, { k: 'cond', label: 'Cond.', val: p => p.cond, html: p => meter(p.cond) }, { k: 'mor', label: 'Moral', val: p => p.morale, html: p => meter(p.morale) },

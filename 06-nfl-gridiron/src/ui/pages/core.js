@@ -19,6 +19,8 @@ const dashboard = {
     for (const pos of POSITIONS) { const n = roster.filter(p => p.pos === pos && !isInjured(p)).length; if (n < ROSTER_MIN[pos]) alerts.push(['bad', `Faltan jugadores sanos en ${pos}: ${n}/${ROSTER_MIN[pos]}.`]); }
     for (const i of issues.filter(x => x.includes('lesionado'))) alerts.push(['warn', i]);
     if (exp.length) alerts.push(['warn', `${exp.length} contrato(s) vencido(s): renueva o quedarán libres.`]);
+    const wantOut = roster.filter((p) => p.wantsOut);
+    if (wantOut.length) alerts.push(['bad', `${wantOut.length} jugador(es) piden que los transfieran: ${wantOut.map((p) => p.name).slice(0, 2).join(', ')}.`]);
     if (d.offers.length) alerts.push(['info', `${d.offers.length} oferta(s) de traspaso esperando respuesta.`]);
     if (t.finance.cash < 0) alerts.push(['bad', 'Saldo negativo: no puedes fichar.']);
     let next = '';

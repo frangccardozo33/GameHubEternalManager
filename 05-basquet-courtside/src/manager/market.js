@@ -60,9 +60,13 @@ export function install(Game) {
     // Un equipo de la IA propone un 1x1: pide a un jugador tuyo y ofrece uno de valor parecido (o algo mayor).
     genOffers() {
       const s = this.s, u = this.user, cap = this.cfg.salaryCap; s.offers = (s.offers || []).filter(o => o.exp >= s.day && this.player(o.give)?.teamId === u.id && this.player(o.get)?.teamId === o.teamId);
-      if (s.offers.length >= 3 || this.rng.next() > 0.3 || u.roster.length <= LIM.min) return;
+      if (s.offers.length >= 3 || u.roster.length <= LIM.min) return;
       const mine = this.roster(u).filter(p => !p.inj && !s.offers.some(o => o.give === p.id)).sort((a, b) => b.ovr - a.ovr).slice(1); if (!mine.length) return;
-      const p = mine[Math.floor(this.rng.next() * mine.length)], v = this.tradeValue(p); if (v <= 0) return;
+      const unhappy = mine.filter(p => p.wantsOut);
+      // un jugador que pide la salida se ofrece casi siempre; si no hay ninguno, es el scouting normal de la IA (30%).
+      if (!unhappy.length && this.rng.next() > 0.3) return;
+      const pool = unhappy.length ? unhappy : mine;
+      const p = pool[Math.floor(this.rng.next() * pool.length)], v = this.tradeValue(p); if (v <= 0) return;
       const cpu = this.s.teams.filter(t => !t.isUser).sort(() => this.rng.next() - 0.5);
       for (const t of cpu) {
         const q = this.roster(t).filter(x => !x.inj).map(x => ({ x, r: this.tradeValue(x) / v })).filter(o => o.r >= 0.75 && o.r <= 1.0).sort((a, b) => b.r - a.r)[0]?.x; if (!q) continue;

@@ -137,11 +137,15 @@ export function generateOffers(league) {
   const d = league.data, P = d.players, rng = league.rng, user = d.teams[d.userTeam], avgs = leagueAverages(league);
   d.offers = d.offers.filter(o => o.expires >= d.week && o.year === d.year);
   if (d.offers.length >= 3) return;
+  const wantsOut = user.roster.map(id => P[id]).filter(p => p.wantsOut && !isInjured(p));
   for (const t of Object.values(d.teams)) {
-    if (t.id === user.id || (d.humans || []).includes(t.id) || !rng.chance(.09) || d.offers.length >= 3) continue;
+    if (t.id === user.id || (d.humans || []).includes(t.id) || d.offers.length >= 3) continue;
+    // un jugador que pide la salida se ofrece casi siempre (bypass del 9% al azar); si no hay ninguno, es scouting normal por necesidad.
+    if (!wantsOut.length && !rng.chance(.09)) continue;
     const needs = teamNeeds(league, t.id, avgs).slice(0, 3);
-    for (const n of needs) {
-      const target = user.roster.map(id => P[id]).filter(p => p.pos === n.pos && p.ovr > n.starterAvg && !isInjured(p)).sort((a, b) => b.ovr - a.ovr)[Math.floor(rng.next() * 2)];
+    let target = wantsOut.length ? wantsOut[Math.floor(rng.next() * wantsOut.length)] : null;
+    for (const n of (target ? [{ pos: target.pos, starterAvg: 0 }] : needs)) {
+      if (!target) target = user.roster.map(id => P[id]).filter(p => p.pos === n.pos && p.ovr > n.starterAvg && !isInjured(p)).sort((a, b) => b.ovr - a.ovr)[Math.floor(rng.next() * 2)];
       if (!target) continue;
       const want = tradeValue(target), give = t.roster.map(id => P[id]).filter(p => p.pos !== n.pos || t.roster.filter(x => P[x].pos === p.pos).length > ROSTER_TARGET[p.pos]).sort((a, b) => Math.abs(tradeValue(a) - want * 1.15) - Math.abs(tradeValue(b) - want * 1.15))[0];
       if (!give || tradeValue(give) < want * .95) continue;

@@ -228,6 +228,17 @@ export class Game {
     p.inj = { games, total: games, type: types[Math.floor(this.rng.next() * types.length)] };
     if (isUser) this.news('Lesión', `${p.name}: ${p.inj.type}. Baja ${games} partido${games > 1 ? 's' : ''}.`, 'injury');
   }
+  // Descontento: moral floja sostenida o sueldo muy por debajo de su valor de mercado, acumulado varios dias seguidos.
+  // Al cruzar el umbral el jugador "quiere salir": otros equipos lo ofertan casi siempre en vez de la chance normal de genOffers().
+  updateDiscontent(p) {
+    if (p.teamId == null) { p.discontentStreak = 0; p.wantsOut = false; return; }
+    const underpaid = (p.contract?.salary ?? 0) < valueOf(p) * 0.7;
+    const unhappy = p.morale < 35 || underpaid;
+    p.discontentStreak = unhappy ? (p.discontentStreak || 0) + 1 : Math.max(0, (p.discontentStreak || 0) - 2);
+    const was = p.wantsOut;
+    p.wantsOut = p.discontentStreak >= 8;
+    if (p.wantsOut && !was && p.teamId === this.s.userId) this.news('Descontento', `${p.name} está descontento y pide que lo transfieran.`, 'trade');
+  }
   healInjuries() {
     for (const p of Object.values(this.s.players)) {
       if (!p.inj) continue; p.inj.games--;
@@ -240,7 +251,7 @@ export class Game {
     this.genOffers();
     if (day.kind === 'regular' && s.day % 6 === 5) this.aiTrades(1);
     const recBonus = this.recoveryBonus();
-    for (const p of Object.values(s.players)) { p.cond = clamp(p.cond + 30 + (p.teamId === s.userId ? recBonus : 0), 0, 100); p.form += (60 - p.form) * 0.08; p.morale += (65 - p.morale) * 0.03; }
+    for (const p of Object.values(s.players)) { p.cond = clamp(p.cond + 30 + (p.teamId === s.userId ? recBonus : 0), 0, 100); p.form += (60 - p.form) * 0.08; p.morale += (65 - p.morale) * 0.03; this.updateDiscontent(p); }
     if (day.kind === 'regular') {
       this.bookDay(); this.trainDay(); s.day++;
       if (s.day >= s.schedule.length) { if (this.cfg.playoffTeams >= 2) this.startPlayoffs(); else this.closeSeason(this.standings()[0].id); }

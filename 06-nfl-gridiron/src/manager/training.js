@@ -1,8 +1,20 @@
-import { TRAINING_AREAS, RB_EXTRA, KEY_ATTRS, POSITIONS, refreshOvr, PHYSICAL } from './constants.js';
+import { TRAINING_AREAS, RB_EXTRA, KEY_ATTRS, POSITIONS, refreshOvr, PHYSICAL, marketValue, capHit } from './constants.js';
 import { clamp } from '../sim/math.js';
 import { avg, sum, normal, rint } from './util.js';
 import { potentialFor } from './generator.js';
 import { isInjured } from './lineup.js';
+
+// Descontento: moral floja sostenida o cap hit muy por debajo de su valor de mercado, acumulado varias semanas seguidas.
+// Al cruzar el umbral el jugador "quiere salir": otros equipos lo ofertan casi siempre en vez de la chance normal de generateOffers().
+export function updateDiscontent(league, p) {
+  if (!p.teamId) { p.discontentStreak = 0; p.wantsOut = false; return; }
+  const underpaid = capHit(p) < marketValue(p) * 0.7;
+  const unhappy = p.morale < 35 || underpaid;
+  p.discontentStreak = unhappy ? (p.discontentStreak || 0) + 1 : Math.max(0, (p.discontentStreak || 0) - 2);
+  const was = p.wantsOut;
+  p.wantsOut = p.discontentStreak >= 8;
+  if (p.wantsOut && !was && p.teamId === league.data.userTeam) league.news(`${p.name} está descontento y pide que lo transfieran.`, 'trade', p.teamId);
+}
 
 const INTENSITY = { light: .7, normal: 1, heavy: 1.3 };
 const K_EFFORT = .9;
@@ -41,6 +53,7 @@ export function weeklyRecovery(league, team) {
     const p = P[id];
     p.fatigue = Math.max(0, p.fatigue - (34 + trainer / 100 * 24 + (p.stamina - 70) * .25));
     p.form = clamp(p.form + (50 - p.form) * .25, 20, 80);
+    updateDiscontent(league, p);
     if (p.injury) {
       p.injury.weeks -= 1 + (trainer > 72 && league.rng.chance(.25) ? 1 : 0);
       if (p.injury.weeks <= 0) { p.injury = null; healed.push(p.id); }

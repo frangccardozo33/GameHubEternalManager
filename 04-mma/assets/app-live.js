@@ -1777,15 +1777,19 @@ class xl {
     );
     for (const a of t.roster) {
       const o = this.fighter(a);
+      if (!o || o.retired) continue;
+      const unhappy = o.morale < 35;
+      o.discontentStreak = unhappy ? (o.discontentStreak || 0) + 1 : Math.max(0, (o.discontentStreak || 0) - 2);
+      const wasOut = o.wantsOut;
+      o.wantsOut = o.discontentStreak >= 8;
+      if (o.wantsOut && !wasOut) this.news("Descontento", `${$t(o)} está descontento y quiere salir del gimnasio.`);
       if (
-        !o ||
-        o.retired ||
         t.roster.length <= 1 ||
         t.offers.some((l) => l.fighterId === a) ||
         (t.booking && t.booking.fighterId === a)
       )
         continue;
-      if (Math.random() < 0.06 + Math.max(0, o.rating - 1150) / 4000) {
+      if (Math.random() < (o.wantsOut ? 0.9 : 0.06 + Math.max(0, o.rating - 1150) / 4000)) {
         const l = {
           id: `o${t.day}-${a}`,
           fighterId: a,
@@ -2281,7 +2285,7 @@ function ts(i, t = "", e = "#bfe75b") {
   return `<div class="portrait ${t}" style="--portrait-accent:${e}"><svg viewBox="0 0 200 220" role="img" aria-label="Retrato de ${xt($t(i))}"><path fill="${e}" opacity=".14" d="M5 210 120 5h55L60 220Z"/><path fill="${n}" d="M83 96v18L48 127c-14 6-22 20-26 47l-9 46h174l-11-48c-5-28-10-39-25-45l-34-13V94Z"/><path fill="#000" opacity=".18" d="m100 112-5 34-34-9 7 53 27 30h24l15-45 11-39-28 8Z"/><path fill="${n}" d="M70 52q3-32 31-32 34 0 33 35l-5 34-13 21H91L76 91Z"/><path fill="#17191b" d="M71 62 68 40q2-23 31-23 35 0 35 28l-4 16-7-16-20-8-24 10Z"/><path fill="#222" opacity=".85" d="m77 77 9 13 16 7 16-9 11-12-6 21-12 13H93L80 96Z"/><path stroke="#352a24" stroke-width="3" d="m80 61 12-1m16 0 13 1m-23 2-3 17h9m-11 7h13" fill="none"/><path stroke="#fff" opacity=".1" stroke-width="2" d="m48 133 36 12m31 0 30-12M102 151v52"/><path fill="#171b20" d="m19 199 31-7 9 28H13Zm133-7 30 7 5 21h-39Z"/><path fill="${e}" d="m19 198 31-7 3 10-36 7Zm133-7 30 7 2 10-36-7Z"/></svg></div>`;
 }
 function Sl(i, t) {
-  return `<tr><td><button class="fighter-name" data-action="profile" data-id="${xt(i.id)}">${ts(i, "avatar")}<span><strong>${xt($t(i))}</strong><small>${xt(Pe[i.style].name)}</small></span></button></td><td>${Qn(i.division)}</td><td><b>${In(i)}</b></td><td>#${t.rank(i)}</td><td><div class="condition">${Yi(i.condition)}<span>${Math.round(i.condition)}%</span></div></td><td>${Ce(t.available(i) ? "Disponible" : "Recuperación", t.available(i) ? "green" : "amber")}</td><td><button class="icon-btn" aria-label="Ver ficha de ${xt($t(i))}" data-action="profile" data-id="${xt(i.id)}">${zt("chevron")}</button></td></tr>`;
+  return `<tr><td><button class="fighter-name" data-action="profile" data-id="${xt(i.id)}">${ts(i, "avatar")}<span><strong>${xt($t(i))}</strong><small>${xt(Pe[i.style].name)}</small></span></button></td><td>${Qn(i.division)}</td><td><b>${In(i)}</b></td><td>#${t.rank(i)}</td><td><div class="condition">${Yi(i.condition)}<span>${Math.round(i.condition)}%</span></div></td><td>${i.wantsOut ? Ce("Quiere salir", "amber") : Ce(t.available(i) ? "Disponible" : "Recuperación", t.available(i) ? "green" : "amber")}</td><td><button class="icon-btn" aria-label="Ver ficha de ${xt($t(i))}" data-action="profile" data-id="${xt(i.id)}">${zt("chevron")}</button></td></tr>`;
 }
 const es = (i, t) =>
   `<div class="table-scroll"><table><thead><tr>${i.map((e) => `<th>${e}</th>`).join("")}</tr></thead><tbody>${t}</tbody></table></div>`;
