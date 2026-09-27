@@ -1,5 +1,6 @@
 // Adaptador del módulo 05 (Básquet): liga compartida + partido en vivo por "lockstep" (ver 05.../src/online/lockstep.js).
 import { Game } from '../../05-basquet-courtside/src/manager/game.js';
+import { setHumans, exportState, command, draftTick, withUser } from './basquet-manage.js';
 import { buildSim, Lockstep, cleanAction, LEAD_STEPS } from '../../05-basquet-courtside/src/online/lockstep.js';
 
 const fmtClock = (sec) => { sec = Math.max(0, sec); if (sec < 60) return sec.toFixed(1).padStart(4, '0'); return `${String(Math.floor(Math.ceil(sec) / 60)).padStart(2, '0')}:${String(Math.ceil(sec) % 60).padStart(2, '0')}`; };
@@ -42,20 +43,26 @@ class BasketLive {
 
 export const basquet = {
   id: 'basquet',
-  create: (seed) => Game.create({}, 0, seed),
+  create: (seed) => { const g = Game.create({}, 0, seed); g.s.teams.forEach((t) => { t.isUser = false; }); return g; },
   load: (json) => new Game(JSON.parse(json)),
   serialize: (g) => JSON.stringify(g.toJSON()),
   clubs: (g) => g.s.teams.map((t) => String(t.id)),
   teams: (g) => g.s.teams.map(pub),
   standings: (g) => g.standings().map((r, i) => ({ id: String(r.id), rank: i + 1, w: r.w, l: r.l, t: 0, diff: r.diff })),
   round(g) {
+    if (g.s.off && g.s.off.stage === 'draft') return { label: 'Draft', year: g.s.season, phase: 'draft', type: 'draft', matches: [] };
     const d = g.currentDay(); if (!d) return null;
     return { label: d.label, year: g.s.season, phase: g.s.phase, type: d.kind, matches: d.entries.map((e) => ({ id: e.id, home: String(e.home), away: String(e.away), played: !!e.done, score: e.done ? [e.hs, e.as] : null, type: d.kind })) };
   },
-  finishRound(g) { g.endDay(g.currentDay()); },
+  finishRound(g) {
+    const d = g.currentDay(); if (!d) return;
+    g.endDay(d);
+    for (const i of g.s.humans || []) if (i !== g.s.userId) withUser(g, i, () => g.genOffers()); // ofertas de la IA para los demás DT humanos
+  },
   results(g) {
     const out = []; g.s.schedule.forEach((d) => d.games.forEach((e) => { if (e.done) out.push({ id: e.id, week: d.day + 1, home: String(e.home), away: String(e.away), score: [e.hs, e.as] }); }));
     return out.slice(-40);
   },
   makeLive: (g, matchId, startAt, extras, now) => new BasketLive(g, matchId, startAt, extras, now),
+  setHumans, exportState, command, tickLeague: draftTick,
 };

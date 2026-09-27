@@ -192,7 +192,8 @@ document.addEventListener('change', event => {
   if (el.dataset.act && (el.tagName === 'SELECT' || el.tagName === 'INPUT')) actions[el.dataset.act]?.(el.dataset, el);
 });
 document.addEventListener('input', event => { const el = event.target; if (el.type === 'range' && el.dataset.act === 'setMinutes') { const o = el.parentElement.querySelector('output'); if (o) o.textContent = (Number(el.value) / 100 * game.gameMinutes()).toFixed(1); } });
-window.__app = { get game() { return game; }, ui, go };
+window.__app = { get game() { return game; }, set game(v) { game = v; }, ui, go };
+if (window.EM_MGR) window.EM_MGR.lock(actions); // gestión online: las jornadas las maneja el servidor
 
 // ---------- Tribuna LBO: álbum de cromos (assets/tribuna/tribuna.js) ----------
 try {
@@ -217,7 +218,7 @@ try {
 } catch (e) { console.warn('Tribuna no disponible', e); }
 
 // ---------- arranque ----------
-const raw = loadRaw();
+const raw = window.EM_MGR ? window.EM_MGR.raw : loadRaw();
 if (raw) { try { game = new Game(raw); ui.screen = 'dashboard'; } catch (e) { game = null; } }
 render();
 

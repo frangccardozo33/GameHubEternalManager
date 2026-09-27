@@ -77,6 +77,15 @@ export class LeagueDO extends DurableObject {
     if (!this.league) return;
     const now = Date.now();
     this.ensureLive(now);
+    const rd = this.mod.round(this.league);
+    if (rd && rd.type === 'draft' && this.mod.tickLeague) { // draft online: sin partidos, turnos con reloj
+      if (now >= this.roundStart()) {
+        const t = this.mod.tickLeague(this.league, now); let dirty = t.changed;
+        if (t.done) { this.mod.finishRound(this.league); this.meta.rounds = (this.meta.rounds || 0) + 1; this.meta.notBefore = Date.now() + 60e3; dirty = true; }
+        if (dirty) { this.meta.rev = (this.meta.rev || 0) + 1; await this.save(); }
+      }
+      await this.reschedule(); return;
+    }
     let committed = false;
     for (const [id, m] of [...this.live]) {
       m.advanceTo(now);
