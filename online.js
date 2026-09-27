@@ -4,6 +4,7 @@
   const MODS = { futbol: 'Fútbol (LFO)', mma: 'Lucha (LLO)', basquet: 'Básquet (LBO)', nfl: 'NFL (LGO)', carreras: 'Carreras (LRO)' };
   let me = null, leagues = [], msg = '', busy = false, cur = null, st = null, poll = null;
   const LIVE = { nfl: '06-nfl-gridiron/dist-live/live.html', basquet: '05-basquet-courtside/courtside-live.html', futbol: '01-futbol/fulbo-live.html', mma: '04-mma/mma-live.html', carreras: '07-carreras-apex/lro-live.html' };
+  const MANAGE = { futbol: '01-futbol/fulbo.html' };
   const READY = ['nfl', 'basquet', 'futbol', 'mma', 'carreras'];
 
   const $ = (id) => document.getElementById(id);
@@ -95,7 +96,7 @@
       if (!club) {
         const taken = new Set(Object.keys(st.clubs));
         h += `<section class="panel"><div class="panel-title">Elegí tu club</div><div class="panel-body inline-form">${st.teams.filter((t) => !taken.has(t.id)).map((t) => `<button class="gloss small" data-claim="${esc(t.id)}">${esc(teamName(t))}</button>`).join('') || 'No quedan clubes libres.'}</div></section>`;
-      } else h += `<p>Tu club: <b>${esc(teamName(T[club]))}</b></p>`;
+      } else h += `<p>Tu club: <b>${esc(teamName(T[club]))}</b>${MANAGE[cur.mod] ? ' <button class="gloss small purple" id="lgManage">Gestionar club</button>' : ''}</p>`;
       const now = Date.now() + st.skew;
       h += `<section class="panel"><div class="panel-title">Partidos de la jornada${st.startAt ? ' · ' + fmt(st.startAt) + ' (' + (now < st.startAt ? 'faltan ' + cd(st.startAt - now) : 'en curso') + ')' : ''}</div><div class="panel-body">`;
       h += st.matches.map((m) => `<div class="shop-item"><div><h3>${m.title ? esc(m.title) : esc(teamName(T[m.home])) + ' <small>vs</small> ' + esc(teamName(T[m.away]))}</h3><p><b>${LBL[m.status]}</b>${m.status === 'final' && m.summary ? ' · ' + esc(m.summary) + (m.method ? ' (' + esc(m.method) + ')' : '') : m.status === 'final' && m.score ? ' · ' + m.score[0] + ' - ' + m.score[1] + (m.method ? ' · ' + esc(m.method) : '') : m.hud && m.hud.text ? ' · ' + esc(m.hud.text) : m.hud ? ' · ' + m.hud.score[0] + ' - ' + m.hud.score[1] + ' · ' + (m.hud.q > 4 ? 'OT' : m.hud.q + 'T') + ' ' + esc(m.hud.time) : ''}${m.viewers ? ' · ' + m.viewers + ' mirando' : ''}${club && (m.home === club || m.away === club || (m.entrants || []).includes(club)) ? ' · <i>tu partido</i>' : ''}</p></div>${m.status === 'open' || m.status === 'live' ? `<button class="gloss small green" data-watch="${esc(m.id)}">${club && (m.home === club || m.away === club || (m.entrants || []).includes(club)) ? 'Dirigir' : 'Ver'}</button>` : ''}</div>`).join('') || '<p>No hay partidos programados.</p>';
@@ -106,7 +107,17 @@
     $('lgBack').onclick = () => { stopPoll(); cur = null; render(); };
     root.querySelectorAll('[data-claim]').forEach((b) => (b.onclick = async () => { try { await api('/api/league/' + cur.id + '/claim', { club: b.dataset.claim }); await load(); await refresh(); } catch (e) { msg = e.message; view(); } }));
     root.querySelectorAll('[data-watch]').forEach((b) => (b.onclick = () => watch(b.dataset.watch)));
+    const gm = $('lgManage'); if (gm) gm.onclick = () => manage();
   }
+  function manage() {
+    const src = MANAGE[cur.mod]; if (!src) return;
+    const ov = document.createElement('div'); ov.id = 'emManage';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:9998;background:#000;display:flex;flex-direction:column';
+    ov.innerHTML = `<button class="gloss small" style="align-self:flex-end;margin:6px">Cerrar gestión ✕</button><iframe style="flex:1;border:0;width:100%" allow="fullscreen" src="${src}?mgr=online&api=${encodeURIComponent(base())}&league=${encodeURIComponent(cur.id)}"></iframe>`;
+    ov.querySelector('button').onclick = () => { ov.remove(); refresh(); };
+    document.body.append(ov);
+  }
+  window.addEventListener('message', (e) => { const d = e.data; if (d && d.type === 'em-online-watch' && cur) { const m = document.getElementById('emManage'); if (m) m.remove(); watch(d.match); } });
   function watch(matchId) {
     const src = LIVE[cur.mod]; if (!src) return;
     const ov = document.createElement('div');

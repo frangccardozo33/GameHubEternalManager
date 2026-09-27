@@ -2,6 +2,7 @@
 // empaquetado por server/tools/build-football.mjs. Todos los clubes los prepara la IA; el DT ajusta en vivo.
 import { TLM } from './vendor/football-core.js';
 import { makeEngine } from './vendor/football-engine.js';
+import { setHumans, exportState, command } from './futbol-manage.js';
 import { Lockstep, cleanAction, snapOf, LEAD_STEPS } from '../../01-futbol/online/lockstep.mjs';
 
 let Engine = null;
@@ -18,6 +19,7 @@ class FootballLive {
     if (!extras.cfg) { // los clubes IA arman XI y táctica una sola vez por jornada
       const key = f.cup ? 'c' + f.id : 'r' + c.state.currentMatchday;
       if (c.state.onlinePrep !== key) { c.prepareRound(); c.state.onlinePrep = key; }
+      for (const id of [f.homeId, f.awayId]) { const cl = c.state.clubs[id]; if (cl && cl.controlledBy === 'user') { if (cl.lineupMode === 'auto') TLM.autoLineup(c.state, cl); TLM.repairLineup(c.state, cl); } } // los DT humanos juegan con su once y tácticas
     }
     this.cfg = extras.cfg || TLM.buildMatchConfig(c.state, f);
     this.m = new (engine())(this.cfg.seed);
@@ -61,14 +63,15 @@ class FootballLive {
 
 export const futbol = {
   id: 'futbol',
-  create(seed) { const c = TLM.Career.create({ seed }); for (const cl of Object.values(c.state.clubs)) cl.controlledBy = 'ai'; return c; },
+  create(seed) { const c = TLM.Career.create({ seed }); for (const cl of Object.values(c.state.clubs)) cl.controlledBy = 'ai'; c.state.onlineSeason0 = c.state.season; return c; },
   load: (json) => TLM.Career.fromJSON(json),
   serialize: (c) => c.toJSON(),
   clubs: leagueIds,
   teams: (c) => leagueIds(c).map((id) => pub(teamOf(c, id))),
   standings: (c) => c.table().map((r) => ({ id: r.clubId, rank: r.pos, w: r.won, l: r.lost, t: r.drawn, diff: r.gd })),
   round(c) {
-    const s = c.state, cp = TLM.cupPendingRound(s);
+    const s = c.state; if (s.onlineSeason0 != null && s.season > s.onlineSeason0) return null; // la liga online dura una sola temporada
+    const cp = TLM.cupPendingRound(s);
     let fixtures, label;
     if (cp) { fixtures = cp.fixtures; label = TLM.fixtureLabel(s, fixtures[0]).round; }
     else { const r = c.round; if (r == null) return null; fixtures = TLM.fixturesOf(s, c.comp, r); label = `Jornada ${r}`; }
@@ -87,4 +90,5 @@ export const futbol = {
     return out.slice(-40);
   },
   makeLive: (c, matchId, startAt, extras, now) => new FootballLive(c, matchId, startAt, extras, now),
+  setHumans, exportState, command,
 };

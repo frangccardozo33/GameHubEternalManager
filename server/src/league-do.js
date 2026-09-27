@@ -24,6 +24,7 @@ export class LeagueDO extends DurableObject {
     this.mod = MODS[this.meta.module];
     const keys = [...Array(this.meta.chunks)].map((_, i) => 'lg' + i), m = await s.get(keys);
     this.league = this.mod.load(keys.map((k) => m.get(k)).join(''));
+    if (this.mod.setHumans) this.mod.setHumans(this.league, Object.keys(this.meta.clubs || {}));
   }
   async save() {
     const txt = this.mod.serialize(this.league), n = Math.ceil(txt.length / CHUNK), o = {};
@@ -88,6 +89,7 @@ export class LeagueDO extends DurableObject {
       }
     }
     if (committed) {
+      this.meta.rev = (this.meta.rev || 0) + 1;
       const r = this.mod.round(this.league);
       if (r && r.matches.every((f) => f.played)) {
         this.mod.finishRound(this.league);
@@ -131,7 +133,29 @@ export class LeagueDO extends DurableObject {
     if (!this.meta) return json({ error: 'liga sin inicializar' }, 404);
     if (path === 'clubs') return json({ clubs: this.mod.clubs(this.league) });
     if (path === 'state') return json(this.publicState());
-    if (path === 'humans' && req.method === 'POST') { this.meta.clubs = await req.json(); await this.saveMeta(); return json({ ok: true }); }
+    if (path === 'humans' && req.method === 'POST') {
+      this.meta.clubs = await req.json();
+      if (this.mod.setHumans) { this.mod.setHumans(this.league, Object.keys(this.meta.clubs)); this.meta.rev = (this.meta.rev || 0) + 1; await this.save(); } else await this.saveMeta();
+      return json({ ok: true });
+    }
+    // ---- gestión del club (mercado, plantel, tácticas previas): el cliente trabaja sobre una copia y manda órdenes que el servidor valida y aplica
+    if (path === 'rev') return json({ rev: this.meta.rev || 0, now: Date.now() });
+    if (path === 'career') {
+      if (!club) return json({ error: 'sin club' }, 403);
+      if (!this.mod.exportState) return json({ error: 'este módulo no tiene gestión online' }, 404);
+      const st = this.mod.exportState(this.league, club);
+      return new Response(`{"rev":${this.meta.rev || 0},"club":${JSON.stringify(club)},"now":${Date.now()},"startAt":${this.roundStart()},"state":${typeof st === 'string' ? st : JSON.stringify(st)}}`, { headers: { 'content-type': 'application/json' } });
+    }
+    if (path === 'cmd' && req.method === 'POST') {
+      if (!club) return json({ error: 'sin club' }, 403);
+      if (!this.mod.command) return json({ error: 'este módulo no tiene gestión online' }, 404);
+      const now = Date.now(), body = await req.json();
+      const locked = [...this.live.values()].some((lv) => lv.teamIdx && lv.teamIdx(club) >= 0);
+      let res;
+      try { res = this.mod.command(this.league, club, body, { now, locked, roundStart: this.roundStart() }); } catch (e) { return json({ ok: false, reason: String(e && e.message || e) }); }
+      if (res && res.mutated) { this.meta.rev = (this.meta.rev || 0) + 1; await this.save(); }
+      return json({ ok: !res || res.ok !== false, ...(res || {}), rev: this.meta.rev || 0 });
+    }
     if (path === 'orders') {
       if (!club || this.meta.module !== 'nfl') return json({ error: 'sin club' }, 403);
       const { cleanGameplan } = await import('./nfl.js');

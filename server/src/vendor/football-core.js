@@ -1677,6 +1677,8 @@ import './football-shim.js';
     const buyer = clubOf(state, o.fromClubId);
     amount = roundMoney(amount);
     if (!TLM.canSpend(buyer, amount)) return { ok: false, reason: 'Saldo insuficiente.' };
+    // vendedor HUMANO (liga online): la contraoferta le queda como oferta abierta para que responda
+    if (clubOf(state, o.toClubId).controlledBy === 'user') { o.amount = amount; o.status = 'OFFERED'; o.awaiting = null; o.counterAmount = null; o.history.push({ by: 'buyer', amount, round: state.currentMatchday }); o.expiresRound = state.currentMatchday + D().offerLifeRounds; return { ok: true, status: 'NEGOTIATING', pending: true }; }
     o.amount = amount; o.awaiting = 'seller'; o.history.push({ by: 'buyer', amount, round: state.currentMatchday }); o.counterAmount = null;
     // respuesta inmediata en el mismo turno (no se bloquea): vuelve a evaluarse ya
     const ev = evaluateOffer(state, o);
@@ -1727,6 +1729,8 @@ import './football-shim.js';
     if (action === 'counter') {
       const amt = roundMoney(counter);
       const buyer = clubOf(state, o.fromClubId);
+      // comprador HUMANO (liga online): decide él; la contraoferta le queda pendiente para aceptar o contraofertar
+      if (buyer.controlledBy === 'user') { o.history.push({ by: 'seller', amount: amt, round: state.currentMatchday }); o.status = 'NEGOTIATING'; o.counterAmount = amt; o.awaiting = null; o.expiresRound = state.currentMatchday + D().offerLifeRounds; return { ok: true, status: 'NEGOTIATING', buyerOffer: amt, human: true }; }
       // el comprador IA evalúa hasta dónde llega: máx = valor percibido según su perfil
       const p = state.players[o.playerId], ceil = buyerCeiling(state, buyer, p);
       o.history.push({ by: 'seller', amount: amt, round: state.currentMatchday });
@@ -2655,7 +2659,8 @@ import './football-shim.js';
       if (cup.status === 'qualifying' && leagueRound >= cup.cutRound) { finalize(state, cup, CUPS[id]); info.push({ cupId: id, qualified: true }); }
       if (cup.status !== 'active') continue;
       const idx = cup.slots.indexOf(leagueRound); if (idx < 0 || !cup.rounds[idx] || cup.rounds[idx].done) continue;
-      const mine = cup.rounds[idx].fixtureIds.map((fid) => state.fixtures[fid]).some((f) => f.homeId === state.currentClubId || f.awayId === state.currentClubId);
+      const hum = state.humanClubs && state.humanClubs.length ? state.humanClubs : [state.currentClubId];   // liga online: cualquier DT humano en la ronda la deja pendiente (se juega en vivo)
+      const mine = cup.rounds[idx].fixtureIds.map((fid) => state.fixtures[fid]).some((f) => hum.includes(f.homeId) || hum.includes(f.awayId));
       if (mine) { state.cupPending = { cupId: id, idx }; info.push({ cupId: id, idx, pending: true, name: cup.rounds[idx].name }); }
       else { const res = simulateRound(state, cup, idx); info.push({ cupId: id, idx, pending: false, name: cup.rounds[idx].name, results: res }); }
     }

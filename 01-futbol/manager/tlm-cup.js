@@ -278,7 +278,8 @@
       if (cup.status === 'qualifying' && leagueRound >= cup.cutRound) { finalize(state, cup, CUPS[id]); info.push({ cupId: id, qualified: true }); }
       if (cup.status !== 'active') continue;
       const idx = cup.slots.indexOf(leagueRound); if (idx < 0 || !cup.rounds[idx] || cup.rounds[idx].done) continue;
-      const mine = cup.rounds[idx].fixtureIds.map((fid) => state.fixtures[fid]).some((f) => f.homeId === state.currentClubId || f.awayId === state.currentClubId);
+      const hum = state.humanClubs && state.humanClubs.length ? state.humanClubs : [state.currentClubId];   // liga online: cualquier DT humano en la ronda la deja pendiente (se juega en vivo)
+      const mine = cup.rounds[idx].fixtureIds.map((fid) => state.fixtures[fid]).some((f) => hum.includes(f.homeId) || hum.includes(f.awayId));
       if (mine) { state.cupPending = { cupId: id, idx }; info.push({ cupId: id, idx, pending: true, name: cup.rounds[idx].name }); }
       else { const res = simulateRound(state, cup, idx); info.push({ cupId: id, idx, pending: false, name: cup.rounds[idx].name, results: res }); }
     }

@@ -85,7 +85,7 @@
   const done = (r, ok) => { UI.toast(r.ok ? ok : r.reason || 'No se pudo.', r.ok ? 'ok' : 'bad'); UI.career.save('auto'); UI.render(); };
   A.withdraw = (el) => done(TLM.withdrawOffer(S(), el.dataset.id), 'Oferta retirada.');
   A.acceptCounter = (el) => done(TLM.acceptCounter(S(), el.dataset.id), '¡Trato cerrado!');
-  A.sendCounter = (el) => { const r = TLM.counterOffer(S(), el.dataset.id, +$('co_' + el.dataset.id).value); UI.toast(r.ok ? (r.status === 'NEGOTIATING' ? 'El vendedor contraoferta ' + M(r.counter) : '¡Trato cerrado!') : r.reason, r.ok ? 'ok' : 'bad'); UI.career.save('auto'); UI.render(); };
+  A.sendCounter = (el) => { const r = TLM.counterOffer(S(), el.dataset.id, +$('co_' + el.dataset.id).value); UI.toast(r.ok ? (r.pending ? 'Contraoferta enviada: tiene que responder el otro DT.' : r.status === 'NEGOTIATING' ? 'El vendedor contraoferta ' + M(r.counter) : '¡Trato cerrado!') : r.reason, r.ok ? 'ok' : 'bad'); UI.career.save('auto'); UI.render(); };
   A.respond = (el) => {
     const v = el.dataset.v, r = TLM.respondToOffer(S(), el.dataset.id, v, v === 'counter' ? +$('rc_' + el.dataset.id).value : undefined);
     UI.toast(r.ok ? (v === 'accept' ? 'Jugador vendido.' : v === 'reject' ? 'Oferta rechazada.' : r.status === 'NEGOTIATING' ? 'El comprador acepta negociar: ' + M(r.buyerOffer) : 'Venta cerrada.') : r.reason, r.ok ? 'ok' : 'bad'); UI.career.save('auto'); UI.render();
