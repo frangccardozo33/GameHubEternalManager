@@ -9,7 +9,9 @@ import { fmtDay } from '../manager/dates.js';
 
 const tname = (g, id) => g.team(id).name;
 const tag = (g, id) => `${crestDot(g.team(id))}${esc(g.team(id).short)}`;
-const teamLink = (g, id) => `${crestDot(g.team(id))}${esc(g.team(id).name)}`;
+// Nombre del DT humano que dirige este equipo en una liga online (vacío en carrera local o si nadie lo tomó).
+const dtTag = (t) => (t && t.humanName ? `<small class="dt-tag">DT: ${esc(t.humanName)}</small>` : '');
+const teamLink = (g, id) => `${crestDot(g.team(id))}${esc(g.team(id).name)}${dtTag(g.team(id))}`;
 const PRESET_BO = { '1,1,1': 'Todas a 1 partido', '3,3,5': 'Al mejor de 3-3-5', '3,5,7': 'Al mejor de 3-5-7', '5,5,7': 'Al mejor de 5-5-7' };
 const line = (m, side, pid) => m.box[side].find(b => b.pid === pid);
 

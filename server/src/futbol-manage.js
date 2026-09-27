@@ -62,9 +62,9 @@ export function applyClubPatch(s, me, p) {
   TLM.repairLineup(s, cl);
 }
 
-export function setHumans(c, ids) {
+export function setHumans(c, ids, names = {}) {
   const set = new Set(ids); c.state.humanClubs = [...set];
-  for (const [id, cl] of Object.entries(c.state.clubs)) if (!cl.foreign) cl.controlledBy = set.has(id) ? 'user' : 'ai';
+  for (const [id, cl] of Object.entries(c.state.clubs)) { if (!cl.foreign) cl.controlledBy = set.has(id) ? 'user' : 'ai'; cl.humanName = set.has(id) ? (names[id] || null) : null; }
   for (const id of set) { const cl = c.state.clubs[id]; if (cl) { cl.lineupMode = cl.lineupMode || 'auto'; TLM.repairLineup(c.state, cl); } }
 }
 

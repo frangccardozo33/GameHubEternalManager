@@ -19,7 +19,10 @@ const isHuman = (g, id) => (g.humans || []).includes(id);
 const mineF = (g, st, fid) => { const f = fighter(g, fid); if (!f || f.stable !== st.id) throw new Error('Ese peleador no es de tu cuadra'); return f; };
 const fee = (f) => Math.round(4000 + f.rating * 3);
 
-export function setHumans(g, ids) { g.humans = ids.filter((id) => stable(g, id)); g.tradeProps ??= []; }
+export function setHumans(g, ids, names = {}) {
+  g.humans = ids.filter((id) => stable(g, id)); g.tradeProps ??= [];
+  for (const s of g.stables) s.humanName = g.humans.includes(s.id) ? (names[s.id] || null) : null;
+}
 
 const view = (f) => ({ id: f.id, name: `${f.firstName} ${f.lastName}`, nickname: f.nickname, country: f.country, age: f.age, division: f.division, style: f.style, rating: f.rating, potential: f.potential,
   attributes: f.attributes, record: f.record, condition: Math.round(f.condition == null ? 100 : f.condition), morale: Math.round(f.morale == null ? 80 : f.morale), photo: f.photo || null, tactics: f.tactics, program: f.program || null, fee: fee(f) });
@@ -31,7 +34,7 @@ export function exportState(g, club) {
     module: 'mma', me: club, stable: { id: st.id, name: st.name, color: st.color, money: Math.round(st.money), w: st.w, l: st.l }, programs: PROGRAMS, maxRoster: MAX_ROSTER,
     fighters: st.roster.map((id) => view(fighter(g, id))),
     market: g.market.slice().sort((a, b) => b.rating - a.rating).map(view),
-    stables: g.stables.map((s) => ({ id: s.id, name: s.name, color: s.color, w: s.w, l: s.l, human: isHuman(g, s.id), roster: s.roster.map((id) => { const f = fighter(g, id); return { id, name: `${f.firstName} ${f.lastName}`, division: f.division, rating: f.rating }; }) })),
+    stables: g.stables.map((s) => ({ id: s.id, name: s.name, color: s.color, w: s.w, l: s.l, human: isHuman(g, s.id), humanName: s.humanName || null, roster: s.roster.map((id) => { const f = fighter(g, id); return { id, name: `${f.firstName} ${f.lastName}`, division: f.division, rating: f.rating }; }) })),
     event: ev ? `Cartelera ${ev.n + 1}` : null, myMatch: mine.length ? mine[0].id : null,
     myBouts: mine.map((b) => ({ id: b.id, a: `${fighter(g, b.a).firstName} ${fighter(g, b.a).lastName}`, b: `${fighter(g, b.b).firstName} ${fighter(g, b.b).lastName}`, played: b.played })),
     tradeProps: (g.tradeProps || []).filter((t) => t.from === club || t.to === club),

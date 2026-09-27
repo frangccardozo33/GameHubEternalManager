@@ -9,7 +9,7 @@ export const chip = (t, cls = '') => `<span class="chip ${cls}">${t}</span>`;
 export const record = r => `${r.w}-${r.l}${r.t ? '-' + r.t : ''}`;
 export const inj = p => p.injury && p.injury.weeks > 0 ? `<span class="inj" title="${esc(p.injury.type)}">🩹 ${p.injury.weeks} sem</span>` : '';
 export const tdot = t => `<span class="tdot" style="background:${t.color}"></span>`;
-export const teamTag = t => `${tdot(t)}<b>${esc(t.short)}</b>`;
+export const teamTag = t => `${tdot(t)}<b>${esc(t.short)}</b>${t.humanName ? `<small class="dt-tag">DT: ${esc(t.humanName)}</small>` : ''}`;
 export const card = (title, body, { right = '', cls = '', id = '' } = {}) => `<section class="card ${cls}" ${id ? `id="${id}"` : ''}><div class="card-h"><h3>${title}</h3>${right}</div>${body}</section>`;
 export const money = v => `$${r1(v).toFixed(1)}M`;
 export const signed = v => (v > 0 ? '+' : '') + v;

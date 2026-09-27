@@ -35,7 +35,7 @@ E.boot('LRO · Gestión del equipo', (s, ui) => {
     <button class="b" onclick="E.cmd('tradePropose',[${tgt.id},+document.getElementById('tGive').value,+document.getElementById('tGet').value])">Proponer</button></div>` : '<p class="muted">Todavía no hay otros DT humanos en la liga.</p>'}
     ${props.map((p) => `<div class="item" style="margin-top:8px"><b>${esc(s.teams.find((t) => t.id === p.from).name)}</b> ofrece a <b>${esc(p.giveName)}</b> por <b>${esc(p.getName)}</b>
       <button class="b g" data-cmd="tradeAnswer" data-args='[${p.id},true]'>Aceptar</button><button class="b r" data-cmd="tradeAnswer" data-args='[${p.id},false]'>Rechazar</button></div>`).join('')}</div>
-  <div class="card"><h2>Campeonato</h2><table><tr><th>#</th><th>Equipo</th><th>Pts</th><th>Vict</th><th>Pod</th></tr>${[...s.teams].sort((a, b) => b.points - a.points || b.wins - a.wins).map((t, i) => `<tr ${t.id === me.id ? 'class="on"' : ''}><td>${i + 1}</td><td>${esc(t.name)}${t.human ? ' <span class="tag">DT</span>' : ''}</td><td>${t.points}</td><td>${t.wins}</td><td>${t.podiums}</td></tr>`).join('')}</table></div>`;
+  <div class="card"><h2>Campeonato</h2><table><tr><th>#</th><th>Equipo</th><th>Pts</th><th>Vict</th><th>Pod</th></tr>${[...s.teams].sort((a, b) => b.points - a.points || b.wins - a.wins).map((t, i) => `<tr ${t.id === me.id ? 'class="on"' : ''}><td>${i + 1}</td><td>${esc(t.name)}${t.human ? ` <span class="tag">DT${t.humanName ? ': ' + esc(t.humanName) : ''}</span>` : ''}</td><td>${t.points}</td><td>${t.wins}</td><td>${t.podiums}</td></tr>`).join('')}</table></div>`;
 });
 </script>
 </body></html>

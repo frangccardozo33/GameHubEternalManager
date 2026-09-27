@@ -20,9 +20,10 @@ export function withUser(lg, id, fn) {
   try { return fn(); } finally { h.offers = d.offers; d.userTeam = prev.userTeam; d.offers = prev.offers; }
 }
 
-export function setHumans(lg, ids) {
+export function setHumans(lg, ids, names = {}) {
   const d = lg.data, hs = ids.filter((id) => d.teams[id]); const before = (d.humans || []).join();
-  d.humans = hs; for (const id of hs) { const t = d.teams[id]; t.gameplan ||= makeGameplan(); withUser(lg, id, () => {}); }
+  d.humans = hs; for (const id of hs) { const t = d.teams[id]; t.gameplan ||= makeGameplan(); t.humanName = names[id] || null; withUser(lg, id, () => {}); }
+  for (const [id, t] of Object.entries(d.teams)) if (!hs.includes(id)) t.humanName = null;
   if (hs.length) d.userTeam = hs[0];
   // la copa se arma con el calendario: mientras no se jugó nada, se rehace para que entren todos los DT humanos
   if (before !== hs.join() && d.week === 0 && !Object.keys(d.results).length && d.phase === 'regular') lg.buildCalendar();

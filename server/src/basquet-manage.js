@@ -19,9 +19,9 @@ export function withUser(g, idx, fn) {
   try { return fn(); } finally { for (const k of CTX) h[k] = s[k]; s.userId = saved.userId; for (const k of CTX) s[k] = saved[k]; }
 }
 
-export function setHumans(g, ids) {
+export function setHumans(g, ids, names = {}) {
   const s = g.s, hs = ids.map(Number).filter((i) => s.teams[i]); s.humans = hs; s.tradeProps ??= [];
-  s.teams.forEach((t) => { t.isUser = hs.includes(t.id); });
+  s.teams.forEach((t) => { t.isUser = hs.includes(t.id); t.humanName = t.isUser ? (names[t.id] ?? names[String(t.id)] ?? null) : null; });
   for (const i of hs) { withUser(g, i, () => {}); g.ensureLineup(s.teams[i]); }
   if (hs.length) s.userId = hs[0];
 }

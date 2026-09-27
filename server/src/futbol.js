@@ -8,7 +8,7 @@ import { Lockstep, cleanAction, snapOf, LEAD_STEPS } from '../../01-futbol/onlin
 let Engine = null;
 const engine = () => (Engine ||= makeEngine(globalThis));
 const teamOf = (c, id) => c.state.clubs[id];
-const pub = (cl) => ({ id: cl.id, name: cl.name, short: cl.shortName, city: '', mascot: cl.name, color: cl.primaryColor, dark: cl.secondaryColor, crest: cl.crest });
+const pub = (cl) => ({ id: cl.id, name: cl.name, short: cl.shortName, city: '', mascot: cl.name, color: cl.primaryColor, dark: cl.secondaryColor, crest: cl.crest, humanName: cl.humanName || null });
 const leagueIds = (c) => c.comp.teams.map((t) => t.id || t);
 const claimableIds = (c) => leagueIds(c).filter((id) => !TLM.isClubBlocked(teamOf(c, id).name));
 
