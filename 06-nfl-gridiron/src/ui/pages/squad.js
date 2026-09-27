@@ -5,6 +5,7 @@ import { releasePlayer, deadCapFor, askFor, offerValue } from '../../manager/eco
 import { openNegotiation } from '../negotiation.js';
 import { avg, r1, pct } from '../../manager/util.js';
 import { PLACEHOLDER } from '../../manager/generator.js';
+import { EDITIONS } from '../../manager/cards.js';
 
 const statLine = p => {
   const s = p.season; if (!s.gp) return '<span class="muted">—</span>';
@@ -69,6 +70,15 @@ const depth = {
 };
 
 // ------------------------------------------------------------------ Player profile
+// Cartas especiales del jugador: las que puede EQUIPAR tu equipo (tiene la carta y también la base) y las que
+// están sueltas en otras franquicias (informativo). Se ganan jugando, no se compran (ver cards.js).
+function cardsPanel(lg, p) {
+  const all = lg.cardsOf(p.id), mine = all.filter(c => c.ownerTeamId === lg.data.userTeam), elsewhere = all.filter(c => c.ownerTeamId !== lg.data.userTeam);
+  if (!mine.length && !elsewhere.length) return '';
+  const row = (c, canEquip) => { const ed = EDITIONS.find(e => e.id === c.editionId), uses = ed.uses == null ? '' : ` · ${c.usesLeft}/${ed.uses} usos`;
+    return `<div class="kv"><span><b>${esc(ed.name)}</b>${uses}${canEquip ? '' : ` <small class="muted">(en ${esc(lg.team(c.ownerTeamId)?.short ?? '?')})</small>`}</span>${canEquip ? `<b>${p.equippedCardId === c.id ? `<button class="btn small" data-act="p-unequip-card" data-id="${p.id}">Quitar</button>` : `<button class="btn small primary" data-act="p-equip-card" data-id="${p.id}" data-cid="${c.id}">Equipar</button>`} <button class="btn small" data-act="p-list-card" data-cid="${c.id}">Vender</button></b>` : ''}</div>`; };
+  return card('Cartas especiales', `<p class="muted small">Salen jugando (rating de partido alto), no se compran. Para equipar una necesitás tener también al jugador en tu plantilla.</p><div class="kvs">${mine.map(c => row(c, true)).join('') || ''}${elsewhere.length ? elsewhere.map(c => row(c, false)).join('') : ''}</div>`);
+}
 const SUM_LABEL = { passAtt: 'Pases intentados', passComp: 'Pases completos', passYds: 'Yardas de pase', passTD: 'TD de pase', int: 'Intercepciones lanzadas', sacksTaken: 'Sacks recibidos', rushAtt: 'Carreras', rushYds: 'Yardas de carrera', rushTD: 'TD de carrera', fumbles: 'Fumbles', tgt: 'Targets', rec: 'Recepciones', recYds: 'Yardas de recepción', recTD: 'TD de recepción', drops: 'Drops', tackles: 'Tackles', sacks: 'Sacks', ints: 'Intercepciones', ff: 'Fumbles forzados', missed: 'Tackles fallados', fgm: 'FG convertidos', fga: 'FG intentados', xpm: 'XP convertidos', xpa: 'XP intentados', punts: 'Punts', puntYds: 'Yardas de punt' };
 const player = {
   id: 'player', title: 'Player Profile', icon: '◉',
@@ -92,6 +102,7 @@ const player = {
        <div class="kvs">${p.injury ? `<div class="kv"><span>Lesión</span><b class="loss">${esc(p.injury.type)} · ${p.injury.weeks} sem</b></div>` : '<div class="kv"><span>Lesión</span><b class="win">Sano</b></div>'}</div>`)}
       ${card('Contrato', c ? `<div class="kvs"><div class="kv"><span>Salario</span><b>${fmtM(c.salary)}</b></div><div class="kv"><span>Bonus de firma</span><b>${fmtM(c.bonus)}</b></div><div class="kv"><span>Años restantes</span><b>${c.years}${p.expiring ? ' (vencido)' : ''}</b></div><div class="kv"><span>Costo anual</span><b>${fmtM(capHit(p))}</b></div><div class="kv"><span>Dead cap si se libera</span><b>${fmtM(deadCapFor(p))}</b></div><div class="kv"><span>Valor de mercado</span><b>${fmtM(marketValue(p))}</b></div></div>` : `<div class="kvs"><div class="kv"><span>Sin contrato</span><b>Agente libre</b></div><div class="kv"><span>Pide</span><b>${fmtM(offerValue(ask))}/año · ${ask.years}a</b></div><div class="kv"><span>Valor de mercado</span><b>${fmtM(marketValue(p))}</b></div></div>`)}</div>
      <div class="grid g2">${card('Estadísticas de la temporada', `<div class="kvs">${sumRows}</div>`)}${card('Últimos partidos', p.log.length ? `<div class="glog">${[...p.log].reverse().map(l => `<div><small>${l.year} S${l.week}</small><b>${l.res} vs ${l.opp}</b><span>${esc(l.text)}</span></div>`).join('')}</div>` : '<div class="empty">Sin partidos registrados.</div>')}</div>
+     ${cardsPanel(lg, p)}
      ${card('Historial', histRows)}`;
   },
   handlers: {
@@ -101,6 +112,9 @@ const player = {
     'p-feat-rb'(app, el) { const f = app.lg.user.gameplan.featured; f.RB = f.RB === el.dataset.id ? null : el.dataset.id; app.commit(); app.refresh(); },
     'p-feat-t'(app, el) { const f = app.lg.user.gameplan.featured; f.target = f.target === el.dataset.id ? null : el.dataset.id; app.commit(); app.refresh(); },
     'p-compare'(app, el) { const c = app.ui.compare ??= []; if (!c.includes(el.dataset.id)) c.push(el.dataset.id); if (c.length > 3) c.shift(); app.toast(`Comparador: ${c.length} jugador(es). Ábrelo en Mercado.`); },
+    'p-equip-card'(app, el) { const r = app.lg.equipCard(app.lg.data.userTeam, el.dataset.id, el.dataset.cid); app.toast(r.ok ? 'Carta equipada.' : r.reason); if (r.ok) { app.commit(); app.refresh(); } },
+    'p-unequip-card'(app, el) { app.lg.equipCard(app.lg.data.userTeam, el.dataset.id, null); app.commit(); app.refresh(); },
+    'p-list-card'(app, el) { const price = prompt('¿Por cuánto la vendés?'); if (!price) return; const r = app.lg.listCard(app.lg.data.userTeam, el.dataset.cid, +price); app.toast(r.ok ? 'Carta puesta en venta.' : r.reason); if (r.ok) { app.commit(); app.refresh(); } },
   },
 };
 export const squadPages = [roster, depth, player];

@@ -1,6 +1,7 @@
 import { emptySeasonLine, emptyTeamSeason } from './generator.js';
 import { DEEP_PLAYS, SHORT_PLAYS } from '../sim/gameplan.js';
 import { r1, sum } from './util.js';
+import { cardBoostBits } from './cards.js';
 
 const ST = ['kickoff', 'punt', 'field-goal', 'extra-point', 'two-point'];
 const fmtSpot = (spot, tid) => `${tid} ${Math.round(spot <= 50 ? spot : 100 - spot)}`;
@@ -124,6 +125,16 @@ export class GameRecorder {
       players[pid] = { name: p.name, pos: p.pos, team: this.teamOf(pid), number: p.number, line: { ...l } };
     }
     const ranked = Object.entries(players).map(([pid, x]) => ({ pid, ...x, grade: this.grade(x.line), headline: this.headline(x.line, x.pos) })).filter(x => x.headline).sort((a, b) => b.grade - a.grade);
+    // Rating de partido 1-10 (estilo 365Scores): posición relativa en el ranking del partido + resultado, con algo de ruido.
+    const score = sim.drive.score, winIdx = score[0] === score[1] ? -1 : (score[0] > score[1] ? 0 : 1), n = ranked.length;
+    const rng = this.league.rng;
+    ranked.forEach((r, idx) => {
+      const pct = n > 1 ? 1 - idx / (n - 1) : 0.6;
+      const resBonus = winIdx < 0 ? 0 : r.team === winIdx ? 0.3 : -0.3;
+      const noiseMul = cardBoostBits(this.P[r.pid] || {}).noiseMul;
+      const rating = Math.max(1, Math.min(10, Math.round((6.2 + pct * 2.8 + resBonus + (rng ? rng.range(-0.3, 0.3) * noiseMul : 0)) * 10) / 10));
+      r.line.rating = rating;
+    });
     const top = ranked.slice(0, 5).map(({ pid, name, pos, team, number, grade, headline }) => ({ pid, name, pos, team, number, grade: r1(grade), headline }));
     const errors = this.errorList(players);
     return { score: [...sim.drive.score], overtime: sim.otPeriods > 0, teamStats: this.tg, players, drives: this.drives, scoring: this.scoring, errors, top, injuries: this.injuries, plays: sim.history.length, ...extra };

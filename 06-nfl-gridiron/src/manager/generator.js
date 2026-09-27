@@ -57,7 +57,8 @@ export function makePlayer(world, pos, level, { age = null, forceAge = false } =
   for (const k of ATTRIBUTES) ratings[k] = ci((PROFILE[pos][k] ?? .62) * 100 * (level / 78) + rng.range(-6, 6));
   const nm = pickName(world);
   const p = { id: world.nextId('p'), name: nm.name, nat: nm.nat, photo: PLACEHOLDER, pos, age, number: 0, ratings, ovr: 0, potential: 0, stamina: ci(normal(rng, 72, 9) - Math.max(0, age - 30) * 1.5, 40, 98), durability: ci(normal(rng, 76, 10), 40, 98),
-    contract: null, teamId: null, ovr0: 0, form: 50, fatigue: 0, morale: 60, greed: Math.round(rng.range(.92, 1.12) * 100) / 100, injury: null, season: emptySeasonLine(), history: [], log: [], acc: {}, joined: world.data.year };
+    contract: null, teamId: null, ovr0: 0, form: 50, fatigue: 0, morale: 60, greed: Math.round(rng.range(.92, 1.12) * 100) / 100, injury: null, season: emptySeasonLine(), history: [], log: [], acc: {}, joined: world.data.year,
+    xp: 0, careerGames: 0, equippedCardId: null, equippedCardLogic: null, equippedCardBoost: 0 };
   refreshOvr(p);
   const diff = level - p.ovr; if (diff) for (const k of KEY_ATTRS[pos]) ratings[k] = ci(ratings[k] + diff);
   refreshOvr(p); p.ovr0 = p.ovr;
@@ -69,7 +70,8 @@ export function makePlayerFromRoster(world, e) {
   const used = world.data.usedNames; used[e.n] = 1; used['s:' + surOf(e.n)] = 1;
   const p = { id: world.nextId('p'), name: e.n, nat: e.nat, photo: e.ph, look: { skin: e.sk, hair: e.hr, hs: e.hs, bald: !!e.bald, h: e.h, w: e.w }, rosterId: e.id, note: e.nt || '', pos: e.p, age: e.a, number: e.num || 0, ratings, ovr: 0, potential: 0,
     stamina: ci(normal(rng, 72, 9) - Math.max(0, e.a - 30) * 1.5, 40, 98), durability: ci(normal(rng, 76, 10), 40, 98), contract: null, teamId: null, ovr0: 0, form: 50, fatigue: 0, morale: 60, greed: Math.round(rng.range(.92, 1.12) * 100) / 100,
-    injury: null, season: emptySeasonLine(), history: [], log: [], acc: {}, joined: world.data.year };
+    injury: null, season: emptySeasonLine(), history: [], log: [], acc: {}, joined: world.data.year,
+    xp: 0, careerGames: 0, equippedCardId: null, equippedCardLogic: null, equippedCardBoost: 0 };
   refreshOvr(p); p.ovr0 = p.ovr; p.potential = Math.max(e.pt || p.ovr, p.ovr);
   return p;
 }

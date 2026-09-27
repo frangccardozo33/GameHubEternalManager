@@ -1,6 +1,7 @@
 import { ATTRIBUTES, POSITIONS, ovrAt, PHYSICAL, INJURY_TYPES } from './constants.js';
 import { clamp } from '../sim/math.js';
 import { avg, weightedPick } from './util.js';
+import { cardBoostBits } from './cards.js';
 
 export const DEPTH_KEYS = [...POSITIONS, 'KR', 'PR'];
 export const OFF_PACKAGES = { '11': { RB: 1, TE: 1, WR: 3 }, '12': { RB: 1, TE: 2, WR: 2 }, '21': { RB: 2, TE: 1, WR: 2 } };
@@ -56,9 +57,10 @@ export function depthIssues(league, team) {
 
 export function engineStats(p, { fatigue = p.fatigue, mods = {}, gp = null, side = 'O' } = {}) {
   const fatMul = 1 - Math.max(0, fatigue - 25) / 100 * .2, formMul = 1 + (p.form - 50) / 100 * .1;
+  const cardFlat = (cardBoostBits(p).flat || 0) / 100;
   const out = {};
   for (const k of ATTRIBUTES) {
-    let v = (p.ratings[k] ?? 55) / 100 * formMul * (PHYSICAL.has(k) ? fatMul : Math.sqrt(fatMul));
+    let v = (p.ratings[k] ?? 55) / 100 * formMul * (PHYSICAL.has(k) ? fatMul : Math.sqrt(fatMul)) + cardFlat;
     const m = mods[k]; if (m) v *= 1 + m;
     out[k] = clamp(v, .3, .98);
   }

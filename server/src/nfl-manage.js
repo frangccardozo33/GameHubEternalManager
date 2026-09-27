@@ -99,6 +99,11 @@ const OPS = {
     if (A.roster.length - t.giveA.length + t.giveB.length > ROSTER_MAX || B.roster.length - t.giveB.length + t.giveA.length > ROSTER_MAX) return { ok: false, message: 'Alguna plantilla superaría el máximo de jugadores.' };
     executeTrade(lg, { teamA: t.from, teamB: t.to, giveA: t.giveA, giveB: t.giveB }); return { ok: true, message: 'Traspaso completado.' };
   },
+  // cartas especiales: se ganan jugando, se pueden vender por separado del jugador (ver cards.js)
+  equipCard: (lg, i, a) => lg.equipCard(i, str(a[0], 20), a[1] ? str(a[1], 20) : null),
+  listCard: (lg, i, a) => lg.listCard(i, str(a[0], 20), num(a[1], 1, 1e9)),
+  unlistCard: (lg, i, a) => lg.unlistCard(i, str(a[0], 20)),
+  buyCard: (lg, i, a) => lg.buyCard(i, str(a[0], 20)),
 };
 
 export function command(lg, club, body, ctx) {

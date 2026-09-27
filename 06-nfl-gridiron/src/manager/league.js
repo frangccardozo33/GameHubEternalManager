@@ -11,6 +11,8 @@ import { clone, shuffle, sum } from './util.js';
 import { makeGameplan } from '../sim/gameplan.js';
 import { insertCup, advanceCup } from './cup.js';
 import { ROSTER } from './roster-data.js';
+import { EDITIONS, cardBoostBits, primeCardContext, gainMatchXP, rollCardDrop, consumeCardUse, clubCards, cardsOf, equipCard, unequipCard, listCard, unlistCard, buyCard } from './cards.js';
+export { EDITIONS, cardBoostBits };
 
 const hash = str => { let h = 2166136261; for (const c of String(str)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 const NUM_KEYS = Object.keys(emptySeasonLine());
@@ -22,7 +24,12 @@ export class League {
     this.world = new World(data);
     if (data.cup === undefined) data.cup = null;   // partidas guardadas antes de la copa: la primera es la de la temporada que viene
     // El staff técnico fue retirado del juego: se neutralizan sus efectos (rating fijo, sin sueldo ni vencimientos), también en partidas guardadas.
-    this._neutralizeStaff(); this._fixTicket();
+    this._neutralizeStaff(); this._fixTicket(); this._fixCards();
+  }
+  _fixCards() {
+    const d = this.data;
+    d.specialCards ??= {}; d.cardListings ??= {}; d.cardSeq ??= 0;
+    for (const p of Object.values(d.players || {})) { p.xp ??= 0; p.careerGames ??= 0; if (p.equippedCardId === undefined) p.equippedCardId = null; if (p.equippedCardLogic === undefined) p.equippedCardLogic = null; if (p.equippedCardBoost === undefined) p.equippedCardBoost = 0; }
   }
   _fixTicket() { for (const t of Object.values(this.data.teams || {})) if (t.finance) t.finance.ticket = 85; }
   _neutralizeStaff() { for (const s of Object.values(this.data.staff || {})) { s.rating = 50; s.salary = 0; s.years = 99; s.expiring = false; } }
@@ -30,7 +37,8 @@ export class League {
   uid(prefix) { return prefix + (++this.data.counters[prefix]); }
   static create({ userTeam = 'NTH', seasonLength = 14, seed = (Date.now() % 900000) + 1, quarterSeconds = 300 } = {}) {
     const data = { v: 1, rosterV: ROSTER.version, seed, rng: new Random(seed), counters: { p: 0, s: 0, g: 0, o: 0, n: 0 }, usedNames: {}, year: 2026, phase: 'regular', week: 0, seasonLength, userTeam, settings: { quarterSeconds },
-      teams: {}, players: {}, staff: {}, freeAgents: [], staffPool: [], teamOrder: [], calendar: [], results: {}, offers: [], newsLog: [], champions: [], userGames: [], weekStartRanks: {}, history: [] };
+      teams: {}, players: {}, staff: {}, freeAgents: [], staffPool: [], teamOrder: [], calendar: [], results: {}, offers: [], newsLog: [], champions: [], userGames: [], weekStartRanks: {}, history: [],
+      specialCards: {}, cardListings: {}, cardSeq: 0 };
     const lg = new League(data);
     seedTeams(lg.world); lg._neutralizeStaff(); lg._fixTicket();
     for (const t of Object.values(data.teams)) autoDepth(lg, t);
@@ -70,6 +78,13 @@ export class League {
     const u = this.data.userTeam;
     return this.data.calendar.map((w, i) => ({ week: i, label: w.label, type: w.type, fx: w.fixtures.find(f => f.home === u || f.away === u) ?? null }));
   }
+  // ---------- cartas especiales (drop por partido, dueño = franquicia, uso limitado, mercado propio)
+  clubCards(teamId) { return clubCards(this, teamId); }
+  cardsOf(pid) { return cardsOf(this, pid); }
+  equipCard(teamId, pid, cardId) { return equipCard(this, teamId, pid, cardId); }
+  listCard(teamId, cardId, price) { return listCard(this, teamId, cardId, price); }
+  unlistCard(teamId, cardId) { return unlistCard(this, teamId, cardId); }
+  buyCard(teamId, cardId) { return buyCard(this, teamId, cardId); }
   standings() {
     const rows = Object.values(this.data.teams).map(t => { const gp = t.record.w + t.record.l + t.record.t; return { id: t.id, name: t.name, ...t.record, gp, diff: t.record.pf - t.record.pa, pct: gp ? (t.record.w + t.record.t / 2) / gp : 0, form: t.form }; });
     rows.sort((a, b) => b.pct - a.pct || b.diff - a.diff || b.pf - a.pf || hash(a.id) - hash(b.id));
@@ -81,6 +96,7 @@ export class League {
   seedFor(fx) { return (this.data.seed * 31 + this.data.year * 97 + hash(fx.id)) >>> 0; }
   buildMatch(fx, { userGameplan = null, gameplans = null } = {}) {
     const d = this.data, home = d.teams[fx.home], away = d.teams[fx.away];
+    primeCardContext(this, fx);
     const providers = [new LineupProvider(this, home.id), new LineupProvider(this, away.id)];
     const gpFor = (t, o) => gameplans?.[t.id] ? clone(gameplans[t.id]) : t.id === d.userTeam ? clone(userGameplan || t.gameplan) : matchupGameplan(this, t, o);
     const gps = [gpFor(home, away), gpFor(away, home)];
@@ -106,7 +122,11 @@ export class League {
       t.finance.hype = Math.max(10, Math.min(95, t.finance.hype + (res === 'W' ? 4 : res === 'L' ? -3 : 0)));
       weeklyFinance(this, t, { home: i === 0, playoff: fx.type === 'semi' || fx.type === 'final' }); t._finWeek = d.week;
       const prov = providers[i];
-      for (const [pid, n] of Object.entries(prov.played)) { const p = P[pid]; p.season.gp++; p.form = Math.max(25, Math.min(80, p.form + (res === 'W' ? 3 : res === 'L' ? -2 : 0))); p.morale = Math.max(20, Math.min(95, p.morale + (res === 'W' ? 2 : -1))); }
+      for (const [pid, n] of Object.entries(prov.played)) {
+        const p = P[pid]; p.season.gp++; p.careerGames = (p.careerGames || 0) + 1; p.form = Math.max(25, Math.min(80, p.form + (res === 'W' ? 3 : res === 'L' ? -2 : 0)));
+        const immune = res === 'L' && cardBoostBits(p).immune;
+        if (!immune) p.morale = Math.max(20, Math.min(95, p.morale + (res === 'W' ? 2 : -1)));
+      }
       for (const [pid, f] of Object.entries(prov.fat)) P[pid].fatigue = Math.round(f * 10) / 10;
       for (const inj of prov.injuries) { const p = P[inj.pid]; p.injury = { type: inj.type, weeks: inj.weeks, total: inj.weeks }; p.form = Math.max(25, p.form - 6); if (t.id === d.userTeam) this.news(`Lesión: ${p.name} (${p.pos}) · ${inj.type} · ${inj.weeks} sem.`, 'injury', t.id); }
       // append to player logs and seasons
@@ -117,6 +137,10 @@ export class League {
       }
     }
     for (const t of summary.top) { const p = P[t.pid]; if (p) p.form = Math.min(80, p.form + 5); }
+    for (const [pid, x] of Object.entries(summary.players)) {
+      const p = P[pid], rating = x.line && x.line.rating; if (!p || rating == null) continue;
+      gainMatchXP(this, p, rating); rollCardDrop(this, p, rating); consumeCardUse(this, p);
+    }
     d.results[fx.id] = userIn ? summary : { id: fx.id, week: summary.week, year: d.year, type: fx.type, home: fx.home, away: fx.away, score, overtime: summary.overtime, winner: fx.winner, top: summary.top.slice(0, 2), slim: true };
     if (userIn) { d.userGames.push(fx.id); d.lastResult = fx.id; }
     return summary;
