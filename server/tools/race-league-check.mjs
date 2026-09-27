@@ -1,0 +1,15 @@
+import { MODS } from '../src/mods.js';
+const M = MODS.carreras; let g = M.create(5); g = M.load(M.serialize(g));
+console.log('liga bytes', M.serialize(g).length); const r = M.round(g); console.log(r.label, r.matches.length, M.clubs(g).length);
+const t0 = 1e6, id = r.matches[0].id;
+const L = M.makeLive(g, id, t0, {}, t0);
+console.log(L.onClient('3', { type: 'act', a: { k: 'cmd', cmd: 'tyres', val: 'push' } }, t0 + 30000));
+console.log(L.onClient('3', { type: 'act', a: { k: 'cmd', cmd: 'pit', val: 'next' } }, t0 + 40000).broadcast[0].a);
+const cfg = JSON.parse(JSON.stringify(L.persist()));
+const T = 1300e3; const t1 = Date.now();
+for (let now = t0; now < t0 + T && !L.finished; now += 100) L.advanceTo(now);
+console.log('cpu ms', Date.now() - t1);
+const L2 = M.makeLive(g, id, t0, cfg, t0 + T);
+console.log(L.finished, L2.finished, L.ls.step, L2.ls.step, L.ls.signature() === L2.ls.signature(), L.hud());
+console.log(L.commit()); M.finishRound(g); console.log(M.round(g).label, M.standings(g).slice(0, 3), M.results(g)[0].text, JSON.stringify(L.hello('3')).length);
+const sn = L2.snapNow(); console.log('snap bytes', JSON.stringify(sn).length);
