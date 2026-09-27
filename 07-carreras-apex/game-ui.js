@@ -224,12 +224,16 @@ function renderDrivers(){
         <div><strong>${Math.round(d.stats[5]*100)}</strong>AGR.</div>
         <div><strong>${Math.round(d.stats[6]*100)}</strong>REG.</div>
         <div><strong>${money(d.salary)}</strong>SALARIO</div>
-      </div><div class="train-box" style="grid-column:1/-1;padding:8px 0"><label style="font-size:11px;letter-spacing:1px">ENFOQUE DE ENTRENAMIENTO&nbsp;<select data-focus="${d.id}">${DRV_STAT_LABELS.map((l,i)=>`<option value="${i}" ${(d.focus==null?recommendedFocus(d):d.focus)===i?'selected':''}>${l} (${Math.round(d.stats[i]*100)})</option>`).join('')}</select></label> <span style="font-size:11px;color:#8a9">Progreso ${Math.round((d.tp||0)/2.5*100)}%</span></div><button class="release-driver" data-release="${d.id}" ${team.driverIds.length<=1?'disabled':''}>LIBERAR PILOTO</button>
+      </div><div class="train-box" style="grid-column:1/-1;padding:8px 0"><label style="font-size:11px;letter-spacing:1px">ENFOQUE DE ENTRENAMIENTO&nbsp;<select data-focus="${d.id}">${DRV_STAT_LABELS.map((l,i)=>`<option value="${i}" ${(d.focus==null?recommendedFocus(d):d.focus)===i?'selected':''}>${l} (${Math.round(d.stats[i]*100)})</option>`).join('')}</select></label> <span style="font-size:11px;color:#8a9">Progreso ${Math.round((d.tp||0)/2.5*100)}%</span></div>
+      <div style="grid-column:1/-1;font-size:11px;${(d.contractRounds||0)<=2?'color:#e08a5a':'color:#8a9'}">Contrato: ${d.contractRounds>0?d.contractRounds+' fechas restantes':(d.staleRounds>0?'vencido hace '+d.staleRounds+' fecha(s): puede irse solo si no renovás':'vencido')}</div>
+      <button class="release-driver" data-renew="${d.id}">RENOVAR CONTRATO (${money(Math.round(d.marketValue*.08))})</button>
+      <button class="release-driver" data-release="${d.id}" ${team.driverIds.length<=1?'disabled':''}>LIBERAR PILOTO</button>
     </div>`).join('');
   document.querySelectorAll('[data-focus]').forEach(s => s.onchange = () => { const d = Career.driversPool.find(x => x.id === Number(s.dataset.focus)); d.focus = Number(s.value); d.tp = 0; saveCareer(Career); renderDrivers(); });
   $('train-intensity').innerHTML = Object.entries(TRAIN_INTENSITY).map(([k,v]) => `<button data-intensity="${k}" class="${(Career.trainIntensity||'normal')===k?'active':''}">${v.label.toUpperCase()}${v.cost?' · '+money(v.cost)+'/fecha':''}</button>`).join('');
   document.querySelectorAll('[data-intensity]').forEach(b => b.onclick = () => { Career.trainIntensity = b.dataset.intensity; saveCareer(Career); renderDrivers(); });
   document.querySelectorAll('[data-release]').forEach(b=>b.onclick=()=>{const id=Number(b.dataset.release);openModal('<h2 id="modal-title">¿LIBERAR PILOTO?</h2><p>Volverá al mercado. Podrás contratar un reemplazo.</p><button class="primary" id="confirm-release">CONFIRMAR</button>');$('confirm-release').onclick=()=>{releaseDriver(id);closeModal();};});
+  document.querySelectorAll('[data-renew]').forEach(b=>b.onclick=()=>renewDriver(Number(b.dataset.renew)));
 }
 
 // ---- MARKET -----------------------------------------------------------
@@ -267,23 +271,49 @@ function releaseDriver(driverId){
   const team = playerTeam(Career);
   if (team.driverIds.length <= 1) return;
   const driver = Career.driversPool.find(d => d.id === driverId);
-  driver.teamId = null; driver.contractRounds = 0;
+  driver.teamId = null; driver.contractRounds = 0; driver.staleRounds = 0;
   team.driverIds = team.driverIds.filter(id => id !== driverId);
   if (team.activeDriverId === driverId) team.activeDriverId = team.driverIds[0];
   pushNews('SALIDA DEL EQUIPO', `${driver.name} deja ${team.name} y vuelve al mercado.`);
   saveCareer(Career);
   refreshAll();
 }
+// Renovar el contrato de un piloto de tu equipo: cuesta un % de su valor de mercado y reinicia las fechas restantes.
+function renewDriver(driverId){
+  const team = playerTeam(Career);
+  const driver = Career.driversPool.find(d => d.id === driverId);
+  if (!driver || driver.teamId !== team.id) return;
+  const cost = Math.round(driver.marketValue * .08);
+  if (!canAfford(team, cost)) { openModal('<h2 id="modal-title">FONDOS INSUFICIENTES</h2><p>No alcanza el presupuesto para renovar.</p>'); return; }
+  spend(team, cost);
+  driver.contractRounds = 6; driver.staleRounds = 0;
+  pushNews('RENOVACIÓN', `${driver.name} renueva contrato con ${team.name}.`);
+  saveCareer(Career);
+  refreshAll();
+}
 function refreshMarketDynamics(){
-  // Contracts tick down; some expire into free agency; AI teams occasionally sign free agents; values drift.
+  // Contracts tick down para TODOS los equipos, incluido el tuyo: ningún contrato es indefinido. Si vence y no lo renovás,
+  // el piloto queda "libre para negociar": con cada fecha que pasa sin renovar crece la chance de que se ofrezca solo a otro equipo.
   Career.driversPool.forEach(d => {
-    if (d.teamId !== null && d.teamId !== 0){
-      d.contractRounds = Math.max(0, (d.contractRounds||6) - 1);
-      if (d.contractRounds === 0 && Math.random() < .3){
-        const team = Career.teams[d.teamId];
-        if (team) team.driverIds = team.driverIds.filter(id => id !== d.id);
-        d.teamId = null;
-      }
+    if (d.teamId !== null){
+      d.contractRounds = Math.max(0, (d.contractRounds == null ? 6 : d.contractRounds) - 1);
+      if (d.contractRounds === 0){
+        d.staleRounds = (d.staleRounds||0) + 1;
+        if (d.teamId === 0){
+          if (d.staleRounds === 1) pushNews('CONTRATO VENCIDO', `${d.name} tiene el contrato vencido: renovalo pronto o puede firmar con otro equipo por su cuenta.`);
+          if (d.staleRounds >= 3 && Math.random() < 0.22){
+            const team = Career.teams[0];
+            team.driverIds = team.driverIds.filter(id => id !== d.id);
+            if (team.activeDriverId === d.id) team.activeDriverId = team.driverIds[0];
+            d.teamId = null; d.staleRounds = 0;
+            pushNews('SE FUE SOLO', `${d.name} se cansó de esperar la renovación y firmó por su cuenta con otro equipo.`);
+          }
+        } else if (Math.random() < .3){
+          const team = Career.teams[d.teamId];
+          if (team) team.driverIds = team.driverIds.filter(id => id !== d.id);
+          d.teamId = null; d.staleRounds = 0;
+        }
+      } else d.staleRounds = 0;
     }
     d.marketValue = Math.max(2000, Math.round(d.marketValue * (0.94 + Math.random()*.14)));
   });

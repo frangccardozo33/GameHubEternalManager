@@ -229,7 +229,7 @@ function makeTeam(index, def, isPlayer){
 function newCareer(){
   const driversPool = makeDriverPool();
   const teams = TEAM_DEFS.map((def,i) => makeTeam(i, def, i === 0));
-  teams.forEach(team => team.driverIds.forEach(did => { if (driversPool[did]) driversPool[did].teamId = team.id; }));
+  teams.forEach(team => team.driverIds.forEach(did => { if (driversPool[did]) { driversPool[did].teamId = team.id; driversPool[did].contractRounds = 6; } }));
   const shuffledTracks = [...TRACKS];
   const calendar = Array.from({length:TRACKS.length}, (_,i) => ({ round:i+1, trackId: shuffledTracks[i % shuffledTracks.length].id, completed:false, result:null, gridPenalty:false }));
   return {
